@@ -47,6 +47,12 @@ enum Stats {
     SERVER_AGE = "542416410794524675",
 }
 
+enum Dev {
+    TESTING = "691005081159598230",
+    LOGS = "1012732893879083138",
+    EMOTES = "1016777566322966549",
+}
+
 const Channels = {
     Cookie,
     Reception,
@@ -55,6 +61,7 @@ const Channels = {
     Yuqi,
     Events,
     Stats,
+    Dev
 }
 
 export default Channels;
