@@ -1,4 +1,4 @@
-import { Client, Message, GuildMember } from "discord.js/typings";
+import { Client, Message, GuildMember } from "discord.js";
 import Scope from "../util/scope";
 
 interface CommandMeta {

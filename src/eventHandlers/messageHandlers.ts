@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js/typings";
+import { Client, Message } from "discord.js";
 import { PREFIX } from "../util/config";
 import * as cmds from "../cmds";
 

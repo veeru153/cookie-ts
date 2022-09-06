@@ -1,4 +1,4 @@
-import { Message } from "discord.js/typings";
+import { Message } from "discord.js";
 import isDevEnv from "./isDevEnv";
 
 const handleError = (message: Message, err: Error) => {
