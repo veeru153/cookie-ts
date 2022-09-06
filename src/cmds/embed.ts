@@ -1,5 +1,5 @@
 import { EmbedBuilder } from "discord.js";
-import { Client, Message, Channel } from "discord.js";
+import { Client, Message, Channel } from "discord.js/typings";
 import handleError from "../util/handleError";
 import Scope from "../util/scope";
 import Command from "./_Command";

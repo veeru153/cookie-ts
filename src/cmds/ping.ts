@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Client, Message } from "discord.js/typings";
 import Scope from "../util/scope";
 import Command from "./_Command";
 

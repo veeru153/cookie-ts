@@ -11,7 +11,7 @@ client.on("ready", () => {
     const identity = process.env.NODE_ENV == "dev" ? "Cookie Dough" : "Cookie Bot";
     console.log(`READY! Logged in as ${identity}.`);
     console.log(`- Environment: ${env}`);
-    // console.log(Object.entries(cmds))
+    console.log(Object.entries(cmds))
 })
 
 client.on("error", console.log);
