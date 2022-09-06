@@ -1,5 +1,5 @@
 import Scope from "../util/scope";
-import { Client, Message, GuildMember } from "discord.js/typings";
+import { Client, Message, GuildMember } from "discord.js";
 
 interface CommandMeta {
     name: string,
@@ -31,9 +31,8 @@ class Command {
 
     _invoke = async (client: Client, message: Message, args: string[]) => {
         if(this._canUserInvokeCmd(message.member)) {
-
+            await this.run(client, message, args);
         }
-        await this.run(client, message, args);
     }
 }
 
