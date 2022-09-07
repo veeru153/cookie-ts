@@ -2,9 +2,10 @@ import { Client, Message } from "discord.js";
 import { PREFIX } from "../util/config";
 import * as cmds from "../cmds";
 import handleError from "../util/handleError";
+import updateServerAge from "../helper/updateServerAge";
 
 export const messageCreate = async (client: Client, message: Message) => {
-    // TODO: server age handler
+    await updateServerAge(client)
     if(message.author.bot) return;
     if(!message.content.startsWith(PREFIX)) {
         // TODO: xp handler
@@ -24,11 +25,11 @@ export const messageCreate = async (client: Client, message: Message) => {
     }
 }
 
-export const messageDelete = (message: Message) => {
-    // server age handler
+export const messageDelete = async (client: Client, message: Message) => {
+    await updateServerAge(client);
 }
 
-export const messageUpdate = (message: Message) => {
-    // server age handler
+export const messageUpdate = async (client: Client, message: Message) => {
+    await updateServerAge(client);
 }
 
