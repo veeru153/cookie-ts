@@ -1,0 +1,51 @@
+import { BaseChannel, CategoryChannel, Channel, Client, Emoji, GuildEmoji, Message, TextChannel } from "discord.js";
+import Scope from "../util/scope";
+import Command from "../cmds/_Command";
+import Channels from "../util/channels";
+import Constants from "../util/constants";
+
+export const updateEmotes = new Command({
+    name: "updateEmotes",
+    desc: "Force Update Emotes in #emotes",
+    scope: [ Scope.STAFF ]
+})
+
+updateEmotes.run = async (client: Client, message: Message, args: string[]) => {
+    let channel = await client.channels.resolve(Channels.Dev.EMOTES).fetch();
+    if(!channel.isTextBased()) throw new Error("Channel is not a TextChannel.");
+    channel = (channel as TextChannel);
+    await clearChannel(channel);
+
+    const emotes = await getEmotes(client);
+    sendEmotes(channel, emotes);
+    const animatedEmotes = await getEmotes(client, true);
+    sendEmotes(channel, animatedEmotes);
+    message.channel.send("Emotes Updated!");
+}
+
+const clearChannel = async (channel: TextChannel) => {
+    const msgs = await channel.messages.fetch();
+    await channel.bulkDelete(msgs);
+}
+
+const getEmotes = async (client: Client, animated = false) => {
+    const emotes = [];
+    const guild = client.guilds.cache.get(Constants.YUQICORD);
+    guild.emojis.cache.forEach((e: GuildEmoji) => {
+        if(animated)
+            return e.animated && emotes.push(e.toString());
+        
+        return !e.animated && emotes.push(e.toString());
+    });
+
+    return emotes;
+}
+
+const sendEmotes = (channel: TextChannel, emoteArr: Emoji[]) => {
+    const threshold = 6;
+    while(emoteArr.length > 0) {
+        const end = Math.min(emoteArr.length, threshold);
+        const consumed = emoteArr.splice(0, end);
+        channel.send(consumed.join("  "));
+    }
+}

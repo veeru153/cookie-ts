@@ -13,6 +13,7 @@ intents.add(
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildMessages,
 )
 
 export default intents;
