@@ -1,6 +1,7 @@
 import { Client, Message } from "discord.js";
 import { PREFIX } from "../util/config";
 import * as cmds from "../cmds";
+import handleError from "../util/handleError";
 
 export const messageCreate = async (client: Client, message: Message) => {
     // TODO: server age handler
@@ -14,8 +15,13 @@ export const messageCreate = async (client: Client, message: Message) => {
     let cmd = msg.shift();
     let args = [...msg];
 
-    if(Object.keys(cmds).includes(cmd)) 
-        (cmds[cmd])._invoke(client, message, args);
+    if(Object.keys(cmds).includes(cmd)) {
+        try {
+            (cmds[cmd])._invoke(client, message, args);
+        } catch (err) {
+            handleError(client, err);
+        }
+    }
 }
 
 export const messageDelete = (message: Message) => {

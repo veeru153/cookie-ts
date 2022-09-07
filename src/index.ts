@@ -1,8 +1,9 @@
-import { Client } from "discord.js";
+import { Client, GuildEmoji, Message } from "discord.js";
 import intents from "./util/intents";
 import partials from "./util/partials";
 import { messageCreate } from "./eventHandlers/messageHandlers";
 import * as cmds from "./cmds";
+import { emojiHandler } from "./eventHandlers/emojiHandlers";
 
 const client = new Client({ intents: intents, partials: partials });
 
@@ -16,7 +17,10 @@ client.on("ready", () => {
 
 client.on("error", console.log);
 client.on("debug", console.log);
-client.on("messageCreate", async (message) => { messageCreate(client, message) });
+client.on("messageCreate", async (message: Message) => { messageCreate(client, message) });
+client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(client, emoji) });
+client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(client, emoji) });
+client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { emojiHandler(client, newEmoji) });
 
 const TOKEN = process.env.NODE_ENV == "dev" ? process.env.DEV_TOKEN : process.env.TOKEN;
 client.login(TOKEN);

@@ -2,7 +2,8 @@ import { BaseChannel, CategoryChannel, Channel, Client, Emoji, GuildEmoji, Messa
 import Scope from "../util/scope";
 import Command from "../cmds/_Command";
 import Channels from "../util/channels";
-import Constants from "../util/constants";
+import { Errors, Guilds } from "../util/constants";
+import log from "../util/log";
 
 export const updateEmotes = new Command({
     name: "updateEmotes",
@@ -12,7 +13,7 @@ export const updateEmotes = new Command({
 
 updateEmotes.run = async (client: Client, message: Message, args: string[]) => {
     let channel = await client.channels.resolve(Channels.Dev.EMOTES).fetch();
-    if(!channel.isTextBased()) throw new Error("Channel is not a TextChannel.");
+    if(!channel.isTextBased()) throw new Error(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);
     await clearChannel(channel);
 
@@ -20,7 +21,10 @@ updateEmotes.run = async (client: Client, message: Message, args: string[]) => {
     sendEmotes(channel, emotes);
     const animatedEmotes = await getEmotes(client, true);
     sendEmotes(channel, animatedEmotes);
-    message.channel.send("Emotes Updated!");
+    log(client, {
+        title: "[Job] Update Emotes",
+        user: message ? message.author : client.user
+    })
 }
 
 const clearChannel = async (channel: TextChannel) => {
@@ -30,7 +34,7 @@ const clearChannel = async (channel: TextChannel) => {
 
 const getEmotes = async (client: Client, animated = false) => {
     const emotes = [];
-    const guild = client.guilds.cache.get(Constants.YUQICORD);
+    const guild = client.guilds.cache.get(Guilds.YUQICORD);
     guild.emojis.cache.forEach((e: GuildEmoji) => {
         if(animated)
             return e.animated && emotes.push(e.toString());

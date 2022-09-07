@@ -38,6 +38,6 @@ embed.run = async (client: Client, message: Message, args: string[]) => {
     
         channel.send({ embeds: [ content ]});
     } catch (err) {
-        handleError(message, err);
+        handleError(client, err);
     }
 }

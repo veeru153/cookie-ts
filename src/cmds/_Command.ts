@@ -1,4 +1,5 @@
 import { Client, Message, GuildMember } from "discord.js";
+import { Errors } from "../util/constants";
 import Scope from "../util/scope";
 
 interface CommandMeta {
@@ -22,12 +23,11 @@ class Command {
 
     _canUserInvokeCmd = (member: GuildMember) => {
         if (this.scope == undefined || this.scope == null || this.scope.length == 0)
-            throw new Error("Scope is null or empty.")
+            throw new Error(Errors.MISSING_SCOPE);
 
         for (let role of this.scope) {
-            if (!member.roles.cache.has(role)) {
-                throw new Error("Insufficient Permissions.");
-            }
+            if (!member.roles.cache.has(role)) 
+                throw new Error(Errors.MISSING_PERMS);
         }
 
         return true;

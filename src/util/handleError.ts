@@ -1,9 +1,12 @@
-import { Message } from "discord.js";
+import { Client, Message } from "discord.js";
 import isDevEnv from "./isDevEnv";
+import log from "./log";
 
-const handleError = (message: Message, err: Error) => {
-    isDevEnv() && message.channel.send(`Error: ${err.message}`);
-    console.error(`Error: ${err.message}`);
+const handleError = (client: Client, err: Error) => {
+    isDevEnv() && log(client, {
+        title: "ERROR",
+        desc: err.message
+    })
 }
 
 export default handleError;
