@@ -1,4 +1,4 @@
-import { BaseChannel, CategoryChannel, Channel, Client, Emoji, GuildEmoji, Message, TextChannel } from "discord.js";
+import { Client, Emoji, GuildEmoji, Message, TextChannel } from "discord.js";
 import Scope from "../util/scope";
 import Command from "../cmds/_Command";
 import Channels from "../util/channels";
@@ -12,7 +12,8 @@ export const updateEmotes = new Command({
 })
 
 updateEmotes.run = async (client: Client, message: Message, args: string[]) => {
-    let channel = await client.channels.resolve(Channels.Dev.EMOTES).fetch();
+    // TODO: Update channel reference when channel is public
+    let channel = await client.channels.resolve(Channels.Cookie.EMOTES).fetch();
     if(!channel.isTextBased()) throw new Error(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);
     await clearChannel(channel);

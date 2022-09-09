@@ -1,8 +1,3 @@
-enum Cookie {
-    TESTING = "691005081159598230",
-    BOT_LOG = "1012732893879083138",
-}
-
 enum Reception {
     INFO = "843217931286216735",
     ANNOUNCEMENTS = "426340078588264448",
@@ -47,7 +42,7 @@ enum Stats {
     SERVER_AGE = "542416410794524675",
 }
 
-enum Dev {
+enum Cookie {
     TESTING = "691005081159598230",
     LOGS = "1012732893879083138",
     EMOTES = "1016777566322966549",
@@ -60,8 +55,7 @@ const Channels = {
     Cookieland,
     Yuqi,
     Events,
-    Stats,
-    Dev
+    Stats
 }
 
 export default Channels;

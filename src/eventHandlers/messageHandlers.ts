@@ -3,14 +3,13 @@ import { PREFIX } from "../util/config";
 import * as cmds from "../cmds";
 import handleError from "../util/handleError";
 import updateServerAge from "../helper/updateServerAge";
+import updateChatXp from "../helper/updateChatXp";
 
 export const messageCreate = async (client: Client, message: Message) => {
-    await updateServerAge(client)
+    await updateServerAge(client);
     if(message.author.bot) return;
-    if(!message.content.startsWith(PREFIX)) {
-        // TODO: xp handler
-        return;
-    }
+    await updateChatXp(message);
+    if(!message.content.startsWith(PREFIX)) return;
 
     let msg = message.content.slice(PREFIX.length).split(" ");
     let cmd = msg.shift();
