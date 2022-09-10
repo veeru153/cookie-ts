@@ -10,5 +10,5 @@ export const ping = new Command({
 
 ping.run = async (client: Client, message: Message, args: string[]) => {
     const ping = Date.now() - message.createdTimestamp;
-    message.channel.send(`Pong! Network Latency: \`${ping}ms\``);
+    message.reply(`Pong! Network Latency: \`${ping}ms\``);
 }

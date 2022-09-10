@@ -16,7 +16,7 @@ const log = (client: Client, { title, user, desc }: Log) => {
     
     // TODO: Replace with actual logging system
     console.log(`LOG - [${user ? user.username : "Cookie"}] ${desc ?? ""}`);
-    client.channels.fetch(Channels.Dev.LOGS)
+    client.channels.fetch(Channels.Cookie.LOGS)
         .then((channel: TextChannel) => channel.send({ embeds: [embed] }))
         .catch((err) => { throw new Error(err) });
 }
