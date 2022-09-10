@@ -9,7 +9,7 @@ const updateServerAge = async (client: Client) => {
     const MS_IN_DAY = 86400000
     const age = Math.floor(ageMs/MS_IN_DAY);
 
-    const channelId = isDevEnv() ? Channels.Dev.TESTING : Channels.Reception.INFO;
+    const channelId = isDevEnv() ? Channels.Cookie.TESTING : Channels.Reception.INFO;
     const channel = await client.channels.fetch(channelId) as TextChannel;
     channel.setTopic(`:calendar_spiral: Server Age: ${age} Days`);
 }

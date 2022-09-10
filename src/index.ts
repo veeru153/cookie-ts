@@ -3,9 +3,10 @@ import intents from "./util/intents";
 import partials from "./util/partials";
 import { messageCreate, messageDelete, messageUpdate } from "./eventHandlers/messageHandlers";
 import * as cmds from "./cmds";
-import { emojiHandler } from "./eventHandlers/emojiHandlers";
+import { emojiHandler, Action } from "./eventHandlers/emojiHandlers";
 import { guildMemberAddHandler } from "./eventHandlers/guildMemberHandler";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./eventHandlers/messageReactionHandlers";
+import isDevEnv from "./util/isDevEnv";
 
 const client = new Client({ intents: intents, partials: partials });
 
@@ -17,14 +18,14 @@ client.on("ready", () => {
     // console.log(Object.entries(cmds))
 })
 
-client.on("error", console.log);
-client.on("debug", console.log);
+isDevEnv() && client.on("error", console.log);
+isDevEnv() && client.on("debug", console.log);
 client.on("messageCreate", async (message: Message) => { messageCreate(client, message) });
 client.on("messageDelete", async (message: Message) => { messageDelete(client, message) });
 client.on("messageUpdate", async (message: Message) => { messageUpdate(client, message) });
-client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(client, emoji) });
-client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(client, emoji) });
-client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { emojiHandler(client, newEmoji) });
+client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(client, emoji, Action.ADD) });
+client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(client, emoji, Action.REMOVE) });
+client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { emojiHandler(client, newEmoji, Action.UPDATE) });
 client.on("guildMemberAdd", async (member: GuildMember) => { guildMemberAddHandler(client, member) });
 client.on("messageReactionAdd", async (reaction: MessageReaction, user: User) => { 
     messageReactionAddHandler(client, reaction, user) 

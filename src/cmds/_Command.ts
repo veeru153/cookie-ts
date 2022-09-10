@@ -34,8 +34,11 @@ class Command {
     }
 
     _invoke = async (client: Client, message: Message, args: string[]) => {
-        if(this._canUserInvokeCmd(message.member)) {
+        try {
+            this._canUserInvokeCmd(message.member);
             await this.run(client, message, args);
+        } catch (err) {
+            throw err;   
         }
     }
 }

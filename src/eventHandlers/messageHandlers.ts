@@ -1,9 +1,9 @@
 import { Client, Message } from "discord.js";
 import { PREFIX } from "../util/config";
 import * as cmds from "../cmds";
-import handleError from "../util/handleError";
 import updateServerAge from "../helper/updateServerAge";
 import updateChatXp from "../helper/updateChatXp";
+import logger from "../util/logger";
 
 export const messageCreate = async (client: Client, message: Message) => {
     await updateServerAge(client);
@@ -16,10 +16,12 @@ export const messageCreate = async (client: Client, message: Message) => {
     let args = [...msg];
 
     if(Object.keys(cmds).includes(cmd)) {
+        const { username, discriminator, id } = message.author;
+        logger.info(`[Command] ${cmd} ran by User : ${username}#${discriminator} (${id})`);
         try {
             (cmds[cmd])._invoke(client, message, args);
         } catch (err) {
-            handleError(client, err);
+            logger.error(`[Command] ${cmd} - ${err}`);
         }
     }
 }

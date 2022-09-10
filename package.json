@@ -8,7 +8,7 @@
     "build": "tsc",
     "prestart": "yarn build",
     "start": "node -r dotenv/config .",
-    "dev": "nodemon -L --ext ts --exec \"NODE_ENV=dev yarn start\""
+    "dev": "nodemon -L --ext ts --exec \"NODE_ENV=dev yarn start | pino-pretty\""
   },
   "author": "veeru153",
   "license": "ISC",
@@ -16,7 +16,8 @@
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "firebase-admin": "^11.0.1"
+    "firebase-admin": "^11.0.1",
+    "pino": "^8.5.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.19",
