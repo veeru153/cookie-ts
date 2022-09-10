@@ -1,21 +1,16 @@
-import { Client, GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
-import intents from "./util/intents";
-import partials from "./util/partials";
+import { GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
 import { messageCreate, messageDelete, messageUpdate } from "./eventHandlers/messageHandlers";
-import * as cmds from "./cmds";
 import { emojiHandler, Action } from "./eventHandlers/emojiHandlers";
 import { guildMemberAddHandler } from "./eventHandlers/guildMemberHandler";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./eventHandlers/messageReactionHandlers";
 import isDevEnv from "./util/isDevEnv";
-
-const client = new Client({ intents: intents, partials: partials });
+import client from "./util/client";
 
 client.on("ready", () => {
     const env = process.env.NODE_ENV == "dev" ? "Development" : "Production";
     const identity = process.env.NODE_ENV == "dev" ? "Cookie Dough" : "Cookie";
     console.log(`READY! Logged in as ${identity}.`);
     console.log(`- Environment: ${env}`);
-    // console.log(Object.entries(cmds))
 })
 
 isDevEnv() && client.on("error", console.log);
@@ -33,6 +28,3 @@ client.on("messageReactionAdd", async (reaction: MessageReaction, user: User) =>
 client.on("messageReactionRemove", async (reaction: MessageReaction, user: User) => { 
     messageReactionRemoveHandler(client, reaction, user) 
 })
-
-const TOKEN = process.env.NODE_ENV == "dev" ? process.env.DEV_TOKEN : process.env.TOKEN;
-client.login(TOKEN);

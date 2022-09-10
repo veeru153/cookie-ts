@@ -17,7 +17,7 @@ export const messageCreate = async (client: Client, message: Message) => {
 
     if(Object.keys(cmds).includes(cmd)) {
         const { username, discriminator, id } = message.author;
-        logger.info(`[Command] ${cmd} ran by User : ${username}#${discriminator} (${id})`);
+        logger.info(`[Command] '${cmd}' ran by User : ${username}#${discriminator} (${id})`);
         try {
             (cmds[cmd])._invoke(client, message, args);
         } catch (err) {
