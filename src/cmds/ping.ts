@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Message } from "discord.js";
 import Scope from "../util/scope";
 import Command from "./_Command";
 
@@ -8,7 +8,7 @@ export const ping = new Command({
     scope: [ Scope.ALL ]
 })
 
-ping.run = async (client: Client, message: Message, args: string[]) => {
+ping.run = async (message: Message, args: string[]) => {
     const ping = Date.now() - message.createdTimestamp;
     message.reply(`Pong! Network Latency: \`${ping}ms\``);
 }

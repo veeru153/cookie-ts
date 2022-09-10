@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Message } from "discord.js";
 import logger from "../util/logger";
 import collections from "../util/collections";
 import Scope from "../util/scope";
@@ -17,7 +17,7 @@ const SECOND_IN_MS = 1000;
 const MULTIPLIER = 1.5;
 const GUARANTEE = 1;
 
-bake.run = async (client: Client, message: Message, args: string[]) => {
+bake.run = async (message: Message, args: string[]) => {
     try {
         const userId = message.author.id;
         const userRank = collections.RANKS.doc(userId);
@@ -70,7 +70,7 @@ const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookie
 
 const sendCooldownMsg = async (message: Message, timeDiff: number, cookies: number) => {
     const { username, discriminator, id } = message.author;
-    logger.info(`[Bake] ${username}#${discriminator} (${id}) is on cooldown`);
+    logger.info(`[Bake] User : ${username}#${discriminator} (${id}) is on cooldown`);
 
     const remainingMs = HALF_DAY_IN_MS - timeDiff;
 

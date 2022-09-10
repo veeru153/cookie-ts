@@ -15,16 +15,19 @@ client.on("ready", () => {
 
 isDevEnv() && client.on("error", console.log);
 isDevEnv() && client.on("debug", console.log);
-client.on("messageCreate", async (message: Message) => { messageCreate(client, message) });
-client.on("messageDelete", async (message: Message) => { messageDelete(client, message) });
-client.on("messageUpdate", async (message: Message) => { messageUpdate(client, message) });
-client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(client, emoji, Action.ADD) });
-client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(client, emoji, Action.REMOVE) });
-client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { emojiHandler(client, newEmoji, Action.UPDATE) });
-client.on("guildMemberAdd", async (member: GuildMember) => { guildMemberAddHandler(client, member) });
+
+client.on("messageCreate", async (message: Message) => { messageCreate(message) });
+client.on("messageDelete", async (message: Message) => { messageDelete(message) });
+client.on("messageUpdate", async (message: Message) => { messageUpdate(message) });
+client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(emoji, Action.ADD) });
+client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(emoji, Action.REMOVE) });
+client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { 
+    emojiHandler(newEmoji, Action.UPDATE)
+});
+client.on("guildMemberAdd", async (member: GuildMember) => { guildMemberAddHandler(member) });
 client.on("messageReactionAdd", async (reaction: MessageReaction, user: User) => { 
-    messageReactionAddHandler(client, reaction, user) 
+    messageReactionAddHandler(reaction, user) 
 })
 client.on("messageReactionRemove", async (reaction: MessageReaction, user: User) => { 
-    messageReactionRemoveHandler(client, reaction, user) 
+    messageReactionRemoveHandler(reaction, user) 
 })
