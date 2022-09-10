@@ -1,6 +1,6 @@
 import { Message, MessageReaction, User } from "discord.js";
 import logger from "../util/logger";
-import BiasRole from "../entities/BiasRole";
+import ReactionRole from "../entities/ReactionRole";
 import { BiasEmbeds, BiasRoles, Errors } from "../util/constants";
 
 export const ADD_ROLE = "ADD_ROLE";
@@ -13,13 +13,13 @@ export const reactionRoleHandler = async (reaction: MessageReaction, user: User,
     const message = await reaction.message.fetch();
     
     const { username, discriminator, id } = user;
-    logger.info(`[Role Reaction] ${username}#${discriminator} (${id}) reacted : ${reaction.emoji.name}: on ${message.id}`);
+    logger.info(`[Reaction Role Manager] ${username}#${discriminator} (${id}) reacted '${reaction.emoji.name}' on ${message.id}`);
 
     if(!(Object.values(BiasEmbeds) as String[]).includes(message.id)) return;
 
     const currUser = await reaction.message.guild.members.fetch(user);
     const emoji = reaction.emoji.name;
-    let biasRole: BiasRole;
+    let biasRole: ReactionRole;
 
     if(message.id === BiasEmbeds.MAIN)
         biasRole = Object.values(BiasRoles.Main).filter(r => r.emoji === emoji)[0];
@@ -43,7 +43,7 @@ export const reactionRoleHandler = async (reaction: MessageReaction, user: User,
             break;
 
         default:
-            logger.error(`[Role Reaction] ${Errors.ROLE_REACTION_UNKNOWN_ACTION}`);
+            logger.error(`[Reaction Role Manager] ${Errors.ROLE_REACTION_UNKNOWN_ACTION}`);
     }
 }
 
