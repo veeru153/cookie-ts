@@ -13,7 +13,8 @@ export const reactionRoleHandler = async (reaction: MessageReaction, user: User,
     const message = await reaction.message.fetch();
     
     const { username, discriminator, id } = user;
-    logger.info(`[Reaction Role Manager] ${username}#${discriminator} (${id}) reacted '${reaction.emoji.name}' on ${message.id}`);
+    const actionStr = action == ADD_ROLE ? "reacted" : "unreacted";
+    logger.info(`[Reaction Role Manager] ${username}#${discriminator} (${id}) ${actionStr} '${reaction.emoji.name}' on Message : ${message.id}`);
 
     if(!(Object.values(BiasEmbeds) as String[]).includes(message.id)) return;
 
