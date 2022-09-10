@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Message } from "discord.js";
 import Scope from "../util/scope";
 import Command from "./_Command";
 import * as jobs from "../jobs";
@@ -13,7 +13,7 @@ export const job = new Command({
 
 const ALLOWED_CHANNELS = Object.values(Channels.Kitchen) as string[];
 
-job.run = async (client: Client, message: Message, args: string[]) => {
+job.run = async (message: Message, args: string[]) => {
     const job = args[0];
     const { username, discriminator, id } = message.author;
 
@@ -28,7 +28,7 @@ job.run = async (client: Client, message: Message, args: string[]) => {
 
         try {
             message.reply(`Running Job: \`${job}\``);
-            await (jobs[job])._invoke(client, message, args);
+            await (jobs[job])._invoke(message, args);
             logger.info(`[Job] '${job}' ran successfully`);
         } catch (err) {
             logger.error(`[Job] Error while running '${job}' : ${err}`);

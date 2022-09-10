@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Message } from "discord.js";
 import Scope from "../util/scope";
 import Command from "./_Command";
 import * as cmds from "./index";
@@ -10,7 +10,7 @@ export const help = new Command({
     scope: [ Scope.ALL ] 
 })
 
-help.run = async (client: Client, message: Message, args: string[]) => {
+help.run = async (message: Message, args: string[]) => {
     const cmdList = Object.values(cmds);
     let res = "__**Commands:**__"
     for(let cmd of cmdList) {
