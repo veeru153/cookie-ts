@@ -1,11 +1,19 @@
 import { Client, GuildEmoji } from "discord.js";
-import handleError from "../util/handleError";
 import { updateEmotes } from "../jobs/updateEmotes";
+import logger from "../util/logger";
 
-export const emojiHandler = async (client: Client, emoji: GuildEmoji) => {
+export enum Action {
+    ADD = "added",
+    REMOVE = "removed",
+    UPDATE = "updated",
+}
+
+export const emojiHandler = async (client: Client, emoji: GuildEmoji, action: Action) => {
+    const { username, discriminator, id } = emoji.author;
+    logger.info(`[Emoji] ${emoji.name} (${emoji.id}) ${action} by User: ${username}#${discriminator} (${id})`);
     try {
         updateEmotes.run(client, null, null);
     } catch (err) {
-        handleError(client, err);
+        logger.error(`[Emoji] ${emoji.id} : ${err}`);
     }
 }

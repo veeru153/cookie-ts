@@ -1,6 +1,6 @@
-import { EmbedBuilder } from "discord.js";
-import { Client, Message, Channel } from "discord.js";
-import handleError from "../util/handleError";
+import { TextChannel } from "discord.js";
+import { Client, Message } from "discord.js";
+import logger from "../util/logger";
 import Scope from "../util/scope";
 import Command from "./_Command";
 
@@ -13,12 +13,12 @@ export const embed = new Command({
 embed.run = async (client: Client, message: Message, args: string[]) => {
     try {
         const isDiffChannel = ["-c", "--channel"].includes(args[0]);
-        let channel = null;
+        let channel: TextChannel = null;
         if(isDiffChannel) {
-            channel = message.mentions.channels.first();
+            channel = message.mentions.channels.first() as TextChannel;
             args.splice(0, 2);
         } else {
-            channel = message.channel;
+            channel = message.channel as TextChannel;
         }
         
         const isEdit = ["-e", "--edit"].includes(args[0]);
@@ -33,11 +33,13 @@ embed.run = async (client: Client, message: Message, args: string[]) => {
         
         if(isEdit) {
             msg.edit({ embeds: [ content ]});
+            logger.info(`[Embed] Updated (${msg.id}) in Channel : ${channel.name} (${channel.id})`);
             return;
         }
     
         channel.send({ embeds: [ content ]});
+        logger.info(`[Embed] Sent to Channel : ${channel.name} (${channel.id})`);
     } catch (err) {
-        handleError(client, err);
+        logger.error(`[Embed] ${err}`);
     }
 }
