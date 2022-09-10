@@ -1,4 +1,4 @@
-import { Client, Message, GuildMember } from "discord.js";
+import { Message, GuildMember } from "discord.js";
 import { Errors } from "../util/constants";
 import Scope from "../util/scope";
 
@@ -19,7 +19,7 @@ class Command {
         this.scope = scope;
     }
 
-    run = async (client: Client, message: Message, args: string[]) => {}
+    run = async (message: Message, args: string[]) => {}
 
     _canUserInvokeCmd = (member: GuildMember) => {
         if (this.scope == undefined || this.scope == null || this.scope.length == 0)
@@ -33,10 +33,10 @@ class Command {
         return true;
     }
 
-    _invoke = async (client: Client, message: Message, args: string[]) => {
+    _invoke = async (message: Message, args: string[]) => {
         try {
             this._canUserInvokeCmd(message.member);
-            await this.run(client, message, args);
+            await this.run(message, args);
         } catch (err) {
             throw err;   
         }

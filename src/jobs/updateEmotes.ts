@@ -1,4 +1,5 @@
-import { Client, Emoji, GuildEmoji, Message, TextChannel } from "discord.js";
+import { Emoji, GuildEmoji, Message, TextChannel } from "discord.js";
+import client from "../util/client";
 import Scope from "../util/scope";
 import Command from "../cmds/_Command";
 import Channels from "../util/channels";
@@ -11,16 +12,16 @@ export const updateEmotes = new Command({
     scope: [ Scope.STAFF ]
 })
 
-updateEmotes.run = async (client: Client, message: Message, args: string[]) => {
+updateEmotes.run = async (message: Message, args: string[]) => {
     // TODO: Update channel reference when channel is public
     let channel = await client.channels.resolve(Channels.Cookie.EMOTES).fetch();
     if(!channel.isTextBased()) throw new Error(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);
     await clearChannel(channel);
 
-    const emotes = await getEmotes(client);
+    const emotes = await getEmotes();
     sendEmotes(channel, emotes);
-    const animatedEmotes = await getEmotes(client, true);
+    const animatedEmotes = await getEmotes(true);
     sendEmotes(channel, animatedEmotes);
     log(client, {
         title: "[Job] Update Emotes",
@@ -33,7 +34,7 @@ const clearChannel = async (channel: TextChannel) => {
     await channel.bulkDelete(msgs);
 }
 
-const getEmotes = async (client: Client, animated = false) => {
+const getEmotes = async (animated = false) => {
     const emotes = [];
     const guild = client.guilds.cache.get(Guilds.YUQICORD);
     guild.emojis.cache.forEach((e: GuildEmoji) => {

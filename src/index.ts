@@ -1,38 +1,33 @@
-import { Client, GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
-import intents from "./util/intents";
-import partials from "./util/partials";
+import { GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
 import { messageCreate, messageDelete, messageUpdate } from "./eventHandlers/messageHandlers";
-import * as cmds from "./cmds";
 import { emojiHandler, Action } from "./eventHandlers/emojiHandlers";
 import { guildMemberAddHandler } from "./eventHandlers/guildMemberHandler";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./eventHandlers/messageReactionHandlers";
 import isDevEnv from "./util/isDevEnv";
-
-const client = new Client({ intents: intents, partials: partials });
+import client from "./util/client";
 
 client.on("ready", () => {
     const env = process.env.NODE_ENV == "dev" ? "Development" : "Production";
     const identity = process.env.NODE_ENV == "dev" ? "Cookie Dough" : "Cookie";
     console.log(`READY! Logged in as ${identity}.`);
     console.log(`- Environment: ${env}`);
-    // console.log(Object.entries(cmds))
 })
 
 isDevEnv() && client.on("error", console.log);
 isDevEnv() && client.on("debug", console.log);
-client.on("messageCreate", async (message: Message) => { messageCreate(client, message) });
-client.on("messageDelete", async (message: Message) => { messageDelete(client, message) });
-client.on("messageUpdate", async (message: Message) => { messageUpdate(client, message) });
-client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(client, emoji, Action.ADD) });
-client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(client, emoji, Action.REMOVE) });
-client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { emojiHandler(client, newEmoji, Action.UPDATE) });
-client.on("guildMemberAdd", async (member: GuildMember) => { guildMemberAddHandler(client, member) });
+
+client.on("messageCreate", async (message: Message) => { messageCreate(message) });
+client.on("messageDelete", async (message: Message) => { messageDelete(message) });
+client.on("messageUpdate", async (message: Message) => { messageUpdate(message) });
+client.on("emojiCreate", async (emoji: GuildEmoji) => { emojiHandler(emoji, Action.ADD) });
+client.on("emojiDelete", async (emoji: GuildEmoji) => { emojiHandler(emoji, Action.REMOVE) });
+client.on("emojiUpdate", async (_: GuildEmoji, newEmoji: GuildEmoji) => { 
+    emojiHandler(newEmoji, Action.UPDATE)
+});
+client.on("guildMemberAdd", async (member: GuildMember) => { guildMemberAddHandler(member) });
 client.on("messageReactionAdd", async (reaction: MessageReaction, user: User) => { 
-    messageReactionAddHandler(client, reaction, user) 
+    messageReactionAddHandler(reaction, user) 
 })
 client.on("messageReactionRemove", async (reaction: MessageReaction, user: User) => { 
-    messageReactionRemoveHandler(client, reaction, user) 
+    messageReactionRemoveHandler(reaction, user) 
 })
-
-const TOKEN = process.env.NODE_ENV == "dev" ? process.env.DEV_TOKEN : process.env.TOKEN;
-client.login(TOKEN);

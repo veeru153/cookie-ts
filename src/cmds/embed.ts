@@ -1,5 +1,4 @@
-import { TextChannel } from "discord.js";
-import { Client, Message } from "discord.js";
+import { TextChannel, Message } from "discord.js";
 import logger from "../util/logger";
 import Scope from "../util/scope";
 import Command from "./_Command";
@@ -10,7 +9,7 @@ export const embed = new Command({
     scope: [ Scope.STAFF ]
 })
 
-embed.run = async (client: Client, message: Message, args: string[]) => {
+embed.run = async (message: Message, args: string[]) => {
     try {
         const isDiffChannel = ["-c", "--channel"].includes(args[0]);
         let channel: TextChannel = null;

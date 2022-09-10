@@ -1,9 +1,10 @@
-import { Client, TextChannel } from "discord.js";
+import { TextChannel } from "discord.js";
+import client from "../util/client";
 import isDevEnv from "../util/isDevEnv";
 import Channels from "../util/channels";
 import { Guilds } from "../util/constants";
 
-const updateServerAge = async (client: Client) => {
+const updateServerAge = async () => {
     const guild = await client.guilds.fetch(Guilds.YUQICORD);
     const ageMs = Date.now() - guild.createdTimestamp;
     const MS_IN_DAY = 86400000

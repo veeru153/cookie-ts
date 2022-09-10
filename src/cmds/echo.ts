@@ -1,4 +1,4 @@
-import { Message, Client } from "discord.js";
+import { Message } from "discord.js";
 import Command from "./_Command";
 import Scope from "../util/scope";
 
@@ -8,7 +8,7 @@ export const echo = new Command({
     scope: [ Scope.STAFF ]
 })
 
-echo.run = async (client: Client, message: Message, args: string[]) => {
+echo.run = async (message: Message, args: string[]) => {
     const isDiffChannel = ["-c", "--channel"].includes(args[0]);
     let channel = null;
     if(isDiffChannel) {
