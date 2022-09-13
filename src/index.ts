@@ -5,6 +5,7 @@ import { guildMemberAddHandler } from "./eventHandlers/guildMemberHandler";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./eventHandlers/messageReactionHandlers";
 import isDevEnv from "./util/isDevEnv";
 import client from "./util/client";
+import { server } from "./server";
 
 client.on("ready", () => {
     const env = process.env.NODE_ENV == "dev" ? "Development" : "Production";
@@ -31,3 +32,5 @@ client.on("messageReactionAdd", async (reaction: MessageReaction, user: User) =>
 client.on("messageReactionRemove", async (reaction: MessageReaction, user: User) => { 
     messageReactionRemoveHandler(reaction, user) 
 })
+
+server();
