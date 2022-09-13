@@ -1,14 +1,14 @@
 import express, { Request, Response } from "express";
 
-const server = express();
+const app = express();
 
-server.all('/', (req: Request, res: Response) => {
+app.all('/', (req: Request, res: Response) => {
     res.send("Ready! Cookie Bot is online!");
 })
 
-const PORT = 3000;
-export const keepAlive = () => {
-    server.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+export const server = () => {
+    app.listen(PORT, () => {
         console.log("Server is ready!");
     })
 }
