@@ -3,6 +3,7 @@ import logger from "../util/logger";
 import collections from "../util/collections";
 import Scope from "../util/scope";
 import Command from "./_Command";
+import { getUserLogString } from "../helpers";
 
 export const bake = new Command({
     name: "bake",
@@ -60,8 +61,7 @@ bake.run = async (message: Message, args: string[]) => {
 }
 
 const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookies: number) => {
-    const { username, discriminator, id } = message.author;
-    logger.info(`[Bake] ${username}#${discriminator} (${id}) baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
+    logger.info(`[Bake] ${getUserLogString(message.author)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
 
     const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
     const msg = `**Cookies Baked!**\nYou baked ${freshCookies} ${cookieStr}.\n**🍪 Total Cookies: ${cookies}**`;
@@ -69,8 +69,7 @@ const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookie
 }
 
 const sendCooldownMsg = async (message: Message, timeDiff: number, cookies: number) => {
-    const { username, discriminator, id } = message.author;
-    logger.info(`[Bake] User : ${username}#${discriminator} (${id}) is on cooldown`);
+    logger.info(`[Bake] User : ${getUserLogString(message.author)} is on cooldown`);
 
     const remainingMs = HALF_DAY_IN_MS - timeDiff;
 

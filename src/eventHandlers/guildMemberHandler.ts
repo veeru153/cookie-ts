@@ -1,7 +1,7 @@
 import { GuildMember, TextChannel } from "discord.js";
 import client from "../util/client";
 import Channels from "../util/channels";
-import { mentionChannelWithId } from "../helper";
+import { mentionChannelWithId } from "../helpers";
 import isDevEnv from "../util/isDevEnv";
 
 export const guildMemberAddHandler = async (member: GuildMember) => {

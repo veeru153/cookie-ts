@@ -23,10 +23,6 @@ updateEmotes.run = async (message: Message, args: string[]) => {
     sendEmotes(channel, emotes);
     const animatedEmotes = await getEmotes(true);
     sendEmotes(channel, animatedEmotes);
-    log(client, {
-        title: "[Job] Update Emotes",
-        user: message ? message.author : client.user
-    })
 }
 
 const clearChannel = async (channel: TextChannel) => {

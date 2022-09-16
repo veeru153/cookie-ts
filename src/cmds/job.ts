@@ -4,6 +4,7 @@ import Command from "./_Command";
 import * as jobs from "../jobs";
 import logger from "../util/logger";
 import Channels from "../util/channels";
+import { getUserLogString } from "../helpers";
 
 export const job = new Command({
     name: "job",
@@ -15,16 +16,15 @@ const ALLOWED_CHANNELS = Object.values(Channels.Kitchen) as string[];
 
 job.run = async (message: Message, args: string[]) => {
     const job = args[0];
-    const { username, discriminator, id } = message.author;
 
     if(!ALLOWED_CHANNELS.includes(message.channel.id)) {
-        logger.info(`[Job] User : ${username}#${discriminator} (${id}) tried running '${job}' outside allowed channels`);
+        logger.info(`[Job] User : ${getUserLogString(message.author)} tried running '${job}' outside allowed channels`);
         return;
     }
 
     args.shift();
     if(Object.keys(jobs).includes(job)) {
-        logger.info(`[Job] '${job}' ran by User : ${username}#${discriminator} (${id})`);
+        logger.info(`[Job] '${job}' ran by User : ${getUserLogString(message.author)}`);
 
         try {
             message.reply(`Running Job: \`${job}\``);

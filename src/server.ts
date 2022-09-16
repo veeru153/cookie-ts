@@ -9,6 +9,6 @@ app.all('/', (req: Request, res: Response) => {
 const PORT = process.env.PORT || 3000;
 export const server = () => {
     app.listen(PORT, () => {
-        console.log("Server is ready!");
+        console.log(`Server is ready! Listening on PORT: ${PORT}`);
     })
 }
