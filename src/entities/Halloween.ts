@@ -1,4 +1,4 @@
-import { CollectorFilter, Message, TextChannel } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import client from "../util/client";
 import Channels from "../util/channels";
 import isDevEnv from "../util/isDevEnv";
@@ -11,10 +11,18 @@ class _Halloween {
     status: boolean;
     START_DATE_MS: Date;
     END_DATE_MS: Date;
+    eventCollection: FirebaseFirestore.CollectionReference;
+    eventDataRef: FirebaseFirestore.DocumentReference;
+    eventData: FirebaseFirestore.DocumentData;
 
     constructor() {
         this.START_DATE_MS = new Date('2022-10-01T00:00:00.000+09:00'); 
         this.END_DATE_MS = new Date('2022-10-31T23:59:59.000Z');
+
+        collections.EVENTS.doc("HALLOWEEN_2022").onSnapshot(async (snapshot) => {
+            this.eventDataRef = snapshot.ref;
+            this.eventData = snapshot;
+        })
     }
 
     __eventIsLive = (status?: boolean) => {
@@ -48,12 +56,14 @@ class _Halloween {
         const CANDY_COUNT = randomNumIn(5, 10);
 
         try {
-            const userInventory = collections.INVENTORY.doc(message.author.id);
-            const userInventoryData = await userInventory.get();
+            const userData = this.eventData[message.author.id];
+            const prevCandies = userData.candies;
 
-            const prevCandies = userInventoryData.data().eventTokens ?? 0;
-            await userInventory.update({
-                eventTokens: prevCandies + CANDY_COUNT,
+            userData.candies = prevCandies + CANDY_COUNT;
+
+
+            await this.eventDataRef.update({
+                [`${message.author.id}.candies`]: prevCandies + CANDY_COUNT
             })
 
             const replyMsg = await message.reply(`You collected ${CANDY_COUNT} candies.\n**Total Candies : ${prevCandies + CANDY_COUNT}`);
@@ -70,8 +80,10 @@ class _Halloween {
     }
 
     summon = async () => {
+        const candiesRequested = randomNumIn(2, 6);
+
         const CHANNEL_ID = isDevEnv() ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
-        const SUMMON_START_MSG = "**A mysterious spirit has appeared!**";
+        const SUMMON_START_MSG = `**A mysterious spirit has appeared!** They want **${candiesRequested}** candies.`;
         const SUMMON_TIMEOUT_MS = randomNumIn(15, 20) * 1000;
         const SUMMON_CMDS = ['trick', 'treat'].map(c => PREFIX + c);
 
@@ -86,17 +98,56 @@ class _Halloween {
 
         collector.on('collect', async (message: Message) => {
             const choice = message.content.slice(PREFIX.length);
-            if(choice == "trick") this.__trick();
-            if(choice == "treat") this.__treat();
+            if(choice == "trick") await this.__trick(message);
+            if(choice == "treat") await this.__treat(message, candiesRequested);
         });
     }
 
-    __trick = () => {
-        
+    __trick = async (message: Message) => {
+        const rngPoints = randomNumIn(-2, 3);
+
+        const REPLY_MSGS = {
+            NEGATIVE: `😒 The spirit was not amused.`,
+            POSITIVE: `👏 The spirit was amused and has given you ${rngPoints} coins.`,
+        }
+
+        const userData = this.eventData[message.author.id];
+        const { coins: prevCoins, points: prevPoints } = userData;
+        let replyMsg: Message;
+
+        await this.eventDataRef.update({
+            [`${message.author.id}.points`]: prevPoints + rngPoints,
+            [`${message.author.id}.coins`]: prevCoins + Math.max(0, rngPoints)
+        })
+
+        if(rngPoints <= 0) 
+            replyMsg = await message.reply(REPLY_MSGS.NEGATIVE);
+        else
+            replyMsg = await message.reply(REPLY_MSGS.POSITIVE);
+
+        setTimeout(() => replyMsg.delete(), 7500);
     }
 
-    __treat = () => {
+    __treat = async (message: Message, candiesRequested: number) => {
+        const userData = this.eventData[message.author.id];
+        const { candies: prevCandies, coins: prevCoins, points: prevPoints } = userData;
+        const userHasEnoughCandies = prevCandies >= candiesRequested;
 
+        if(userHasEnoughCandies) {
+            await this.eventDataRef.update({
+                [`${message.author.id}.candies`]: prevCandies - candiesRequested,
+                [`${message.author.id}.coins`]: prevCoins + 1,
+                [`${message.author.id}.points`]: prevPoints + 1,
+            })
+
+            const replyMsg = await message.reply(`**Treat!**\nYou exchanged ${candiesRequested} candies with the spirit for 1 coin.\nTotal Candies: ${prevCandies - candiesRequested}\nTotal Coins: ${prevCoins + 1}`);
+
+            setTimeout(() => replyMsg.delete(), 7500);
+            return;
+        }
+
+        const replyMsg = await message.reply("You don't have enough candies T-T");
+        setTimeout(() => replyMsg.delete(), 7500);
     }
 }
 
