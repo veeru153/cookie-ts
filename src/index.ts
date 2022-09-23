@@ -6,12 +6,14 @@ import { messageReactionAddHandler, messageReactionRemoveHandler } from "./event
 import isDevEnv from "./util/isDevEnv";
 import client from "./util/client";
 import { server } from "./server";
+import logger from "./util/logger";
 
 client.on("ready", () => {
     const env = process.env.NODE_ENV == "dev" ? "Development" : "Production";
     const identity = process.env.NODE_ENV == "dev" ? "Cookie Dough" : "Cookie";
     console.log(`READY! Logged in as ${identity}.`);
     console.log(`- Environment: ${env}`);
+    logger.info(`${identity} is online!`)
 })
 
 isDevEnv() && client.on("error", console.log);

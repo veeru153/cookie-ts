@@ -1,2 +1,2 @@
 export * from "./idParsers";
-export * from "./randomNumIn";
+export * from "./numberUtils";

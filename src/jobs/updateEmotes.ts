@@ -4,7 +4,6 @@ import Scope from "../util/scope";
 import Command from "../cmds/_Command";
 import Channels from "../util/channels";
 import { Errors, Guilds } from "../util/constants";
-import log from "../util/log";
 
 export const updateEmotes = new Command({
     name: "updateEmotes",
@@ -13,7 +12,6 @@ export const updateEmotes = new Command({
 })
 
 updateEmotes.run = async (message: Message, args: string[]) => {
-    // TODO: Update channel reference when channel is public
     let channel = await client.channels.resolve(Channels.Reception.EMOTES).fetch();
     if(!channel.isTextBased()) throw new Error(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);

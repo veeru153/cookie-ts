@@ -19,9 +19,9 @@ class _Halloween {
         this.START_DATE_MS = new Date('2022-10-01T00:00:00.000+09:00'); 
         this.END_DATE_MS = new Date('2022-10-31T23:59:59.000Z');
 
-        collections.EVENTS.doc("HALLOWEEN_2022").onSnapshot(async (snapshot) => {
+        collections.EVENTS.doc("HALLOWEEN_2022").get().then((snapshot) => {
             this.eventDataRef = snapshot.ref;
-            this.eventData = snapshot;
+            this.eventData = snapshot.data();
         })
     }
 
@@ -30,6 +30,19 @@ class _Halloween {
 
         if(status != null) this.status = status;
         return this.status;
+    }
+
+    __initUser = async (id: string) => {
+        if(this.eventData[id]) return;
+        await this.eventDataRef.update({
+            [`${id}`]: {
+                candies: 0,
+                coins: 0,
+                points: 0
+            }
+        })
+
+        this.eventData = (await this.eventDataRef.get()).data();
     }
 
     dropCandies = async () => {
@@ -47,15 +60,30 @@ class _Halloween {
             await dropStartMsg.delete();
         }, DROP_TIMEOUT_MS);
 
+        const alreadyInteracted = [];
+
         collector.on('collect', async (message: Message) => {
-            this.__handleCandyCollection(message);
+            await this.__initUser(message.author.id);
+            if(alreadyInteracted.includes(message.author.id)) {
+                const replyMsg = await message.reply("You have already collected candies from this bag!");
+                setTimeout(async () => {
+                    if(replyMsg && replyMsg.deletable) await replyMsg.delete();
+                    if(message && message.deletable) await message.delete();
+                }, 5000)
+                return;
+            }
+            alreadyInteracted.push(message.author.id);
+            await this.__handleCandyCollection(message);
         });
+
+        collector.on('end', async () => {
+            alreadyInteracted.length = 0;
+        })
     }
 
-    __handleCandyCollection = async (message: Message) => {
-        const CANDY_COUNT = randomNumIn(5, 10);
-
+    __handleCandyCollection = async (message: Message) => {        
         try {
+            const CANDY_COUNT = randomNumIn(5, 10);
             const userData = this.eventData[message.author.id];
             const prevCandies = userData.candies;
 
@@ -66,16 +94,16 @@ class _Halloween {
                 [`${message.author.id}.candies`]: prevCandies + CANDY_COUNT
             })
 
-            const replyMsg = await message.reply(`You collected ${CANDY_COUNT} candies.\n**Total Candies : ${prevCandies + CANDY_COUNT}`);
+            const replyMsg = await message.reply(`You collected ${CANDY_COUNT} candies.\n**Total Candies : ${prevCandies + CANDY_COUNT}**`);
             logger.info(`[Halloween Event] User : ${getUserLogString(message.author)} collected ${CANDY_COUNT} candies. Total Candies : ${prevCandies + CANDY_COUNT}`);
 
             setTimeout(async () => {
-                await replyMsg.delete();
-                await message.delete();
+                if(replyMsg && replyMsg.deletable) await replyMsg.delete();
+                if(message && message.deletable) await message.delete();
             }, 5000);
 
         } catch (err) {
-            logger.error(`[Halloween] User : ${getUserLogString(message.author)} could not collect candies. Check console.`);
+            logger.error(`[Halloween] User : ${getUserLogString(message.author)} could not collect candies - ${err}`);
         }
     }
 
@@ -96,58 +124,88 @@ class _Halloween {
             await summonStartMsg.delete();
         }, SUMMON_TIMEOUT_MS);
 
+        const alreadyInteracted = [];
+
         collector.on('collect', async (message: Message) => {
+            await this.__initUser(message.author.id);
+            if(alreadyInteracted.includes(message.author.id)) {
+                const replyMsg = await message.reply("You already interacted with the spirit!");
+                setTimeout(async () => {
+                    if(replyMsg && replyMsg.deletable) await replyMsg.delete();
+                    if(message && message.deletable) await message.delete();
+                }, 5000);
+                return;
+            } 
+
+            alreadyInteracted.push(message.author.id);
             const choice = message.content.slice(PREFIX.length);
             if(choice == "trick") await this.__trick(message);
             if(choice == "treat") await this.__treat(message, candiesRequested);
         });
+
+        collector.on('end', async () => {
+            alreadyInteracted.length = 0;
+        })
     }
 
     __trick = async (message: Message) => {
-        const rngPoints = randomNumIn(-2, 3);
-
-        const REPLY_MSGS = {
-            NEGATIVE: `😒 The spirit was not amused.`,
-            POSITIVE: `👏 The spirit was amused and has given you ${rngPoints} coins.`,
+        try {
+            const RNG_POINTS = randomNumIn(-2, 3);
+            const REPLY_MSGS = {
+                NEGATIVE: `😒 The spirit was not amused.`,
+                POSITIVE: `👏 The spirit was amused and has given you **${RNG_POINTS}** coins.`,
+            }
+    
+            const userData = this.eventData[message.author.id];
+            const { coins: prevCoins, points: prevPoints } = userData;
+            let replyMsg: Message;
+    
+            await this.eventDataRef.update({
+                [`${message.author.id}.points`]: prevPoints + RNG_POINTS,
+                [`${message.author.id}.coins`]: prevCoins + Math.max(0, RNG_POINTS)
+            })
+    
+            if(RNG_POINTS <= 0) 
+                replyMsg = await message.reply(REPLY_MSGS.NEGATIVE);
+            else
+                replyMsg = await message.reply(REPLY_MSGS.POSITIVE);
+    
+            setTimeout(async () => replyMsg.delete(), 7500);
+        } catch (err) {
+            logger.error(`[Halloween] User : ${getUserLogString(message.author)} could not trick spirit - ${err}`);
         }
-
-        const userData = this.eventData[message.author.id];
-        const { coins: prevCoins, points: prevPoints } = userData;
-        let replyMsg: Message;
-
-        await this.eventDataRef.update({
-            [`${message.author.id}.points`]: prevPoints + rngPoints,
-            [`${message.author.id}.coins`]: prevCoins + Math.max(0, rngPoints)
-        })
-
-        if(rngPoints <= 0) 
-            replyMsg = await message.reply(REPLY_MSGS.NEGATIVE);
-        else
-            replyMsg = await message.reply(REPLY_MSGS.POSITIVE);
-
-        setTimeout(() => replyMsg.delete(), 7500);
     }
 
     __treat = async (message: Message, candiesRequested: number) => {
-        const userData = this.eventData[message.author.id];
-        const { candies: prevCandies, coins: prevCoins, points: prevPoints } = userData;
-        const userHasEnoughCandies = prevCandies >= candiesRequested;
+        try {
+            const userData = this.eventData[message.author.id];
+            const { candies: prevCandies, coins: prevCoins, points: prevPoints } = userData;
+            const userHasEnoughCandies = prevCandies >= candiesRequested;
+    
+            if(userHasEnoughCandies) {
+                await this.eventDataRef.update({
+                    [`${message.author.id}.candies`]: prevCandies - candiesRequested,
+                    [`${message.author.id}.coins`]: prevCoins + 1,
+                    [`${message.author.id}.points`]: prevPoints + 1,
+                })
+    
+                const replyMsg = await message.reply(`**Treat!**\nYou exchanged ${candiesRequested} candies with the spirit for 1 coin.\nTotal Candies: ${prevCandies - candiesRequested}\nTotal Coins: ${prevCoins + 1}`);
+    
+                setTimeout(async () => {
+                    if(replyMsg && replyMsg.deletable) await replyMsg.delete()
+                }, 7500);
+                return;
+            }
+    
+            const replyMsg = await message.reply("You don't have enough candies T-T");
+            setTimeout(async () => {
+                if(replyMsg && replyMsg.deletable) await replyMsg.delete();
+                if(message && message.deletable) await message.delete();
+            }, 7500);
+        } catch (err) {
+            logger.error(`[Halloween] User : ${getUserLogString(message.author)} could not treat spirit - ${err}`);
 
-        if(userHasEnoughCandies) {
-            await this.eventDataRef.update({
-                [`${message.author.id}.candies`]: prevCandies - candiesRequested,
-                [`${message.author.id}.coins`]: prevCoins + 1,
-                [`${message.author.id}.points`]: prevPoints + 1,
-            })
-
-            const replyMsg = await message.reply(`**Treat!**\nYou exchanged ${candiesRequested} candies with the spirit for 1 coin.\nTotal Candies: ${prevCandies - candiesRequested}\nTotal Coins: ${prevCoins + 1}`);
-
-            setTimeout(() => replyMsg.delete(), 7500);
-            return;
         }
-
-        const replyMsg = await message.reply("You don't have enough candies T-T");
-        setTimeout(() => replyMsg.delete(), 7500);
     }
 }
 
