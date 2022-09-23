@@ -22,10 +22,12 @@ bake.run = async (message: Message, args: string[]) => {
     try {
         const userId = message.author.id;
         const userRank = collections.RANKS.doc(userId);
+        const userRankData = await userRank.get();
         const userInventory = collections.INVENTORY.doc(userId);
+        const userInventoryData = await userInventory.get();
         const currTime = Date.now();
 
-        if (!(await userInventory.get()).exists) {
+        if (!userInventoryData.exists) {
             const freshCookies = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER);
             userInventory.set({
                 cookies: freshCookies,
@@ -35,8 +37,8 @@ bake.run = async (message: Message, args: string[]) => {
             return;
         }
 
-        const cookies = (await userInventory.get()).data().cookies;
-        const lastBaked = (await userInventory.get()).data().lastBaked;
+        const cookies = userInventoryData.data().cookies;
+        const lastBaked = userInventoryData.data().lastBaked;
         const timeDiff = currTime - lastBaked;
 
         if (timeDiff < HALF_DAY_IN_MS) {
@@ -44,7 +46,7 @@ bake.run = async (message: Message, args: string[]) => {
             return;
         }
 
-        const userLevel = (await userRank.get()).data().level;
+        const userLevel = userRankData.data().level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
         const bias = Math.min(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);

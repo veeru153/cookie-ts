@@ -14,7 +14,7 @@ export const updateEmotes = new Command({
 
 updateEmotes.run = async (message: Message, args: string[]) => {
     // TODO: Update channel reference when channel is public
-    let channel = await client.channels.resolve(Channels.Cookie.EMOTES).fetch();
+    let channel = await client.channels.resolve(Channels.Reception.EMOTES).fetch();
     if(!channel.isTextBased()) throw new Error(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);
     await clearChannel(channel);
