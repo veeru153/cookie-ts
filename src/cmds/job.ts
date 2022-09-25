@@ -12,7 +12,10 @@ export const job = new Command({
     scope: [ Scope.STAFF ]
 })
 
-const ALLOWED_CHANNELS = Object.values(Channels.Kitchen) as string[];
+const ALLOWED_CHANNELS = [
+    ...Object.values(Channels.Kitchen) as string[],
+    ...Object.values(Channels.Cookie) as string[],
+];
 
 job.run = async (message: Message, args: string[]) => {
     const job = args[0];
@@ -27,11 +30,14 @@ job.run = async (message: Message, args: string[]) => {
         logger.info(`[Job] '${job}' ran by User : ${getUserLogString(message.author)}`);
 
         try {
+            console.log(job);
             message.reply(`Running Job: \`${job}\``);
             await (jobs[job])._invoke(message, args);
             logger.info(`[Job] '${job}' ran successfully`);
         } catch (err) {
             logger.error(`[Job] Error while running '${job}' : ${err}`);
         } 
+    } else {
+        logger.info(`[Job] '${job}' not found`);
     }
 }

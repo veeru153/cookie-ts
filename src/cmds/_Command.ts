@@ -1,4 +1,4 @@
-import { Message, GuildMember } from "discord.js";
+import { Message, GuildMember, DMChannel } from "discord.js";
 import { Errors } from "../util/constants";
 import Scope from "../util/scope";
 
@@ -35,6 +35,7 @@ class Command {
 
     _invoke = async (message: Message, args: string[]) => {
         try {
+            if(message.channel instanceof DMChannel) return;
             this._canUserInvokeCmd(message.member);
             await this.run(message, args);
         } catch (err) {

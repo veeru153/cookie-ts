@@ -13,7 +13,7 @@ const IGNORED_CHANNELS = [
     Channels.Cookieland.BOTLAND,
     Channels.Cookie.TESTING,
     Channels.Cookie.LOGS,
-    Channels.Cookie.EMOTES,
+    Channels.Reception.EMOTES,
 ] as string[];
 
 const updateChatXp = async (message: Message) => {
