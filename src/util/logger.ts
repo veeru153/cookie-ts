@@ -23,6 +23,14 @@ class Logger {
         sendToLogChannel("**[ERROR]** " + log);
         this._logger.error(log);
     }
+
+    devInfo(log: string) {
+        this._logger.info(log);
+    }
+
+    devError(log: string) {
+        this._logger.error(log);
+    }
 }
 
 const logger = new Logger();

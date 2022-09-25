@@ -4,6 +4,7 @@ import collections from "../util/collections";
 import Scope from "../util/scope";
 import Command from "./_Command";
 import { getUserLogString } from "../helpers";
+import isDevEnv from "../util/isDevEnv";
 
 export const bake = new Command({
     name: "bake",
@@ -29,10 +30,11 @@ bake.run = async (message: Message, args: string[]) => {
 
         if (!userInventoryData.exists) {
             const freshCookies = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER);
-            userInventory.set({
+            !isDevEnv() && userInventory.set({
                 cookies: freshCookies,
                 lastBaked: currTime,
             })
+
             await sendBakeSuccessMsg(message, freshCookies, freshCookies);
             return;
         }
@@ -41,21 +43,21 @@ bake.run = async (message: Message, args: string[]) => {
         const lastBaked = userInventoryData.data().lastBaked;
         const timeDiff = currTime - lastBaked;
 
-        if (timeDiff < HALF_DAY_IN_MS) {
+        if (!isDevEnv() && timeDiff < HALF_DAY_IN_MS) {
             await sendCooldownMsg(message, timeDiff, cookies);
             return;
         }
 
         const userLevel = userRankData.data().level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
-        const bias = Math.min(0, Math.random() - skew);
+        const bias = Math.max(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
 
-        userInventory.update({
+        !isDevEnv() && userInventory.update({
             cookies: cookies + freshCookies,
             lastBaked: currTime,
         })
-        
+
         await sendBakeSuccessMsg(message, freshCookies, cookies + freshCookies);
     } catch (err) {
         logger.error(`[Bake] ${err}`);
