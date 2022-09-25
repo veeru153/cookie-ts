@@ -17,7 +17,7 @@ class _Halloween {
 
     constructor() {
         this.START_DATE_MS = new Date('2022-10-01T00:00:00.000+09:00'); 
-        this.END_DATE_MS = new Date('2022-10-31T23:59:59.000Z');
+        this.END_DATE_MS = new Date('2022-10-31T23:59:59.000+09:00');
 
         collections.EVENTS.doc("HALLOWEEN_2022").get().then((snapshot) => {
             this.eventDataRef = snapshot.ref;

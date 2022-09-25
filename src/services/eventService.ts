@@ -14,6 +14,7 @@ class _EventService {
     triggerEvent = () => {
         if(this.isTriggerActive) {
             logger.info("[Event Service] Trigger is already active");
+            return;
         }
 
         if(this.isLive) {
@@ -22,7 +23,7 @@ class _EventService {
         }
 
         logger.info("[Event Service] Triggering event...");
-        this.eventInterval = setInterval(this.__triggerEvent, 1000);
+        this.eventInterval = setInterval(this.__triggerEvent, 2500);
         logger.info("[Event Service] Event trigger active")
     }
 
@@ -41,9 +42,10 @@ class _EventService {
         if(this.isForceStarted || Halloween.__eventIsLive()) {
             this.isTriggerActive = false;
             this.isLive = true;
+            clearInterval(this.eventInterval);
         }
         
-        
+        logger.info("[Event/Halloween_2022] Starting event...")
         let CANDY_DROP_INTERVAL = randomNumIn(20 * 60000, 30 * 60000);
         isDevEnv() && (CANDY_DROP_INTERVAL = 25 * 1000);
         const _dropCandies = () => {
