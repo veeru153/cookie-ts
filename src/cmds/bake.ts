@@ -1,10 +1,8 @@
 import { Message } from "discord.js";
 import logger from "../util/logger";
-import collections from "../util/collections";
 import Scope from "../util/scope";
 import Command from "./_Command";
 import { getUserLogString } from "../helpers";
-import isDevEnv from "../util/isDevEnv";
 import { ranksRepo, inventoryRepo } from "../util/collections_v2";
 
 export const bake = new Command({
@@ -22,14 +20,14 @@ const GUARANTEE = 1;
 
 bake.run = async (message: Message, args: string[]) => {
     try {
-        const userId = message.author.id;
-        const userRank = ranksRepo.get(userId);
-        const userInventory = inventoryRepo.get(userId);
+        const { id } = message.author;
+        const userRank = ranksRepo.get(id);
+        const userInventory = inventoryRepo.get(id);
         const currTime = Date.now();
 
         if (userInventory == null) {
             const freshCookies = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER);
-            inventoryRepo.set(userId, {
+            inventoryRepo.set(id, {
                 cookies: freshCookies,
                 lastBaked: currTime,
             })
@@ -46,12 +44,13 @@ bake.run = async (message: Message, args: string[]) => {
             return;
         }
 
+        // TODO: update cookie formula
         const userLevel = userRank.level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
         const bias = Math.max(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
 
-        inventoryRepo.set(userId, {
+        inventoryRepo.set(id, {
             cookies: cookies + freshCookies,
             lastBaked: currTime,
         })
