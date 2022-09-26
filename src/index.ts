@@ -8,6 +8,7 @@ import client from "./util/client";
 import { server } from "./server";
 import logger from "./util/logger";
 import EventService from "./services/eventService";
+import * as repos from "./util/collections_v2";
 
 client.on("ready", () => {
     const env = process.env.NODE_ENV == "dev" ? "Development" : "Production";
@@ -16,6 +17,9 @@ client.on("ready", () => {
     console.log(`- Environment: ${env}`);
     logger.info(`${identity} is online!`);
     EventService.__triggerEvent();
+    for(let repo of Object.values(repos)) {
+        repo.initialize();
+    }
 })
 
 isDevEnv() && client.on("error", console.log);
