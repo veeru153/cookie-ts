@@ -5,6 +5,7 @@ import Scope from "../util/scope";
 import Command from "./_Command";
 import { getUserLogString } from "../helpers";
 import isDevEnv from "../util/isDevEnv";
+import { ranksRepo, inventoryRepo } from "../util/collections_v2";
 
 export const bake = new Command({
     name: "bake",
@@ -22,15 +23,13 @@ const GUARANTEE = 1;
 bake.run = async (message: Message, args: string[]) => {
     try {
         const userId = message.author.id;
-        const userRank = collections.RANKS.doc(userId);
-        const userRankData = await userRank.get();
-        const userInventory = collections.INVENTORY.doc(userId);
-        const userInventoryData = await userInventory.get();
+        const userRank = ranksRepo.get(userId);
+        const userInventory = inventoryRepo.get(userId);
         const currTime = Date.now();
 
-        if (!userInventoryData.exists) {
+        if (userInventory == null) {
             const freshCookies = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER);
-            !isDevEnv() && userInventory.set({
+            inventoryRepo.set(userId, {
                 cookies: freshCookies,
                 lastBaked: currTime,
             })
@@ -39,27 +38,31 @@ bake.run = async (message: Message, args: string[]) => {
             return;
         }
 
-        const cookies = userInventoryData.data().cookies;
-        const lastBaked = userInventoryData.data().lastBaked;
+        const { cookies, lastBaked } = userInventory;
         const timeDiff = currTime - lastBaked;
 
-        if (!isDevEnv() && timeDiff < HALF_DAY_IN_MS) {
+        if (timeDiff < HALF_DAY_IN_MS) {
             await sendCooldownMsg(message, timeDiff, cookies);
             return;
         }
 
-        const userLevel = userRankData.data().level;
+        const userLevel = userRank.level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
         const bias = Math.max(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
 
-        !isDevEnv() && userInventory.update({
+        inventoryRepo.set(userId, {
             cookies: cookies + freshCookies,
             lastBaked: currTime,
         })
 
         await sendBakeSuccessMsg(message, freshCookies, cookies + freshCookies);
     } catch (err) {
+        const replyMsg = await message.reply("An error occured!");
+        setTimeout(() => {
+            replyMsg.deletable && replyMsg.delete();
+            message.deletable && message.delete();
+        }, 5000);
         logger.error(`[Bake] ${err}`);
     }
 }
