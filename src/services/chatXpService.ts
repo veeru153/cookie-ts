@@ -3,6 +3,7 @@ import logger from "../util/logger";
 import Channels from "../util/channels";
 import collections from "../util/collections";
 import { getUserLogString } from "../helpers";
+import { ranksRepo } from "../util/collections_v2";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1/MULTIPLIER;
@@ -11,7 +12,7 @@ const LEVEL_LIMIT = 20;
 const IGNORED_CHANNELS = [
     Channels.Kitchen.STAFF_BOT,
     Channels.Cookieland.BOTLAND,
-    Channels.Cookie.TESTING,
+    // Channels.Cookie.TESTING,
     Channels.Cookie.LOGS,
     Channels.Reception.EMOTES,
 ] as string[];
@@ -21,31 +22,48 @@ const updateChatXp = async (message: Message) => {
     const { id } = message.author;
 
     try {
-        const userRank = collections.RANKS.doc(id);
-        
+        // const userRank = collections.RANKS.doc(id);
+        const userRank = await ranksRepo.get(id);
+
         // TODO: Work on chat xp formula
-        if(!(await userRank.get()).exists) {
-            userRank.set({
+        // if(!(await userRank.get()).exists) {
+        //     userRank.set({
+        //         xp: Math.floor((Math.random() + GUARANTEE) * MULTIPLIER),
+        //         level: 0,
+        //     })
+        //     return;
+        // }
+
+        if(userRank == null) {
+            console.log("user is null")
+            ranksRepo.set(id, {
                 xp: Math.floor((Math.random() + GUARANTEE) * MULTIPLIER),
                 level: 0,
             })
             return;
         }
     
-        let userLevel = (await userRank.get()).data().level;
-        let userXp = (await userRank.get()).data().xp;
+        // let userLevel = (await userRank.get()).data().level;
+        let userLevel = userRank.level;
+        // let userXp = (await userRank.get()).data().xp;
+        let userXp = userRank.xp;
     
         // TODO: chat xp formula
         let updatedXp = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER) + userXp;
     
         if(updatedXp >= (userLevel + 1) * LEVEL_LIMIT) {
-            updatedXp -= (userLevel - 1) * LEVEL_LIMIT;
+            updatedXp -= ((userLevel + 1) * LEVEL_LIMIT);
             userLevel++;
             logger.info(`[Chat XP] ${getUserLogString(message.author)} advanced to Level ${userLevel}`);
             const msg = await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
         }
     
-        userRank.update({
+        // userRank.update({
+        //     xp: updatedXp,
+        //     level: userLevel,
+        // })
+
+        ranksRepo.set(id, {
             xp: updatedXp,
             level: userLevel,
         })
