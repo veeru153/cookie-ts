@@ -1,4 +1,5 @@
 import { GuildEmoji } from "discord.js";
+import { getUserLogString } from "../helpers";
 import { updateEmotes } from "../jobs/updateEmotes";
 import logger from "../util/logger";
 
@@ -9,8 +10,7 @@ export enum Action {
 }
 
 export const emojiHandler = async (emoji: GuildEmoji, action: Action) => {
-    const { username, discriminator, id } = emoji.author;
-    logger.info(`[Emoji] ${emoji.name} (${emoji.id}) ${action} by User: ${username}#${discriminator} (${id})`);
+    logger.info(`[Emoji] ${emoji.name} (${emoji.id}) ${action} by User: ${getUserLogString(emoji.author)}`);
     try {
         updateEmotes.run(null, null);
     } catch (err) {

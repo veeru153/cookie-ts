@@ -1,8 +1,9 @@
 import { Message } from "discord.js";
 import logger from "../util/logger";
-import collections from "../util/collections";
 import Scope from "../util/scope";
 import Command from "./_Command";
+import { getUserLogString } from "../helpers";
+import { profileRepo, inventoryRepo } from "../util/collections";
 
 export const bake = new Command({
     name: "bake",
@@ -19,23 +20,23 @@ const GUARANTEE = 1;
 
 bake.run = async (message: Message, args: string[]) => {
     try {
-        const userId = message.author.id;
-        const userRank = collections.RANKS.doc(userId);
-        const userInventory = collections.INVENTORY.doc(userId);
+        const { id } = message.author;
+        const userProfile = profileRepo.get(id);
+        const userInventory = inventoryRepo.get(id);
         const currTime = Date.now();
 
-        if (!(await userInventory.get()).exists) {
+        if (userInventory == null) {
             const freshCookies = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER);
-            userInventory.set({
+            inventoryRepo.set(id, {
                 cookies: freshCookies,
                 lastBaked: currTime,
             })
+
             await sendBakeSuccessMsg(message, freshCookies, freshCookies);
             return;
         }
 
-        const cookies = (await userInventory.get()).data().cookies;
-        const lastBaked = (await userInventory.get()).data().lastBaked;
+        const { cookies, lastBaked } = userInventory;
         const timeDiff = currTime - lastBaked;
 
         if (timeDiff < HALF_DAY_IN_MS) {
@@ -43,25 +44,30 @@ bake.run = async (message: Message, args: string[]) => {
             return;
         }
 
-        const userLevel = (await userRank.get()).data().level;
+        // TODO: update cookie formula
+        const userLevel = userProfile.level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
-        const bias = Math.min(0, Math.random() - skew);
+        const bias = Math.max(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
 
-        userInventory.update({
+        inventoryRepo.set(id, {
             cookies: cookies + freshCookies,
             lastBaked: currTime,
         })
-        
+
         await sendBakeSuccessMsg(message, freshCookies, cookies + freshCookies);
     } catch (err) {
+        const replyMsg = await message.reply("An error occured!");
+        setTimeout(() => {
+            replyMsg.deletable && replyMsg.delete();
+            message.deletable && message.delete();
+        }, 5000);
         logger.error(`[Bake] ${err}`);
     }
 }
 
 const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookies: number) => {
-    const { username, discriminator, id } = message.author;
-    logger.info(`[Bake] ${username}#${discriminator} (${id}) baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
+    logger.info(`[Bake] ${getUserLogString(message.author)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
 
     const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
     const msg = `**Cookies Baked!**\nYou baked ${freshCookies} ${cookieStr}.\n**🍪 Total Cookies: ${cookies}**`;
@@ -69,8 +75,7 @@ const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookie
 }
 
 const sendCooldownMsg = async (message: Message, timeDiff: number, cookies: number) => {
-    const { username, discriminator, id } = message.author;
-    logger.info(`[Bake] User : ${username}#${discriminator} (${id}) is on cooldown`);
+    logger.info(`[Bake] User : ${getUserLogString(message.author)} is on cooldown`);
 
     const remainingMs = HALF_DAY_IN_MS - timeDiff;
 

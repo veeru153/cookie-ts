@@ -1,11 +1,11 @@
 import { MessageReaction, User } from "discord.js";
 import logger from "../util/logger";
-import { reactionRoleHandler, ADD_ROLE, REMOVE_ROLE } from "../helper/reactionRoleManager";
+import { reactionRoleService, ADD_ROLE, REMOVE_ROLE } from "../services/reactionRoleService";
 
 export const messageReactionAddHandler = async (reaction: MessageReaction, user: User) => {
     try {
         if(reaction.partial) reaction = await reaction.fetch();
-        await reactionRoleHandler(reaction, user, ADD_ROLE);
+        await reactionRoleService(reaction, user, ADD_ROLE);
     } catch (err) {
         logger.error(`[MessageReactionAddHandler] ${err}`);
     }
@@ -14,7 +14,7 @@ export const messageReactionAddHandler = async (reaction: MessageReaction, user:
 export const messageReactionRemoveHandler = async (reaction: MessageReaction, user: User) => {
     try {
         if(reaction.partial) reaction = await reaction.fetch();
-        await reactionRoleHandler(reaction, user, REMOVE_ROLE);
+        await reactionRoleService(reaction, user, REMOVE_ROLE);
     } catch (err) {
         logger.error(`[MessageReactionRemoveHandler] ${err}`);
     }

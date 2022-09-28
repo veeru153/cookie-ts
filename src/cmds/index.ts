@@ -4,3 +4,4 @@ export * from "./echo";
 export * from "./job";
 export * from "./bake";
 export * from "./help";
+export * from "./profile";
