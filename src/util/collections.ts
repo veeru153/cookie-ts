@@ -9,5 +9,4 @@ export const shopRepo = new Repository("shop");
 export const assetsRepo = new Repository("assets");
 
 // TODO: Migrate events to use repo instead. Keeping for Halloween 2022
-export const EVENTS = db.collection("events");
 export const eventsRepo = new Repository("events");

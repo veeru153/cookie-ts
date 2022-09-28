@@ -3,7 +3,7 @@ import logger from "../util/logger";
 import Scope from "../util/scope";
 import Command from "./_Command";
 import { getUserLogString } from "../helpers";
-import { ranksRepo, inventoryRepo } from "../util/collections";
+import { profileRepo, inventoryRepo } from "../util/collections";
 
 export const bake = new Command({
     name: "bake",
@@ -21,7 +21,7 @@ const GUARANTEE = 1;
 bake.run = async (message: Message, args: string[]) => {
     try {
         const { id } = message.author;
-        const userRank = ranksRepo.get(id);
+        const userProfile = profileRepo.get(id);
         const userInventory = inventoryRepo.get(id);
         const currTime = Date.now();
 
@@ -45,7 +45,7 @@ bake.run = async (message: Message, args: string[]) => {
         }
 
         // TODO: update cookie formula
-        const userLevel = userRank.level;
+        const userLevel = userProfile.level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
         const bias = Math.max(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);

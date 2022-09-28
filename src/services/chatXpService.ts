@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import logger from "../util/logger";
 import Channels from "../util/channels";
 import { getUserLogString } from "../helpers";
-import { ranksRepo } from "../util/collections";
+import { profileRepo } from "../util/collections";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1/MULTIPLIER;
@@ -21,19 +21,19 @@ const updateChatXp = async (message: Message) => {
     const { id } = message.author;
 
     try {
-        const userRank = await ranksRepo.get(id);
+        const userProfile = profileRepo.get(id);
 
-        if(userRank == null) {
+        if(userProfile == null) {
             console.log("user is null")
-            ranksRepo.set(id, {
+            await profileRepo.set(id, {
                 xp: Math.floor((Math.random() + GUARANTEE) * MULTIPLIER),
                 level: 0,
             })
             return;
         }
 
-        let userLevel = userRank.level;
-        let userXp = userRank.xp;
+        let userLevel = userProfile.level;
+        let userXp = userProfile.xp;
     
         // TODO: chat xp formula
         let updatedXp = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER) + userXp;
@@ -45,14 +45,13 @@ const updateChatXp = async (message: Message) => {
             const msg = await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
         }
 
-        ranksRepo.set(id, {
+        await profileRepo.set(id, {
             xp: updatedXp,
             level: userLevel,
         })
     } catch (err) {
         logger.error(`[Chat XP] ${err}`);
     }
-
 }
 
 export default updateChatXp;

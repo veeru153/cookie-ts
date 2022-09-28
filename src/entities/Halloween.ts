@@ -5,7 +5,7 @@ import isDevEnv from "../util/isDevEnv";
 import { getUserLogString, randomNumIn } from "../helpers";
 import { PREFIX } from "../util/config";
 import logger from "../util/logger";
-import { EVENTS } from "../util/collections";
+import { EVENTS } from "../util/collections_legacy";
 
 class _Halloween {
     status: boolean;
