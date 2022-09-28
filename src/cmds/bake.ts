@@ -3,7 +3,7 @@ import logger from "../util/logger";
 import Scope from "../util/scope";
 import Command from "./_Command";
 import { getUserLogString } from "../helpers";
-import { ranksRepo, inventoryRepo } from "../util/collections_v2";
+import { ranksRepo, inventoryRepo } from "../util/collections";
 
 export const bake = new Command({
     name: "bake",

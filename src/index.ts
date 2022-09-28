@@ -8,7 +8,7 @@ import client from "./util/client";
 import { server } from "./server";
 import logger from "./util/logger";
 import EventService from "./services/eventService";
-import * as repos from "./util/collections_v2";
+import * as repos from "./util/collections";
 
 client.on("ready", () => {
     const env = process.env.NODE_ENV == "dev" ? "Development" : "Production";

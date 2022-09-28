@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import logger from "../util/logger";
 import Channels from "../util/channels";
 import { getUserLogString } from "../helpers";
-import { ranksRepo } from "../util/collections_v2";
+import { ranksRepo } from "../util/collections";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1/MULTIPLIER;
