@@ -1,11 +1,13 @@
 import { db } from "./firebase";
+import Repository from "./Repository";
 
-export const RANKS = db.collection("ranks");
-export const INVENTORY = db.collection("inventory");
+
+export const ranksRepo = new Repository("ranks");
+export const inventoryRepo = new Repository("inventory");
+export const profileRepo = new Repository("profile");
+export const shopRepo = new Repository("shop");
+export const assetsRepo = new Repository("assets");
+
+// TODO: Migrate events to use repo instead. Keeping for Halloween 2022
 export const EVENTS = db.collection("events");
-
-export default {
-    RANKS,
-    INVENTORY,
-    EVENTS,
-}
+export const eventsRepo = new Repository("events");

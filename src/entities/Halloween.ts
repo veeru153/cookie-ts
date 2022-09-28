@@ -5,7 +5,7 @@ import isDevEnv from "../util/isDevEnv";
 import { getUserLogString, randomNumIn } from "../helpers";
 import { PREFIX } from "../util/config";
 import logger from "../util/logger";
-import collections from "../util/collections";
+import { EVENTS } from "../util/collections";
 
 class _Halloween {
     status: boolean;
@@ -19,7 +19,7 @@ class _Halloween {
         this.START_DATE_MS = new Date('2022-10-01T00:00:00.000+09:00'); 
         this.END_DATE_MS = new Date('2022-10-31T23:59:59.000+09:00');
 
-        collections.EVENTS.doc("HALLOWEEN_2022").get().then((snapshot) => {
+        EVENTS.doc("HALLOWEEN_2022").get().then((snapshot) => {
             this.eventDataRef = snapshot.ref;
             this.eventData = snapshot.data();
         })
