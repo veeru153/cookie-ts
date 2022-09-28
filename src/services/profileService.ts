@@ -1,4 +1,5 @@
 import { createCanvas, loadImage, CanvasRenderingContext2D, Canvas, Image } from "canvas";
+import logger from "../util/logger";
 
 class _ProfileService {
     canvas: Canvas;
@@ -7,38 +8,42 @@ class _ProfileService {
     HEIGHT: number = 332;
     PADDING: number = 20;
     MARGIN: number = 12;
+    RADIUS: number = 20;
     data: any;
 
-    getProfileCard = async () => {
-        this.data = {
-            name: "Veeru",
-            discriminator: 6884,
-            xpRatio: 432/500,
-            level: 24,
-            cookies: 122343,
-            coins: 1231,
-            biases: [
-                "https://cdn.discordapp.com/attachments/786583150947991592/1024685150744879224/unknown.png",
-                // "https://cdn.discordapp.com/attachments/786583150947991592/1024685150203809852/unknown.png",
-                "https://cdn.discordapp.com/emojis/691006062446379080.png?quality=lossless"
-            ]
-        }
-
+    getProfileCard = async (payload) => {
+        this.data = payload;
         this.canvas = createCanvas(this.WIDTH, this.HEIGHT);
         this.ctx = this.canvas.getContext('2d');
         await this.__constructCanvas();
+        logger.info("[ProfileService] Profile card ready");
         return this.canvas.toBuffer('image/png');
-
     }
 
     __constructCanvas = async () => {
+        // Rounded Edges Clip
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(0 + this.MARGIN, 0);
+        this.ctx.lineTo(this.WIDTH - this.MARGIN, 0);
+        this.ctx.arcTo(this.WIDTH, 0, this.WIDTH, 0 + this.MARGIN, this.RADIUS);
+        this.ctx.lineTo(this.WIDTH, this.HEIGHT - this.MARGIN);
+        this.ctx.arcTo(this.WIDTH, this.HEIGHT, this.WIDTH - this.MARGIN, this.HEIGHT, this.RADIUS);
+        this.ctx.lineTo(0 + this.MARGIN, this.HEIGHT);
+        this.ctx.arcTo(0, this.HEIGHT, 0, this.HEIGHT - this.MARGIN, this.RADIUS);
+        this.ctx.lineTo(0, 0 + this.MARGIN);
+        this.ctx.arcTo(0, 0, 0 + this.MARGIN, 0, this.RADIUS);
+        this.ctx.closePath();
+        this.ctx.clip();
+        
+
         // Background
         this.ctx.save();
-        const bgImgUrl = "https://i.picsum.photos/id/12/480/332.jpg?hmac=DpH3gLh68cZRmxbBnDtVH1Vxi3hXuJhI1sgCzUNN_6Q";
-        const bgImg = await loadImage(bgImgUrl);
+        const bgImg = await loadImage(this.data.bg);
         this.ctx.drawImage(bgImg, 0, 0, this.WIDTH, this.HEIGHT);
         this.ctx.restore();
-
+        logger.info("[ProfileService] Background added");
+        
 
         // Gradient / Tint
         this.ctx.save();
@@ -48,31 +53,34 @@ class _ProfileService {
         this.ctx.fillStyle = tint;
         this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
         this.ctx.restore();
+        logger.info("[ProfileService] Tint added");
 
 
         // XP
         this.ctx.save();
+        const xpVal = this.data.xp / ((this.data.level + 1) * 20);
         const xpBarW = (this.WIDTH + this.PADDING) * 0.54;
         const xpBarH = 26;
         const xpBarX = this.PADDING;
         const xpBarY = this.HEIGHT * 0.70 - xpBarH / 2;
         const xpCornerOffset = 10;
         const xpCornerR = 6.4;
-        this.__makeXpBar(xpBarX, xpBarY, xpBarW, xpBarH, xpCornerOffset, xpCornerR, this.data.xpRatio);
+        this.__makeXpBar(xpBarX, xpBarY, xpBarW, xpBarH, xpCornerOffset, xpCornerR, xpVal);
         this.ctx.restore();
+        logger.info("[ProfileService] XP added");
 
 
         // Profile Picture
         this.ctx.save();
-        const dpUrl = "https://i.picsum.photos/id/8/78/78.jpg?hmac=DOIU-OGFD_JkHMefjT1g2pDrmG_lMbJln-XflK8OYoE";
-        const dpImg = await loadImage(dpUrl);
-        const dpSide = 78;
-        const dpX = this.PADDING;
-        const dpY = this.HEIGHT * 0.70 - xpBarH / 2 - this.MARGIN - dpSide;
-        const dpCornerOffset = 10;
-        const dpCornerR = 16;
-        this.__makeProfilePic(dpX, dpY, dpSide, dpCornerOffset, dpCornerR, dpImg);
+        const avatarImg = await loadImage(this.data.avatar);
+        const avatarSide = 78;
+        const avatarX = this.PADDING;
+        const avatarY = this.HEIGHT * 0.70 - xpBarH / 2 - this.MARGIN - avatarSide;
+        const avatarCornerOffset = 10;
+        const avatarCornerR = 16;
+        this.__makeAvatar(avatarX, avatarY, avatarSide, avatarCornerOffset, avatarCornerR, avatarImg);
         this.ctx.restore();
+        logger.info("[ProfileService] Avatar added");
 
 
         // Filler - Level
@@ -84,34 +92,37 @@ class _ProfileService {
         const fillerCornerOffset = 10;
         const fillerCornerR = 6.4;
         const fillerCol = "#2e2e2e"
-        const fillerText = "Level 24";
+        const fillerText = `Level ${this.data.level}`;
         const fillerTextX = fillerX + fillerW / 2;
         const fillerTextY = fillerY + fillerH / 2 + 6;
         this.__makeFiller(fillerX, fillerY, fillerW, fillerH, fillerCornerOffset, fillerCornerR, fillerCol, fillerText, fillerTextX, fillerTextY);
         this.ctx.restore();
+        logger.info("[ProfileService] Level added");
 
 
         // Name
         this.ctx.save();
         const nameText = (str: string) => str.length > 20 ? str.substring(0, 19) + "..." : str;
-        const nameX = dpX + dpSide + this.MARGIN;
-        const nameY = dpY + (dpSide / 2) + 9;
+        const nameX = avatarX + avatarSide + this.MARGIN;
+        const nameY = avatarY + (avatarSide / 2) + 9;
         this.ctx.shadowColor = "rgba(0,0,0,0.8)";
         this.ctx.shadowBlur = 4;
         this.ctx.font = "20px Helvetica";
         this.ctx.fillStyle = "white";
         this.ctx.fillText(nameText(this.data.name), nameX, nameY);
         this.ctx.restore();
+        logger.info("[ProfileService] Name added");
 
 
         // Discriminator
         this.ctx.save();
-        const disNumX = dpX + dpSide + this.MARGIN;
+        const disNumX = avatarX + avatarSide + this.MARGIN;
         const disNumY = nameY + 2 * this.MARGIN + 1;
         this.ctx.font = "18px Helvetica";
         this.ctx.fillStyle = "white";
         this.ctx.fillText(`#${this.data.discriminator}`, disNumX, disNumY);
         this.ctx.restore();
+        logger.info("[ProfileService] Discriminator added");
 
 
         // Cookie
@@ -129,8 +140,9 @@ class _ProfileService {
         const cookieCountY = cookieY + 20;
         this.ctx.font = "18px Helvetica";
         this.ctx.fillStyle = "white";
-        this.ctx.fillText(this.data.cookies, cookieCountX, cookieCountY);
+        this.ctx.fillText(this.data.cookies.toLocaleString('en-US'), cookieCountX, cookieCountY);
         this.ctx.restore();
+        logger.info("[ProfileService] Cookies added");
 
 
         // Coin
@@ -148,8 +160,9 @@ class _ProfileService {
         const coinCountY = coinY + 20;
         this.ctx.font = "18px Helvetica";
         this.ctx.fillStyle = "white";
-        this.ctx.fillText(this.data.coins, coinCountX, coinCountY);
+        this.ctx.fillText(this.data.coins.toLocaleString('en-US'), coinCountX, coinCountY);
         this.ctx.restore();
+        logger.info("[ProfileService] Coins added");
 
 
         // Old Level
@@ -170,20 +183,21 @@ class _ProfileService {
         // this.ctx.restore();
 
 
-        // Bias Roles
+        // Badges
         this.ctx.save();
-        const biasImgs = [
-            await loadImage(this.data.biases[0]),
-            await loadImage(this.data.biases[1]),
+        const badges = [
+            await loadImage(this.data.badge1),
+            await loadImage(this.data.badge2),
         ]
-        const biasX = fillerX;
-        const biasY = fillerY + fillerH + this.MARGIN;
-        const biasW = fillerW;
-        const biasH = 56;
-        const biasCornerOffset = 10;
-        const biasCornerR = 6.4;
-        this.__biasSigns(biasX, biasY, biasW, biasH, biasCornerOffset, biasCornerR, biasImgs);
+        const badgesX = fillerX;
+        const badgesY = fillerY + fillerH + this.MARGIN;
+        const badgesW = fillerW;
+        const badgesH = 56;
+        const badgesCornerOffset = 10;
+        const badgesCornerR = 6.4;
+        this.__makeBadges(badgesX, badgesY, badgesW, badgesH, badgesCornerOffset, badgesCornerR, badges);
         this.ctx.restore();
+        logger.info("[ProfileService] Badges added");
 
     }
 
@@ -217,23 +231,23 @@ class _ProfileService {
         this.ctx.fillText("xp", xpLabelX, xpLabelY);
     }
 
-    __makeProfilePic = (dpX: number, dpY: number, dpSide: number, dpCornerOffset: number, dpCornerR: number, dpImg: Image) => {
+    __makeAvatar = (avatarX: number, avatarY: number, avatarSide: number, avatarCornerOffset: number, avatarCornerR: number, avatarImg: Image) => {
         this.ctx.beginPath();
-        this.ctx.moveTo(dpX + dpCornerOffset, dpY);
-        this.ctx.lineTo(dpX + dpSide - dpCornerOffset, dpY);
-        this.ctx.arcTo(dpX + dpSide, dpY, dpX + dpSide, dpY + dpCornerOffset, dpCornerR);
-        this.ctx.lineTo(dpX + dpSide, dpY + dpSide - dpCornerOffset);
-        this.ctx.arcTo(dpX + dpSide, dpY + dpSide, dpX + dpSide - dpCornerOffset, dpY + dpSide, dpCornerR);
-        this.ctx.lineTo(dpX + dpCornerOffset, dpY + dpSide);
-        this.ctx.arcTo(dpX, dpY + dpSide, dpX, dpY + dpSide - dpCornerOffset, dpCornerR);
-        this.ctx.lineTo(dpX, dpY + + dpCornerOffset);
-        this.ctx.arcTo(dpX, dpY, dpX + dpCornerOffset, dpY, dpCornerR);
+        this.ctx.moveTo(avatarX + avatarCornerOffset, avatarY);
+        this.ctx.lineTo(avatarX + avatarSide - avatarCornerOffset, avatarY);
+        this.ctx.arcTo(avatarX + avatarSide, avatarY, avatarX + avatarSide, avatarY + avatarCornerOffset, avatarCornerR);
+        this.ctx.lineTo(avatarX + avatarSide, avatarY + avatarSide - avatarCornerOffset);
+        this.ctx.arcTo(avatarX + avatarSide, avatarY + avatarSide, avatarX + avatarSide - avatarCornerOffset, avatarY + avatarSide, avatarCornerR);
+        this.ctx.lineTo(avatarX + avatarCornerOffset, avatarY + avatarSide);
+        this.ctx.arcTo(avatarX, avatarY + avatarSide, avatarX, avatarY + avatarSide - avatarCornerOffset, avatarCornerR);
+        this.ctx.lineTo(avatarX, avatarY + + avatarCornerOffset);
+        this.ctx.arcTo(avatarX, avatarY, avatarX + avatarCornerOffset, avatarY, avatarCornerR);
         this.ctx.closePath();
         this.ctx.clip();
 
         this.ctx.shadowColor = "rgba(0,0,0,0.8)";
         this.ctx.shadowBlur = 8;
-        this.ctx.drawImage(dpImg, dpX, dpY, dpSide, dpSide);
+        this.ctx.drawImage(avatarImg, avatarX, avatarY, avatarSide, avatarSide);
     }
 
     __makeFiller = (fillerX: number, fillerY: number, fillerW: number, fillerH: number, fillerCornerOffset: number, fillerCornerR: number, fillerCol: string, fillerText: string, fillerTextX: number, fillerTextY: number) => {
@@ -260,28 +274,28 @@ class _ProfileService {
         this.ctx.fillText(fillerText, fillerTextX, fillerTextY);
     }
 
-    __biasSigns = (biasX: number, biasY: number, biasW: number, biasH: number, biasCornerOffset: number, biasCornerR: number, biasImgs: Image[]) => {
-        this.ctx.moveTo(biasX + biasCornerOffset, biasY);
-        this.ctx.lineTo(biasX + biasW - biasCornerOffset, biasY);
-        this.ctx.arcTo(biasX + biasW, biasY, biasX + biasW, biasY + biasCornerOffset, biasCornerR);
-        this.ctx.lineTo(biasX + biasW, biasY + biasH - biasCornerOffset);
-        this.ctx.arcTo(biasX + biasW, biasY + biasH, biasX + biasW - biasCornerOffset, biasY + biasH, biasCornerR);
-        this.ctx.lineTo(biasX + biasCornerOffset, biasY + biasH);
-        this.ctx.arcTo(biasX, biasY + biasH, biasX, biasY + biasH - biasCornerOffset, biasCornerR);
-        this.ctx.lineTo(biasX, biasY + biasCornerOffset);
-        this.ctx.arcTo(biasX, biasY, biasX + biasCornerOffset, biasY, biasCornerR);
+    __makeBadges = (badgesX: number, badgesY: number, badgeW: number, badgeH: number, badgeCornerOffset: number, badgeCornerR: number, badges: Image[]) => {
+        this.ctx.moveTo(badgesX + badgeCornerOffset, badgesY);
+        this.ctx.lineTo(badgesX + badgeW - badgeCornerOffset, badgesY);
+        this.ctx.arcTo(badgesX + badgeW, badgesY, badgesX + badgeW, badgesY + badgeCornerOffset, badgeCornerR);
+        this.ctx.lineTo(badgesX + badgeW, badgesY + badgeH - badgeCornerOffset);
+        this.ctx.arcTo(badgesX + badgeW, badgesY + badgeH, badgesX + badgeW - badgeCornerOffset, badgesY + badgeH, badgeCornerR);
+        this.ctx.lineTo(badgesX + badgeCornerOffset, badgesY + badgeH);
+        this.ctx.arcTo(badgesX, badgesY + badgeH, badgesX, badgesY + badgeH - badgeCornerOffset, badgeCornerR);
+        this.ctx.lineTo(badgesX, badgesY + badgeCornerOffset);
+        this.ctx.arcTo(badgesX, badgesY, badgesX + badgeCornerOffset, badgesY, badgeCornerR);
         this.ctx.closePath();
         this.ctx.clip();
 
         this.ctx.fillStyle = "rgba(255,255,255,0.36)";
-        this.ctx.fillRect(biasX, biasW, biasX, biasY);
+        this.ctx.fillRect(badgesX, badgeW, badgesX, badgesY);
 
-        const biasImgSide = 42;
-        const bias0X = biasX + biasW*0.30 - biasImgSide/2;
-        const bias1X = biasX + biasW*0.70 - biasImgSide/2;
-        const biasImgY = biasY + (biasH/2 - biasImgSide/2);
-        this.ctx.drawImage(biasImgs[0], bias0X, biasImgY, biasImgSide, biasImgSide);
-        this.ctx.drawImage(biasImgs[1], bias1X, biasImgY, biasImgSide, biasImgSide);
+        const badgeSide = 42;
+        const badge0X = badgesX + badgeW*0.30 - badgeSide/2;
+        const badge1X = badgesX + badgeW*0.70 - badgeSide/2;
+        const badgeY = badgesY + (badgeH/2 - badgeSide/2);
+        this.ctx.drawImage(badges[0], badge0X, badgeY, badgeSide, badgeSide);
+        this.ctx.drawImage(badges[1], badge1X, badgeY, badgeSide, badgeSide);
     }
 
     __alphaToHex = (a: number) => {
@@ -290,6 +304,18 @@ class _ProfileService {
         const hexVal = intVal.toString(16);
         return hexVal.padStart(2, "0");
     }
+}
+
+interface ProfilePayload {
+    name: string;
+    discriminator: string;
+    badge1: string;
+    badge2: string;
+    bg: string;
+    level: number;
+    xp: number;
+    cookies: number;
+    coins: number;
 }
 
 const ProfileService = new _ProfileService();
