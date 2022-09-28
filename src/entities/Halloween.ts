@@ -46,8 +46,10 @@ class _Halloween {
     }
 
     dropCandies = async () => {
+        const candyEmotes = ["🍬","🍭","🍫"];
+        const emote = candyEmotes[Math.floor(Math.random() * candyEmotes.length)];
         const CHANNEL_ID = isDevEnv() ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
-        const DROP_START_MSG = "**A mysterious bag of candies has appeared!**";
+        const DROP_START_MSG = `${emote} **A mysterious bag of candies has appeared!**`;
         const DROP_TIMEOUT_MS = randomNumIn(15, 20) * 1000;
         const COLLECT_CMDS = ['pick', 'collect'].map(c => PREFIX + c);
 
@@ -109,9 +111,11 @@ class _Halloween {
 
     summon = async () => {
         const candiesRequested = randomNumIn(2, 6);
+        const spiritEmotes = ["👻","🧟","🧛","👺","👹"];
+        const emote = spiritEmotes[Math.floor(Math.random() * spiritEmotes.length)];
 
         const CHANNEL_ID = isDevEnv() ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
-        const SUMMON_START_MSG = `**A mysterious spirit has appeared!** They want **${candiesRequested}** candies.`;
+        const SUMMON_START_MSG = `${emote} **A mysterious spirit has appeared!** They want **${candiesRequested}** candies.`;
         const SUMMON_TIMEOUT_MS = randomNumIn(15, 20) * 1000;
         const SUMMON_CMDS = ['trick', 'treat'].map(c => PREFIX + c);
 
@@ -189,7 +193,7 @@ class _Halloween {
                     [`${message.author.id}.points`]: prevPoints + 1,
                 })
     
-                const replyMsg = await message.reply(`**Treat!**\nYou exchanged ${candiesRequested} candies with the spirit for 1 coin.\nTotal Candies: ${prevCandies - candiesRequested}\nTotal Coins: ${prevCoins + 1}`);
+                const replyMsg = await message.reply(`You exchanged ${candiesRequested} candies with the spirit for 1 coin.\nTotal Candies: ${prevCandies - candiesRequested}\nTotal Coins: ${prevCoins + 1}`);
     
                 setTimeout(async () => {
                     if(replyMsg && replyMsg.deletable) await replyMsg.delete()
@@ -197,7 +201,9 @@ class _Halloween {
                 return;
             }
     
-            const replyMsg = await message.reply("You don't have enough candies T-T");
+            const sadEmotes = ["😭","😖","😦","😢"];
+            const emote = sadEmotes[Math.floor(Math.random() * sadEmotes.length)];
+            const replyMsg = await message.reply(`${emote} You don't have enough candies...`);
             setTimeout(async () => {
                 if(replyMsg && replyMsg.deletable) await replyMsg.delete();
                 if(message && message.deletable) await message.delete();
