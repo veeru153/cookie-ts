@@ -8,7 +8,7 @@ import { assetsRepo, inventoryRepo, profileRepo } from "../util/collections";
 
 export const profile = new Command({
     name: "profile",
-    desc: "Generates user profile",
+    desc: "[BETA] Generates a User Profile Card",
     scope: [ Scope.ALL ]
 });
 

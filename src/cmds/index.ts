@@ -5,3 +5,5 @@ export * from "./job";
 export * from "./bake";
 export * from "./help";
 export * from "./profile";
+export * from "./shop";
+export * from "./wallet";
