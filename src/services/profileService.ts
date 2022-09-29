@@ -8,7 +8,7 @@ class _ProfileService {
     HEIGHT: number = 332;
     PADDING: number = 20;
     MARGIN: number = 12;
-    RADIUS: number = 20;
+    RADIUS: number = 16;
     data: any;
 
     getProfileCard = async (payload) => {
@@ -118,6 +118,8 @@ class _ProfileService {
         this.ctx.save();
         const disNumX = avatarX + avatarSide + this.MARGIN;
         const disNumY = nameY + 2 * this.MARGIN + 1;
+        this.ctx.shadowColor = "rgba(0,0,0,0.8)";
+        this.ctx.shadowBlur = 4;
         this.ctx.font = "18px Helvetica";
         this.ctx.fillStyle = "white";
         this.ctx.fillText(`#${this.data.discriminator}`, disNumX, disNumY);
@@ -199,6 +201,18 @@ class _ProfileService {
         this.ctx.restore();
         logger.info("[ProfileService] Badges added");
 
+
+        // Beta
+        this.ctx.save();
+        const betaW = 48;
+        const betaH = 20;
+        const betaX = this.WIDTH - this.PADDING - betaW;
+        const betaY = this.PADDING + 2;
+        const betaCornerOffset = 12;
+        const betaCornerR = 12;
+        this.__makeBetaLogo(betaX, betaY, betaW, betaH, betaCornerOffset, betaCornerR);
+        this.ctx.restore();
+        logger.info("[ProfileService] Beta Logo added");
     }
 
     __makeXpBar = (xpBarX: number, xpBarY: number, xpBarW: number, xpBarH: number, xpCornerOffset: number, xpCornerR: number, xpRatio: number) => {
@@ -296,6 +310,31 @@ class _ProfileService {
         const badgeY = badgesY + (badgeH/2 - badgeSide/2);
         this.ctx.drawImage(badges[0], badge0X, badgeY, badgeSide, badgeSide);
         this.ctx.drawImage(badges[1], badge1X, badgeY, badgeSide, badgeSide);
+    }
+
+    __makeBetaLogo = (betaX: number, betaY: number, betaW: number, betaH: number, betaCornerOffset: number, betaCornerR: number) => {
+        this.ctx.beginPath();
+        this.ctx.moveTo(betaX + betaW/2, betaY);
+        this.ctx.lineTo(betaX + betaW - betaCornerOffset, betaY);
+        this.ctx.arcTo(betaX + betaW - 2, betaY, betaX + betaW, betaY + betaH/2, betaCornerR);
+        this.ctx.arcTo(betaX + betaW - 2, betaY + betaH, betaX + betaW - betaCornerOffset, betaY + betaH, betaCornerR);
+        this.ctx.lineTo(betaX + betaCornerOffset, betaY + betaH);
+
+        this.ctx.arcTo(betaX + 2, betaY + betaH, betaX, betaY + betaH / 2, betaCornerR);
+        this.ctx.lineTo(betaX, betaY + betaH / 2);
+        this.ctx.arcTo(betaX + 2, betaY, betaX + betaW/2, betaY, betaCornerR);
+
+        this.ctx.closePath();
+        this.ctx.clip();
+
+        this.ctx.fillStyle = "#F04747";
+        this.ctx.fillRect(betaX, betaY, betaW, betaH);
+
+        const betaTextX = betaX + 8;
+        const betaTextY = betaY + betaH/2 + 4;
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "bold 12px Helvetica";
+        this.ctx.fillText("BETA", betaTextX, betaTextY);
     }
 
     __alphaToHex = (a: number) => {
