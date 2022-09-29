@@ -19,16 +19,16 @@ profile.run = async (message: Message, args: string[]) => {
         const { id, username, discriminator } = message.author;
         const userProfile = profileRepo.get(id);
         const userInv = inventoryRepo.get(id);
-    
+
         const payload = {
             name: username,
             discriminator: discriminator,
             avatar: message.author.displayAvatarURL({ extension: 'png', size: 128, forceStatic: true }),
             xp: userProfile.xp,
             level: userProfile.level,
-            bg: assetsRepo.get("backgrounds")[userProfile.bg],
-            badge1: assetsRepo.get("badges")[userProfile.badge1],
-            badge2: assetsRepo.get("badges")[userProfile.badge2],
+            bg: assetsRepo.get("backgrounds")[userProfile.bg].src,
+            badge1: assetsRepo.get("badges")[userProfile.badge1].src,
+            badge2: assetsRepo.get("badges")[userProfile.badge2].src,
             cookies: userInv?.cookies ?? 0,
             coins: userInv?.coins ?? 0,
         }

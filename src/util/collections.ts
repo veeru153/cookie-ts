@@ -1,8 +1,5 @@
-import { db } from "./firebase";
 import Repository from "./Repository";
 
-
-export const ranksRepo = new Repository("ranks");
 export const inventoryRepo = new Repository("inventory");
 export const profileRepo = new Repository("profile");
 export const shopRepo = new Repository("shop");
