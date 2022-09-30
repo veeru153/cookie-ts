@@ -49,21 +49,22 @@ const customizeProfile = async (message: Message, arr: string[]) => {
         const value = arr[i + 1];
         res += await __equipItem(key, value);
     }
-    
+
     await profileRepo.set(message.author.id, userProfile);
     await message.reply(res);
 }
 
 const __equipItem = async (key: string, value: string) => {
     const { badges, backgrounds } = userInv;
-    if(!["badge1", "badge2", "background"].includes(key))
+    if(!["badge1", "badge2", "background", "bg"].includes(key))
         return `${key} - Invalid Key\n`;
 
     if(["badge1", "badge2"].includes(key) && !badges.includes(value)) 
         return `\`${key}\` - \`${value}\` not found in owned badges\n`;
 
-    if((key == "background" || key == "bg") && !backgrounds.includes(value)) {
-        key = "bg";
+    if(key == "background") key = "bg";
+
+    if((key == "bg") && !backgrounds.includes(value)) {
         return `\`${key}\` - \`${value}\` not found in owned backgrounds\n`;
     }
 

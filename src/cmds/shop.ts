@@ -40,11 +40,10 @@ shop.run = async (message: Message, args: string[]) => {
                 break;
 
             default:
-                await message.reply("Insuffcient Arguments!");
+                await message.reply("Invalid Arguments!");
                 break;
         }
     } catch (err) {
-        console.log(err, HANDLED_ERRORS);
         if (HANDLED_ERRORS.includes(err.message)) {
             message.reply(err.message);
             logger.info(`[ShopService] ${err}`);
