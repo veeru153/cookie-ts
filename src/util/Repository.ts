@@ -14,6 +14,10 @@ class Repository {
         this.collection.onSnapshot(snapshot => {
             snapshot.docChanges().forEach(change => {
                 const doc = change.doc;
+                if(change.type === "removed") {
+                    this.data.delete(doc.id);
+                    return;
+                }
                 this.data.set(doc.id, doc.data());
             })
         })

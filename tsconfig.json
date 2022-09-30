@@ -9,6 +9,7 @@
         "outDir": "build",
         "baseUrl": "./",
         "skipLibCheck": true,
+        "incremental": true,
         "paths": {
             "*": [
                 "node_modules/*"

@@ -9,7 +9,7 @@ class _EventService {
     isForceStarted = false;
     isLive = false;
     eventInterval = null;
-    eventTimeouts = [];
+    eventTimeouts = new Map<string, NodeJS.Timeout>();
 
     triggerEvent = () => {
         if(this.isTriggerActive) {
@@ -23,7 +23,7 @@ class _EventService {
         }
 
         logger.info("[Event Service] Triggering event...");
-        this.eventInterval = setInterval(this.__triggerEvent, 2500);
+        this.eventInterval = setInterval(this.__triggerEvent, 5000);
         logger.info("[Event Service] Event trigger active")
     }
 
@@ -46,29 +46,35 @@ class _EventService {
         }
         
         logger.info("[Event/Halloween_2022] Starting event...")
-        let CANDY_DROP_INTERVAL = randomNumIn(20 * 60000, 30 * 60000);
-        isDevEnv() && (CANDY_DROP_INTERVAL = 25 * 1000);
+
+        const dropTimeout = "DROP_TIMEOUT";
+        const candyIntervalDev = 15 * 1000;
+        const candyIntervalMin = 10 * 60000;
+        const candyIntervalMax = 20 * 60000;
+        let CANDY_DROP_INTERVAL = isDevEnv() ? candyIntervalDev : randomNumIn(candyIntervalMin, candyIntervalMax);
         const _dropCandies = () => {
             if(!this.isLive) return;
             Halloween.dropCandies();
-            CANDY_DROP_INTERVAL = randomNumIn(20 * 60000, 30 * 60000);
-            isDevEnv() && (CANDY_DROP_INTERVAL = 25 * 1000);
-            this.eventTimeouts.push(setTimeout(_dropCandies, CANDY_DROP_INTERVAL));
+            CANDY_DROP_INTERVAL = isDevEnv() ? candyIntervalDev : randomNumIn(10 * 60000, 20 * 60000);
             logger.info(`[Event/Halloween_2022] Next Candy Drop in ${msToTime(CANDY_DROP_INTERVAL)}`);
+            this.eventTimeouts.set(dropTimeout, setTimeout(_dropCandies, CANDY_DROP_INTERVAL))
         }
-        this.eventTimeouts.push(setTimeout(_dropCandies, CANDY_DROP_INTERVAL));
+        this.eventTimeouts.set(dropTimeout, setTimeout(_dropCandies, CANDY_DROP_INTERVAL));
         logger.info(`[Event/Halloween_2022] Next Candy Drop in ${msToTime(CANDY_DROP_INTERVAL)}`);
         
-        let SUMMON_INTERVAL = randomNumIn(90 * 60000, 120 * 60000);
-        isDevEnv() && (SUMMON_INTERVAL = 40 * 1000);
+        const summonTimeout = "SUMMON_TIMEOUT";
+        const summonIntervalDev = 24 * 1000;
+        const summonIntervalMin = 45 * 60000;
+        const summonIntervalMax = 70 * 60000;
+        let SUMMON_INTERVAL = isDevEnv() ? summonIntervalDev : randomNumIn(summonIntervalMin, summonIntervalMax);
         const _summonSpirit = () => {
+            if(!this.isLive) return;
             Halloween.summon();
-            SUMMON_INTERVAL = randomNumIn(90 * 60000, 120 * 60000);
-            isDevEnv() && (SUMMON_INTERVAL = 40 * 1000);
-            this.eventTimeouts.push(setTimeout(_summonSpirit, SUMMON_INTERVAL));
+            SUMMON_INTERVAL = isDevEnv() ? summonIntervalDev : randomNumIn(summonIntervalMin, summonIntervalMax);
+            this.eventTimeouts.set(summonTimeout, setTimeout(_summonSpirit, SUMMON_INTERVAL));
             logger.info(`[Event/Halloween_2022] Next Spirit Summon in ${msToTime(SUMMON_INTERVAL)}`);
         }        
-        this.eventTimeouts.push(setTimeout(_summonSpirit, SUMMON_INTERVAL));
+        this.eventTimeouts.set(summonTimeout, setTimeout(_summonSpirit, SUMMON_INTERVAL));
         logger.info(`[Event/Halloween_2022] Next Spirit Summon in ${msToTime(SUMMON_INTERVAL)}`);
     }
 
@@ -82,8 +88,9 @@ class _EventService {
         this.isForceStarted = false;
         logger.info("[Event Service] Ending event...");
         clearInterval(this.eventInterval);
-        for(let timeouts of this.eventTimeouts) {
-            clearTimeout(timeouts);
+        for(let timeouts of Object.entries(this.eventTimeouts)) {
+            clearTimeout(timeouts[1]);
+            this.eventTimeouts.delete(timeouts[0]);
         }
         this.isLive = false;
         logger.info("[Event Service] Event ended")
