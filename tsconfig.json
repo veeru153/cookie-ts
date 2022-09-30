@@ -9,6 +9,7 @@
         "outDir": "build",
         "baseUrl": "./",
         "skipLibCheck": true,
+        "incremental": true,
         "paths": {
             "*": [
                 "node_modules/*"
@@ -17,5 +18,5 @@
     },
     "include": [
         "src/**/*"
-, "rough/canvas.js"    ]
+    ]
 }

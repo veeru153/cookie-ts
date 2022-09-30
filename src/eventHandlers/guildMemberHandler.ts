@@ -15,16 +15,19 @@ export const guildMemberAddHandler = async (member: GuildMember) => {
 }
 
 const initMemberCollections = async (member: GuildMember) => {
-    await profileRepo.set(member.id, {
+    !profileRepo.get(member.id) && await profileRepo.set(member.id, {
         level: 0,
         xp: 0,
         badge1: "SIGN_YUQI",
         badge2: "IDLE_BLOB",
-        bg: "DEFAULT"
+        bg: "YUQI_REVEAL"
     })
-    await inventoryRepo.set(member.id, {
+    
+    inventoryRepo.get(member.id) && await inventoryRepo.set(member.id, {
         cookies: 0,
         lastBaked: -1,
-        coins: 0
+        coins: 0,
+        backgrounds: ["YUQI_REVEAL"],
+        badges: ["SIGN_YUQI", "IDLE_BLOB"],
     });
 }

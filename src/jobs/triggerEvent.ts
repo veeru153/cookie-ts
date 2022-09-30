@@ -2,7 +2,6 @@ import { Message } from "discord.js";
 import Scope from "../util/scope";
 import Command from "../cmds/_Command";
 import EventService from "../services/eventService";
-import Halloween from "../entities/Halloween";
 
 export const triggerEvent = new Command({
     name: "triggerEvent",

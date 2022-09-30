@@ -24,7 +24,7 @@ const updateChatXp = async (message: Message) => {
         const userProfile = profileRepo.get(id);
 
         if(userProfile == null) {
-            console.log("user is null")
+            logger.error(`[ChatXpService] User : (${id}) is Null`)
             await profileRepo.set(id, {
                 xp: Math.floor((Math.random() + GUARANTEE) * MULTIPLIER),
                 level: 0,

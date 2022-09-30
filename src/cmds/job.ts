@@ -28,16 +28,19 @@ job.run = async (message: Message, args: string[]) => {
     args.shift();
     if(Object.keys(jobs).includes(job)) {
         logger.info(`[Job] '${job}' ran by User : ${getUserLogString(message.author)}`);
-
         try {
             console.log(job);
-            message.reply(`Running Job: \`${job}\``);
+            const msg = await message.channel.send(`Running Job: \`${job}\``);
             await (jobs[job])._invoke(message, args);
+            msg.deletable && msg.delete();
+            await message.reply(`Job \`${job}\` - Complete`);
             logger.info(`[Job] '${job}' ran successfully`);
         } catch (err) {
+            await message.reply(`Job \`${job}\` - Failed`)
             logger.error(`[Job] Error while running '${job}' : ${err}`);
         } 
     } else {
+        await message.reply(`Job \`${job}\` - Not Found`)
         logger.info(`[Job] '${job}' not found`);
     }
 }

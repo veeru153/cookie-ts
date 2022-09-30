@@ -16,7 +16,7 @@ client.on("ready", () => {
     console.log(`READY! Logged in as ${identity}.`);
     console.log(`- Environment: ${env}`);
     logger.info(`${identity} is online!`);
-    EventService.__triggerEvent();
+    EventService.triggerEvent();
     for(let repo of Object.values(repos)) {
         repo.initialize();
     }
