@@ -7,3 +7,4 @@ export * from "./help";
 export * from "./profile";
 export * from "./shop";
 export * from "./wallet";
+export * from "./whois";
