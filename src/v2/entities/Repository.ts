@@ -1,3 +1,4 @@
+import { identity } from "../utils/constants";
 import { db } from "../utils/firebase";
 import logger from "../utils/logger";
 
@@ -19,7 +20,10 @@ class Repository {
                     this.data.delete(doc.id);
                     return;
                 }
-                this.data.set(doc.id, doc.data());
+                this.data.set(doc.id, {
+                    id: doc.id,
+                    ...doc.data()
+                });
             })
         })
     }

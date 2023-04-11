@@ -18,4 +18,4 @@ client.on("ready", () => {
 isDevEnv && client.on("error", console.log);
 isDevEnv && client.on("debug", console.log);
 
-client.on("messageCreate", async (message: Message) => { messageCreate(message) });
+// client.on("messageCreate", async (message: Message) => { messageCreate(message) });
