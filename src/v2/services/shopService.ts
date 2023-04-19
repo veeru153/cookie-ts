@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js";
-import { ShopItemType, ShopItem } from "../utils/collectionSchemas/ShopItem"
+import { ShopItemType, ShopItem } from "../utils/schemas/ShopItem"
 import { profileRepo, shopRepo } from "../utils/repos";
-import { Errors, ShopErrors } from "../utils/enums/Errors";
-import { UserProfile } from "../utils/collectionSchemas/UserProfile";
+import { Errors, ShopError } from "../utils/enums/Errors";
+import { UserProfile } from "../utils/schemas/UserProfile";
 import { inventoryRepo } from "../utils/repos";
-import { UserInventory } from "../utils/collectionSchemas/UserInventory";
+import { UserInventory } from "../utils/schemas/UserInventory";
 import logger from "../utils/logger";
 
 // Add to list
@@ -24,7 +24,7 @@ export const unlistItem = async (itemId: string) => {
 }
 
 // Get all listed shop items
-export const getCatalogue = (): string => {
+export const getFormattedCatalogue = (): string => {
   const header = ["**[BETA] Shop Catalogue:**", "Name [Type] - Stock Remaining - Cost"];
   const list = [];
   let counter = 0;
@@ -43,6 +43,15 @@ export const getCatalogue = (): string => {
   return [...header, ...list].join('\n');
 }
 
+export const getCatalogue = (getUnlistsed: boolean) => {
+  const list = [];
+  shopRepo.data.forEach((item: ShopItem, key) => {
+    if (!getUnlistsed && !item.listed) return;
+    list.push(item);
+  })
+  return list;
+}
+
 // Validate and add item to member's inventory
 export const buyItem = async (member: GuildMember, itemId: string) => {
   const item = shopRepo.get(itemId) as ShopItem;
@@ -54,40 +63,40 @@ export const buyItem = async (member: GuildMember, itemId: string) => {
 
 const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
   if (!item)
-    throw new Error(ShopErrors.ITEM_NOT_FOUND);
+    throw new Error(ShopError.ITEM_NOT_FOUND);
 
   if (!item.listed)
-    throw new Error(ShopErrors.ITEM_UNLISTED)
+    throw new Error(ShopError.ITEM_UNLISTED)
 
   const { level: userLevel } = profileRepo.get(member.id) as UserProfile;
   const { level, joinedBeforeTs, memberAgeTs } = item.eligibility;
 
   if (userLevel < level)
-    throw new Error(ShopErrors.USER_LEVEL_LOW);
+    throw new Error(ShopError.USER_LEVEL_LOW);
 
   if (joinedBeforeTs != -1 && member.joinedTimestamp > joinedBeforeTs)
-    throw new Error(ShopErrors.ITEM_TIME_LIMITED);
+    throw new Error(ShopError.ITEM_TIME_LIMITED);
 
   if (memberAgeTs != -1 && (Date.now() - member.joinedTimestamp < memberAgeTs))
-    throw new Error(ShopErrors.MEMBERSHIP_TIME_TOO_LOW);
+    throw new Error(ShopError.MEMBERSHIP_TIME_TOO_LOW);
 
   if (userInventory.coins < item.cost)
-    throw new Error(ShopErrors.NOT_ENOUGH_COINS);
+    throw new Error(ShopError.NOT_ENOUGH_COINS);
 
   if (item.stock == 0)
-    throw new Error(ShopErrors.ITEM_OUT_OF_STOCK);
+    throw new Error(ShopError.ITEM_OUT_OF_STOCK);
 }
 
 const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: UserInventory) => {
   let ownedInventory = getSubInventory(item, userInventory);
   if (ownedInventory === null) {
     logger.error(`[shopService.completePurchase()] No user inventory exists for this item type. Item : ${item}`);
-    throw new Error(ShopErrors.UNEXPECTED_ERROR);
+    throw new Error(ShopError.UNEXPECTED_ERROR);
   }
 
   let ownedSet: Set<string> = new Set(ownedInventory);
   if (ownedSet.has(item.id))
-    throw new Error(ShopErrors.USER_HAS_ITEM);
+    throw new Error(ShopError.USER_HAS_ITEM);
   ownedSet.add(item.id);
   ownedInventory = Array.from(ownedSet);
 

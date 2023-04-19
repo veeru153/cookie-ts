@@ -16,7 +16,7 @@ const IGNORED_CHANNELS = [
     Channels.Reception.EMOTES,
 ] as string[];
 
-const updateChatXp = async (message: Message) => {
+export const updateChatXp = async (message: Message) => {
     if (IGNORED_CHANNELS.includes(message.channel.id)) return;
     const { id } = message.author;
 
@@ -42,7 +42,7 @@ const updateChatXp = async (message: Message) => {
             updatedXp -= ((userLevel + 1) * LEVEL_LIMIT);
             userLevel++;
             logger.info(`[Chat XP] ${getUserLogString(message.author)} advanced to Level ${userLevel}`);
-            const msg = await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
+            await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
         }
 
         await profileRepo.set(id, {
@@ -53,5 +53,3 @@ const updateChatXp = async (message: Message) => {
         logger.error(`[Chat XP] ${err}`);
     }
 }
-
-export default updateChatXp;

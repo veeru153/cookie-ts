@@ -1,8 +1,8 @@
 import { MessageReaction, User } from "discord.js";
 import { BiasRoles } from "../utils/enums/BiasRoles";
-import { BiasEmbeds } from "../utils/enums/Embeds";
+import { BiasEmbed } from "../utils/enums/Embeds";
 
-const RoleMsgIds = [BiasEmbeds.MAIN, BiasEmbeds.SUB] as string[];
+const RoleMsgIds = [BiasEmbed.MAIN, BiasEmbed.SUB] as string[];
 
 const enum RoleAction {
     ADD_ROLE,
@@ -35,8 +35,8 @@ const handleReactionRole = async (reaction: MessageReaction, user: User, action:
 const getBiasRole = async (reaction: MessageReaction) => {
     const message = await reaction.message.fetch();
     const emoji = reaction.emoji.name;
-    if (message.id === BiasEmbeds.MAIN)
+    if (message.id === BiasEmbed.MAIN)
         return Object.values(BiasRoles.Main).filter(r => r.emoji === emoji)[0];
-    else if (message.id === BiasEmbeds.SUB)
+    else if (message.id === BiasEmbed.SUB)
         return Object.values(BiasRoles.Sub).filter(r => r.emoji === emoji)[0];
 }

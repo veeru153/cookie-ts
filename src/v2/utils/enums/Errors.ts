@@ -7,7 +7,7 @@ export enum Errors {
     MISSING_PERMS = "Missing Permissions",
 }
 
-export enum ShopErrors {
+export enum ShopError {
     ITEM_NOT_FOUND = "Item does not exist",
     ITEM_UNLISTED = "Item is currently not available for sale",
     USER_LEVEL_LOW = "Item Locked. Item can be purchased at a higher level",
