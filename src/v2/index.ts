@@ -6,6 +6,7 @@ import * as repos from "./utils/repos";
 import { messageCreate, messageDelete, messageUpdate } from "./handlers/messageHandlers";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./handlers/messageReactionHandlers";
 import { guildMemberAddHandler } from "./handlers/guildMemberHandlers";
+import { emojiAddHandler, emojiRemoveHandler, emojiUpdateHandler } from "./handlers/emojiHandlers";
 
 client.on(Events.ClientReady, () => {
     console.log(`READY! Logged in as ${identity}.`);
@@ -25,11 +26,9 @@ client.on(Events.MessageCreate, async (message: Message) => messageCreate(messag
 client.on(Events.MessageDelete, async (message: Message) => messageDelete(message));
 client.on(Events.MessageUpdate, async (message: Message) => messageUpdate(message));
 
-// client.on(Events.GuildEmojiCreate, async (emoji: GuildEmoji) => { emojiHandler(emoji, Action.ADD) });
-// client.on(Events.GuildEmojiDelete, async (emoji: GuildEmoji) => { emojiHandler(emoji, Action.REMOVE) });
-// client.on(Events.GuildEmojiUpdate, async (_: GuildEmoji, newEmoji: GuildEmoji) => { 
-//     emojiHandler(newEmoji, Action.UPDATE)
-// });
+client.on(Events.GuildEmojiCreate, async (emoji: GuildEmoji) => emojiAddHandler(emoji));
+client.on(Events.GuildEmojiDelete, async (emoji: GuildEmoji) => emojiRemoveHandler(emoji));
+client.on(Events.GuildEmojiUpdate, async (_: GuildEmoji, newEmoji: GuildEmoji) => emojiUpdateHandler(newEmoji));
 
 client.on(Events.GuildMemberAdd, async (member: GuildMember) => { guildMemberAddHandler(member) });
 

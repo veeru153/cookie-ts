@@ -53,12 +53,16 @@ export const getCatalogue = (getUnlistsed: boolean) => {
 }
 
 // Validate and add item to member's inventory
-export const buyItem = async (member: GuildMember, itemId: string) => {
+export const buyShopItem = async (member: GuildMember, itemId: string) => {
   const item = shopRepo.get(itemId) as ShopItem;
   const userInventory = inventoryRepo.get(member.id) as UserInventory;
   validatePurchase(member, item, userInventory);
   await completePurchaseAndDeductFunds(item, userInventory);
   await inventoryRepo.set(member.id, userInventory);
+  return {
+    name: item.name,
+    cost: item.cost
+  };
 }
 
 const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
