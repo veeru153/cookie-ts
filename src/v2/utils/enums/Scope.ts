@@ -4,6 +4,7 @@ enum Scope {
     MODS = "426340251418755072",
     ADMIN = "426340205000130570",
     OWNER = "443256646773506048",
+    BOOSTER = "799045188156260413",
 }
 
 export default Scope;

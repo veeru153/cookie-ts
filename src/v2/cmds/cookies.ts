@@ -6,13 +6,13 @@ import { UserInventory } from "../utils/schemas/UserInventory";
 
 const cookiesFn = async (message: Message) => {
     const userInv = inventoryRepo.get(message.author.id) as UserInventory;
-    const res = `Total Cookies: ${userInv.cookies} 🍪`;
+    const res = `🍪 Total Cookies: ${userInv.cookies}`;
     await message.reply(res);
 }
 
 export const cookies = new Command({
     name: "cookies",
-    desc: "[BETA] Cookie Count",
+    desc: "[BETA] Returns number of cookies",
     scope: [Scope.ALL],
     fn: cookiesFn
 })

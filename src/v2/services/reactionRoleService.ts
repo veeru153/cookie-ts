@@ -5,8 +5,8 @@ import { BiasEmbed } from "../utils/enums/Embeds";
 const RoleMsgIds = [BiasEmbed.MAIN, BiasEmbed.SUB] as string[];
 
 const enum RoleAction {
-    ADD_ROLE,
-    REMOVE_ROLE
+    ADD_ROLE = "Added",
+    REMOVE_ROLE = "Removed"
 }
 
 export const addReactionRole = async (reaction: MessageReaction, user: User) => {
@@ -28,7 +28,7 @@ const handleReactionRole = async (reaction: MessageReaction, user: User, action:
     if (action === RoleAction.REMOVE_ROLE)
         member.roles.remove(role);
 
-    const ackMessage = await reaction.message.channel.send(`${user.toString()} Role Added: \`${biasRole.name}\``);
+    const ackMessage = await reaction.message.channel.send(`${user.toString()} Role ${action}: \`${biasRole.name}\``);
     setTimeout(() => { ackMessage.delete() }, 5000);
 }
 

@@ -21,7 +21,7 @@ const shopFn = async (message: Message, args: string[]) => {
                 break;
         }
     } catch (err) {
-        if (Object.keys(ShopError).includes(err)) {
+        if (Object.values(ShopError).includes(err.message)) {
             message.reply(err.message);
             logger.info(`[ShopService] ${err}`);
         } else {
@@ -38,17 +38,19 @@ const getList = async (message: Message) => {
 }
 
 const buyItem = async (message: Message, args: string[]) => {
-    if (args.length < 2)
+    if (args.length < 2) {
         message.reply("Insuffcient Arguments! Missing `ITEM_ID`");
+        return;
+    }
     const itemId = args[1];
     const { name, cost } = await buyShopItem(message.member, itemId);
-    await message.reply(`You just bought ${name} for ${cost} 🪙`);
+    await message.reply(`You just bought ${name} for ${cost} 🍪`);
 }
 
 
 export const shop = new Command({
     name: "shop",
-    desc: "[BETA] Spend Coins Here",
+    desc: "[BETA] A place to spend cookies to upgrade your profile.",
     scope: [Scope.ALL],
     fn: shopFn
 })

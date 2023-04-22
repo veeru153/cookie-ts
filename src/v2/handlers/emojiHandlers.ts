@@ -2,6 +2,7 @@ import { GuildEmoji } from "discord.js";
 import { updateEmotesJob } from "../jobs/updateEmotes";
 import logger from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
+import { updateEmotes } from "../services/guildService";
 
 enum Action {
     ADD = "added",
@@ -12,7 +13,7 @@ enum Action {
 const emojiHandler = async (emoji: GuildEmoji, action: Action) => {
     logger.info(`[Emoji] ${emoji.name} (${emoji.id}) ${action} by User: ${getUserLogString(emoji.author)}`);
     try {
-        updateEmotesJob();
+        updateEmotes();
     } catch (err) {
         logger.error(`[Emoji] ${emoji.id} : ${err}`);
     }

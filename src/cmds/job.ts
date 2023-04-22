@@ -9,7 +9,7 @@ import { getUserLogString } from "../helpers";
 export const job = new Command({
     name: "job",
     desc: "Handle Server Jobs",
-    scope: [ Scope.STAFF ]
+    scope: [Scope.STAFF]
 })
 
 const ALLOWED_CHANNELS = [
@@ -20,13 +20,13 @@ const ALLOWED_CHANNELS = [
 job.run = async (message: Message, args: string[]) => {
     const job = args[0];
 
-    if(!ALLOWED_CHANNELS.includes(message.channel.id)) {
+    if (!ALLOWED_CHANNELS.includes(message.channel.id)) {
         logger.info(`[Job] User : ${getUserLogString(message.author)} tried running '${job}' outside allowed channels`);
         return;
     }
 
     args.shift();
-    if(Object.keys(jobs).includes(job)) {
+    if (Object.keys(jobs).includes(job)) {
         logger.info(`[Job] '${job}' ran by User : ${getUserLogString(message.author)}`);
         try {
             console.log(job);
@@ -38,7 +38,7 @@ job.run = async (message: Message, args: string[]) => {
         } catch (err) {
             await message.reply(`Job \`${job}\` - Failed`)
             logger.error(`[Job] Error while running '${job}' : ${err}`);
-        } 
+        }
     } else {
         await message.reply(`Job \`${job}\` - Not Found`)
         logger.info(`[Job] '${job}' not found`);

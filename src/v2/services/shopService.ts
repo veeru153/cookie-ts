@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { ShopItemType, ShopItem } from "../utils/schemas/ShopItem"
 import { profileRepo, shopRepo } from "../utils/repos";
-import { Errors, ShopError } from "../utils/enums/Errors";
+import { ShopError } from "../utils/enums/Errors";
 import { UserProfile } from "../utils/schemas/UserProfile";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
@@ -25,7 +25,7 @@ export const unlistItem = async (itemId: string) => {
 
 // Get all listed shop items
 export const getFormattedCatalogue = (): string => {
-  const header = ["**[BETA] Shop Catalogue:**", "Name [Type] - Stock Remaining - Cost"];
+  const header = ["**[BETA] Shop Catalogue:**", "Name [Type] - Cost"];
   const list = [];
   let counter = 0;
 
@@ -33,7 +33,11 @@ export const getFormattedCatalogue = (): string => {
     if (!item.listed) return;
     counter++;
     const { name, cost, type, stock } = item;
-    list.push(`${counter}. \`${key}\` - ${name} [${type.charAt(0).toUpperCase() + type.slice(1)}] - ${stock} - ${cost} 🪙`);
+    const row = `${counter}. \`${key}\` - ${name} [${type.charAt(0).toUpperCase() + type.slice(1)}] - ${cost} 🍪`
+    if (stock === 0)
+      list.push(`~~${row}~~`);
+    else
+      list.push(row);
   });
 
   if (list.length === 0) {

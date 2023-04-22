@@ -13,3 +13,5 @@ export const canMemberRunCmd = (member: GuildMember, cmd: Command) => {
 
     return true;
 }
+
+export const canMemberRunJob = (member: GuildMember, cmd: Command) => canMemberRunCmd(member, cmd);
