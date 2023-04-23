@@ -1,0 +1,10 @@
+<h1>Shop</h1>
+
+<div>
+    <% for (shopItem of catalogue) {%>
+        <img src="<%= shopItem.src %>" alt="<%= shopItem.name %>" />
+        <p>
+            <%= shopItem.name %>
+        </p>
+        <% } %>
+</div>

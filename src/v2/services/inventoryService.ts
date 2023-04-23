@@ -10,7 +10,7 @@ export const initializeMemberCollections = async (member: GuildMember) => {
         bg: "YUQI_REVEAL"
     })
 
-    inventoryRepo.get(member.id) && await inventoryRepo.set(member.id, {
+    !inventoryRepo.get(member.id) && await inventoryRepo.set(member.id, {
         cookies: 0,
         lastBaked: -1,
         coins: 0,

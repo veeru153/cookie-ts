@@ -1,11 +1,12 @@
 import { GuildMember } from "discord.js";
 import { ShopItemType, ShopItem } from "../utils/schemas/ShopItem"
-import { profileRepo, shopRepo } from "../utils/repos";
+import { assetsRepo, profileRepo, shopRepo } from "../utils/repos";
 import { ShopError } from "../utils/enums/Errors";
 import { UserProfile } from "../utils/schemas/UserProfile";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
 import logger from "../utils/logger";
+import { Asset } from "../utils/schemas/Asset";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {
@@ -51,7 +52,19 @@ export const getCatalogue = (getUnlistsed: boolean) => {
   const list = [];
   shopRepo.data.forEach((item: ShopItem, key) => {
     if (!getUnlistsed && !item.listed) return;
-    list.push(item);
+
+    const asset = assetsRepo.get(item.id) as Asset;
+
+    if (!asset) {
+      logger.info(`[ShopService.getCatalogue] Could not find asset for item.id : ${item.id}`);
+    } else {
+      const shopItem = {
+        name: item.name,
+        cost: item.cost,
+        src: asset.src
+      }
+      list.push(shopItem);
+    }
   })
   return list;
 }
