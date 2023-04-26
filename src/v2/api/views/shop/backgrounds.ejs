@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="/css/backgrounds.css">
+<%- include('../partials/meta') %>
+    <%- include('../partials/header', { title: "profile backgrounds" , subtitle: "shop - beta" }) %>
+        <div class="wrapper">
+            <% for (item of backgrounds) {%>
+                <%- include('./bgContainer.ejs', item) %>
+                    <% } %>
+        </div>
+        <%- include('../partials/footer') %>

@@ -7,6 +7,7 @@ import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
 import logger from "../utils/logger";
 import { Asset } from "../utils/schemas/Asset";
+import { CatalogueItem } from "../utils/types/CatalogueItem";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {
@@ -49,7 +50,7 @@ export const getFormattedCatalogue = (): string => {
 }
 
 export const getCatalogue = (getUnlistsed: boolean) => {
-  const list = [];
+  const list: CatalogueItem[] = [];
   shopRepo.data.forEach((item: ShopItem, key) => {
     if (!getUnlistsed && !item.listed) return;
 
@@ -59,9 +60,11 @@ export const getCatalogue = (getUnlistsed: boolean) => {
       logger.info(`[ShopService.getCatalogue] Could not find asset for item.id : ${item.id}`);
     } else {
       const shopItem = {
+        id: item.id,
         name: item.name,
         cost: item.cost,
-        src: asset.src
+        src: asset.src,
+        type: item.type
       }
       list.push(shopItem);
     }
