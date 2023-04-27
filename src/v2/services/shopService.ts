@@ -133,7 +133,6 @@ const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: Use
     await shopRepo.set(item.id, { stock: item.stock - 1 })
   userInventory.coins = - item.cost;
   updateSubInventory(item.type as ShopItemType, userInventory, ownedInventory);
-  console.log(userInventory);
 }
 
 const updateSubInventory = (type: ShopItemType, userInventory: UserInventory, ownedInventory: string[]) => {

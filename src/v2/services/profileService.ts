@@ -15,7 +15,6 @@ export const customizeProfile = async (id: string, key: ShopItemType, value: str
 
     const userInventory = inventoryRepo.get(id) as UserInventory;
     const itemTypeList = getItemTypeList(userInventory, key);
-    console.log(itemTypeList);
     if (!itemTypeList.includes(value))
         throw new CookieException('Could not find this item in inventory.');
 

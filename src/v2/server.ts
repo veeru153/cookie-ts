@@ -5,7 +5,6 @@ import { sendToLogChannel } from "./helpers/sendToLogChannel";
 
 const app = express();
 app.use(express.static(__dirname + "/public"));
-console.log(__dirname);
 for (const route of routes) {
     app.use(route.url, route.router);
 }

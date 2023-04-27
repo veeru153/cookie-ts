@@ -31,7 +31,6 @@ const runJob = async (message: Message, args: string[]) => {
     if (Object.keys(jobs).includes(job)) {
         log.info(sendToLogChannel(`[Job] '${job}' ran by User : ${getUserLogString(message.author)}`))
         try {
-            console.log(job);
             const msg = await message.channel.send(`Running Job: \`${job}\``);
             await (jobs[job] as Command).run(message, args);
             msg.deletable && msg.delete();

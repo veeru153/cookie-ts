@@ -19,13 +19,13 @@ client.on(Events.ClientReady, async () => {
     for (let repo of Object.values(repos)) {
         await repo.initialize();
     }
-    log.info(sendToLogChannel('Repositories Initialized'));
+    log.info(sendToLogChannel('Repositories Initialized!'));
     server();
-    log.info(sendToLogChannel('Server is ready!'));
+    sendToLogChannel('Server is ready!');
 })
 
-isDevEnv && client.on(Events.Error, console.log);
-isDevEnv && client.on(Events.Debug, console.log);
+isDevEnv && client.on(Events.Error, log.info);
+isDevEnv && client.on(Events.Debug, log.info);
 
 client.on(Events.MessageCreate, async (message: Message) => await messageCreate(message));
 client.on(Events.MessageDelete, async (message: Message) => await messageDelete(message));
