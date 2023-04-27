@@ -2,7 +2,8 @@ import express, { Request, Response } from "express";
 import { routes } from "./api/routes";
 
 const app = express();
-
+app.use(express.static(__dirname + "/public"));
+console.log(__dirname);
 for (const route of routes) {
     app.use(route.url, route.router);
 }

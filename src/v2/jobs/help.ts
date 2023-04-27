@@ -1,6 +1,5 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
-import { PREFIX } from "../utils/constants";
 import Scope from "../utils/enums/Scope";
 import { canMemberRunJob } from "../helpers/canMemberRunCmd";
 import * as jobs from "./index";
@@ -11,7 +10,7 @@ const helpFn = async (message: Message) => {
     for (let job of jobList) {
         try {
             const userCanRunCmd = canMemberRunJob(message.member, job);
-            userCanRunCmd && (res += `\n\`${PREFIX}${job.name}\`\t-\t${job.desc}`);
+            userCanRunCmd && (res += `\n\`${job.name}\`\t-\t${job.desc}`);
         } catch (err) {
             continue;
         }

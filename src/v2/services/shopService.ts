@@ -7,6 +7,7 @@ import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
 import logger from "../utils/logger";
 import { Asset } from "../utils/schemas/Asset";
+import { CatalogueItem } from "../utils/types/CatalogueItem";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {
@@ -49,7 +50,7 @@ export const getFormattedCatalogue = (): string => {
 }
 
 export const getCatalogue = (getUnlistsed: boolean) => {
-  const list = [];
+  const list: CatalogueItem[] = [];
   shopRepo.data.forEach((item: ShopItem, key) => {
     if (!getUnlistsed && !item.listed) return;
 
@@ -59,14 +60,17 @@ export const getCatalogue = (getUnlistsed: boolean) => {
       logger.info(`[ShopService.getCatalogue] Could not find asset for item.id : ${item.id}`);
     } else {
       const shopItem = {
+        id: item.id,
         name: item.name,
         cost: item.cost,
-        src: asset.src
+        src: asset.src,
+        type: item.type,
+        ts: asset.ts ?? Number.MAX_VALUE
       }
       list.push(shopItem);
     }
   })
-  return list;
+  return list.sort((a, b) => b.ts - a.ts);
 }
 
 // Validate and add item to member's inventory
@@ -90,7 +94,10 @@ const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: Us
     throw new Error(ShopError.ITEM_UNLISTED)
 
   const { level: userLevel } = profileRepo.get(member.id) as UserProfile;
-  const { level, joinedBeforeTs, memberAgeTs } = item.eligibility;
+
+  let level = item.eligibility.level ?? -1;
+  let joinedBeforeTs = item.eligibility.joinedBeforeTs ?? -1;
+  let memberAgeTs = item.eligibility.memberAgeTs ?? -1;
 
   if (userLevel < level)
     throw new Error(ShopError.USER_LEVEL_LOW);
@@ -124,6 +131,15 @@ const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: Use
   if (item.stock != -1)
     await shopRepo.set(item.id, { stock: item.stock - 1 })
   userInventory.coins = - item.cost;
+  updateSubInventory(item.type as ShopItemType, userInventory, ownedInventory);
+  console.log(userInventory);
+}
+
+const updateSubInventory = (type: ShopItemType, userInventory: UserInventory, ownedInventory: string[]) => {
+  if (type === ShopItemType.BACKGROUND)
+    return userInventory.backgrounds = ownedInventory;
+  if (type === ShopItemType.BADGE)
+    return userInventory.badges = ownedInventory;
 }
 
 const getSubInventory = (item: ShopItem, userInventory: UserInventory): string[] => {

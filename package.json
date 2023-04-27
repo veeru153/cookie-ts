@@ -8,7 +8,7 @@
     "build": "tsc && tscp",
     "prestart": "yarn build",
     "start": "node -r dotenv/config .",
-    "dev": "nodemon -L --ext ts ejs --exec \"NODE_ENV=dev yarn start | pino-pretty\""
+    "dev": "nodemon -L --ext ts,ejs,css --watch src  --exec \"NODE_ENV=dev yarn start | pino-pretty\""
   },
   "author": "veeru153",
   "license": "ISC",

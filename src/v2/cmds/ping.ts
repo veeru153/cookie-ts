@@ -1,4 +1,4 @@
-import { Interaction, Message } from "discord.js";
+import { Message } from "discord.js";
 import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
 
