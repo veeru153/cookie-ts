@@ -1,4 +1,4 @@
-<div class="container" onclick="prompt('Use the following command to buy:', '-shop buy <%= item.id %>')">
+<div class="container" onclick="navigator.clipboard.writeText('-shop buy <%= item.id %>')">
     <img src="<%= item.src %>" alt="<%= item.name %>" />
     <div class="info">
         <p>

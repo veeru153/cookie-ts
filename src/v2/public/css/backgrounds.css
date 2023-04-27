@@ -10,6 +10,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: whitesmoke;
 }
 
 .container img {
@@ -36,6 +37,10 @@
 
 .container .info:hover {
     opacity: 100%;
+}
+
+.container .info:active::before {
+    content: "*command copied*";
 }
 
 @media screen and (min-width: 592px) {
