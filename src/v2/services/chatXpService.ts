@@ -1,8 +1,9 @@
 import { Message } from "discord.js";
 import { Channels } from "../utils/enums/Channels";
 import { profileRepo } from "../utils/repos";
-import logger from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1 / MULTIPLIER;
@@ -24,7 +25,7 @@ export const updateChatXp = async (message: Message) => {
         const userProfile = profileRepo.get(id);
 
         if (userProfile == null) {
-            logger.error(`[ChatXpService] User : (${id}) is Null`)
+            log.warn(`[ChatXpService] User : (${id}) is null`)
             await profileRepo.set(id, {
                 xp: Math.floor((Math.random() + GUARANTEE) * MULTIPLIER),
                 level: 0,
@@ -41,7 +42,7 @@ export const updateChatXp = async (message: Message) => {
         if (updatedXp >= (userLevel + 1) * LEVEL_LIMIT) {
             updatedXp -= ((userLevel + 1) * LEVEL_LIMIT);
             userLevel++;
-            logger.info(`[Chat XP] ${getUserLogString(message.author)} advanced to Level ${userLevel}`);
+            log.info(`[Chat XP] ${getUserLogString(message.author)} advanced to Level ${userLevel}`);
             await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
         }
 
@@ -50,6 +51,6 @@ export const updateChatXp = async (message: Message) => {
             level: userLevel,
         })
     } catch (err) {
-        logger.error(`[Chat XP] ${err}`);
+        log.error(sendToLogChannel(`[Chat XP] Error while updating xp for User : ${getUserLogString(message.author)} : ${err}`));
     }
 }

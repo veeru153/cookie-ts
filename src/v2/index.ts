@@ -1,18 +1,19 @@
 import { Events, GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
 import client from "./utils/client";
 import { env, identity, isDevEnv } from "./utils/constants";
-import logger from "./utils/logger";
 import * as repos from "./utils/repos";
 import { messageCreate, messageDelete, messageUpdate } from "./handlers/messageHandlers";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./handlers/messageReactionHandlers";
 import { guildMemberAddHandler } from "./handlers/guildMemberHandlers";
 import { emojiAddHandler, emojiRemoveHandler, emojiUpdateHandler } from "./handlers/emojiHandlers";
 import { server } from "./server";
+import { log } from "./utils/logger";
+import { sendToLogChannel } from "./helpers/sendToLogChannel";
 
 client.on(Events.ClientReady, async () => {
-    console.log(`READY! Logged in as ${identity}.`);
-    console.log(`- Environment: ${env}`);
-    logger.info(`${identity} is online!`);
+    log.info(`READY! Logged in as ${identity}.`);
+    log.info(`- Environment: ${env}`);
+    log.info(sendToLogChannel(`${identity} is online!`));
     // TODO: Event Service
     // EventService.triggerEvent();
     for (let repo of Object.values(repos)) {

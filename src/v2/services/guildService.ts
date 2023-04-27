@@ -4,6 +4,7 @@ import { isDevEnv } from "../utils/constants";
 import { Channels } from "../utils/enums/Channels";
 import { Guild } from "../utils/enums/Guilds";
 import { Errors } from "../utils/enums/Errors";
+import { CookieException } from "../utils/CookieException";
 
 export const updateGuildAge = async () => {
     const guild = await client.guilds.fetch(Guild.YUQICORD);
@@ -18,7 +19,8 @@ export const updateGuildAge = async () => {
 
 export const updateEmotes = async () => {
     let channel = await client.channels.resolve(Channels.Reception.EMOTES).fetch();
-    if (!channel.isTextBased()) throw new Error(Errors.CHANNEL_TYPE_NOT_TEXT);
+    if (!channel.isTextBased())
+        throw new CookieException(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);
     await clearChannel(channel);
 

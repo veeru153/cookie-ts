@@ -1,8 +1,9 @@
 import { GuildEmoji } from "discord.js";
 import { updateEmotesJob } from "../jobs/updateEmotes";
-import logger from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { updateEmotes } from "../services/guildService";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 enum Action {
     ADD = "added",
@@ -11,11 +12,11 @@ enum Action {
 }
 
 const emojiHandler = async (emoji: GuildEmoji, action: Action) => {
-    logger.info(`[Emoji] ${emoji.name} (${emoji.id}) ${action} by User: ${getUserLogString(emoji.author)}`);
+    log.info(`[EmojiHandler] ${emoji.name} (${emoji.id}) ${action} by User: ${getUserLogString(emoji.author)}`);
     try {
         updateEmotes();
     } catch (err) {
-        logger.error(`[Emoji] ${emoji.id} : ${err}`);
+        log.error(sendToLogChannel(`[EmojiHandler] Error : ${emoji.id} ${action} by User: ${getUserLogString(emoji.author)} : ${err}`));
     }
 }
 
