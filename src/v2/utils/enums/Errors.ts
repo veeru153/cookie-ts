@@ -5,13 +5,16 @@ export enum Errors {
     // Scopes and Permissions
     MISSING_SCOPE = "Scope Null or Empty",
     MISSING_PERMS = "Missing Permissions",
+
+    // General
+    INSUFFICIENT_ARGS = "Insufficient Arguments",
 }
 
 export enum ShopError {
     ITEM_NOT_FOUND = "Item does not exist",
     ITEM_UNLISTED = "Item is currently not available for sale",
     USER_LEVEL_LOW = "Item Locked. Item can be purchased at a higher level",
-    ITEM_TIME_LIMITED = "Limited Item",
+    ITEM_TIME_LIMITED = "Limited Item. This item is currently not available",
     MEMBERSHIP_TIME_TOO_LOW = "Item Locked. Spend more time with us to unlock",
     NOT_ENOUGH_COINS = "Not enough coins",
     USER_HAS_ITEM = "You already have the item",
