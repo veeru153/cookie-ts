@@ -4,4 +4,5 @@ export interface CatalogueItem {
     cost: number;
     src: string;
     type: string;
+    ts: number;
 }

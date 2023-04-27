@@ -64,12 +64,13 @@ export const getCatalogue = (getUnlistsed: boolean) => {
         name: item.name,
         cost: item.cost,
         src: asset.src,
-        type: item.type
+        type: item.type,
+        ts: asset.ts ?? Number.MAX_VALUE
       }
       list.push(shopItem);
     }
   })
-  return list;
+  return list.sort((a, b) => b.ts - a.ts);
 }
 
 // Validate and add item to member's inventory
@@ -93,7 +94,10 @@ const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: Us
     throw new Error(ShopError.ITEM_UNLISTED)
 
   const { level: userLevel } = profileRepo.get(member.id) as UserProfile;
-  const { level, joinedBeforeTs, memberAgeTs } = item.eligibility;
+
+  let level = item.eligibility.level ?? -1;
+  let joinedBeforeTs = item.eligibility.joinedBeforeTs ?? -1;
+  let memberAgeTs = item.eligibility.memberAgeTs ?? -1;
 
   if (userLevel < level)
     throw new Error(ShopError.USER_LEVEL_LOW);

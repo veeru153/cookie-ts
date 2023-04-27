@@ -1,11 +1,15 @@
 .wrapper {
     display: grid;
     grid-template-columns: 1fr;
-    margin: 24px auto;
+    margin: 24px 12px 124px;
+    grid-gap: 16px;
 }
 
 .container {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .container img {
@@ -23,8 +27,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #66339987;
-    color: #da9d7f;
+    background-color: #663399de;
+    color: #fe9664;
     opacity: 0;
     transition: opacity 200ms linear;
     cursor: pointer;
@@ -36,6 +40,7 @@
 
 @media screen and (min-width: 592px) {
     .wrapper {
+        margin: 24px auto 124px;
         grid-template-columns: repeat(2, 1fr);
         grid-gap: 12px;
     }

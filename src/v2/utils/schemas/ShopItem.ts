@@ -5,16 +5,14 @@ export interface ShopItem extends DocumentData {
     eligibility: Eligibility;
     listed: boolean;
     name: string;
-    originalCost: number;
     type: ShopItemType | string;
     stock: number;
-    limited: string;
 }
 
 interface Eligibility {
-    joinedBeforeTs: number;
-    level: number;
-    memberAgeTs: number;
+    joinedBeforeTs?: number;
+    level?: number;
+    memberAgeTs?: number;
 }
 
 export enum ShopItemType {
