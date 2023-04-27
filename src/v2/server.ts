@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import { routes } from "./api/routes";
+import { log } from "./utils/logger";
+import { sendToLogChannel } from "./helpers/sendToLogChannel";
 
 const app = express();
 app.use(express.static(__dirname + "/public"));
@@ -15,6 +17,6 @@ app.all('/', (req: Request, res: Response) => {
 const PORT = process.env.PORT || 3000;
 export const server = () => {
     app.listen(PORT, () => {
-        console.log(`Server is ready! Listening on PORT: ${PORT}`);
+        log.info(`Server is ready! Listening on PORT: ${PORT}`);
     })
 }

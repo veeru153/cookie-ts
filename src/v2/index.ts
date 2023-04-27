@@ -19,7 +19,9 @@ client.on(Events.ClientReady, async () => {
     for (let repo of Object.values(repos)) {
         await repo.initialize();
     }
+    log.info(sendToLogChannel('Repositories Initialized'));
     server();
+    log.info(sendToLogChannel('Server is ready!'));
 })
 
 isDevEnv && client.on(Events.Error, console.log);
