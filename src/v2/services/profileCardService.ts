@@ -4,7 +4,6 @@ import logger from "../utils/logger";
 export const generateCard = async (payload) => {
     const canvas = createCanvas(WIDTH, HEIGHT);
     const ctx = canvas.getContext('2d');
-    // TODO: Migrate from class based service
     await constructCanvas(ctx, payload);
     return canvas.toBuffer('image/png');
 }
@@ -12,23 +11,15 @@ export const generateCard = async (payload) => {
 const constructCanvas = async (ctx: CanvasRenderingContext2D, data: any) => {
     try {
         // makeRoundedEdges(ctx);
-        console.log(1);
         await addBackground(ctx, data);
-        console.log(2);
         addGradient(ctx);
-        console.log(3);
         addXpBar(ctx, data);
-        console.log(4);
         await addProfilePicture(ctx, data);
-        console.log(5);
         addName(ctx, data);
-        console.log(6);
         addDiscriminator(ctx, data);
-        console.log(7);
         addBetaLogo(ctx);
-        console.log(8);
     } catch (err) {
-        logger.error('Could not create canvas');
+        logger.error(`Could not create canvas: ${err}`);
     }
 }
 
@@ -53,11 +44,13 @@ const addBackground = async (ctx: CanvasRenderingContext2D, data: any) => {
     const bgImg = await loadImage(data.background) as unknown as CanvasImageSource;
     const bgW = bgImg.width as number;
     const bgH = bgImg.height as number;
-    const dW = (Math.max(bgW, WIDTH) / Math.min(bgW, WIDTH));
-    const dH = (Math.max(bgH, HEIGHT) / Math.min(bgH, HEIGHT));
-
-    // const bgWidth = ;
-    const bgHeight = bgImg.height as number;
+    const dW = (Math.min(bgW, WIDTH) / Math.max(bgW, WIDTH));
+    const dH = (Math.min(bgH, HEIGHT) / Math.max(bgH, HEIGHT));
+    const diff = (bgW > bgH) ? dW : dH;
+    const bgWidth = bgW * diff;
+    const bgHeight = bgH * diff;
+    ctx.fillStyle = "whitesmoke";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.drawImage(bgImg, (WIDTH - bgWidth) * 0.5, (HEIGHT - bgHeight) * 0.5, bgWidth, bgHeight);
     ctx.restore();
 }
@@ -94,14 +87,13 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.fillStyle = "rgba(255,255,255,0.58)";
     ctx.fillRect(xpBarX, xpBarY, xpBarW * xpRatio, xpBarH);
 
-    const xpLabelX = PADDING + MARGIN;
-    const xpLabelY = xpBarY + (xpBarH / 2) + 4.5;
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "black";
     ctx.shadowColor = "black";
-    ctx.shadowBlur = 4;
+    ctx.font = "16px Helvetica";
     ctx.textAlign = "start";
-    ctx.font = "bold 16px Helvetica";
     ctx.fillText("xp", xpLabelX, xpLabelY);
+    ctx.textAlign = "end";
+    ctx.fillText(`Level ${data.level}`, levelX, levelY);
     ctx.restore();
 }
 
@@ -185,6 +177,11 @@ const xpBarY = HEIGHT - PADDING - xpBarH;
 const xpCornerOffset = 10;
 const xpCornerR = 6.4;
 
+const xpLabelX = PADDING + MARGIN;
+const xpLabelY = xpBarY + (xpBarH / 2) + 4.5;
+const levelX = WIDTH - (1.75 * PADDING);
+const levelY = xpLabelY + 1;
+
 const avatarSide = 78;
 const avatarX = PADDING;
 const avatarY = xpBarY - MARGIN - avatarSide;
@@ -193,10 +190,10 @@ const avatarCornerR = 10;
 
 const getNameText = (str: string) => str.length > 20 ? str.substring(0, 19) + "..." : str;
 const nameX = avatarX + avatarSide + MARGIN;
-const nameY = avatarY + (avatarSide / 2) + 18;
+const nameY = avatarY + (avatarSide / 2) + 12;
 
 const disNumX = avatarX + avatarSide + MARGIN;
-const disNumY = nameY + 2 * MARGIN + 1;
+const disNumY = (nameY + 2 * MARGIN + 1) - 3;
 
 const betaW = 48;
 const betaH = 20;
