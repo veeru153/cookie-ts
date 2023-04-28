@@ -1,11 +1,12 @@
 import { Message } from "discord.js";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
-import logger from "../utils/logger";
 import { PREFIX } from "../utils/constants";
 import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
 import { Command } from "../entities/Command";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 export const messageCreate = async (message: Message) => {
     await updateGuildAge();
@@ -18,11 +19,11 @@ export const messageCreate = async (message: Message) => {
     let args = [...msg];
 
     if (Object.keys(cmds).includes(cmd)) {
-        logger.info(`[Command] '${cmd}' ran by User : ${getUserLogString(message.author)}`);
+        log.info(`[Command] '${cmd}' ran by User : ${getUserLogString(message.author)}`);
         try {
             (cmds[cmd] as Command).run(message, args);
         } catch (err) {
-            logger.error(`[Command] ${cmd} - ${err}`);
+            log.error(sendToLogChannel(`[Command] Error while running ${cmd} by User : ${getUserLogString(message.author)} : ${err}`));
         }
     }
 }

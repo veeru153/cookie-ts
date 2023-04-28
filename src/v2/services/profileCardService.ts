@@ -1,5 +1,6 @@
 import { createCanvas, loadImage } from "canvas";
-import logger from "../utils/logger";
+import { CookieException } from "../utils/CookieException";
+import { log } from "../utils/logger";
 
 export const generateCard = async (payload) => {
     const canvas = createCanvas(WIDTH, HEIGHT);
@@ -19,7 +20,7 @@ const constructCanvas = async (ctx: CanvasRenderingContext2D, data: any) => {
         addDiscriminator(ctx, data);
         addBetaLogo(ctx);
     } catch (err) {
-        logger.error(`Could not create canvas: ${err}`);
+        throw new CookieException("Error generating profile :(", `[ProfileCardService] Could not create canvas: ${err}`);
     }
 }
 
@@ -53,6 +54,7 @@ const addBackground = async (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.drawImage(bgImg, (WIDTH - bgWidth) * 0.5, (HEIGHT - bgHeight) * 0.5, bgWidth, bgHeight);
     ctx.restore();
+    log.info("[ProfileCardService] Background added");
 }
 
 const addGradient = (ctx: CanvasRenderingContext2D) => {
@@ -63,6 +65,7 @@ const addGradient = (ctx: CanvasRenderingContext2D) => {
     ctx.fillStyle = tint;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.restore();
+    log.info("[ProfileCardService] Gradient added");
 }
 
 const addXpBar = (ctx: CanvasRenderingContext2D, data: any) => {
@@ -95,6 +98,7 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.textAlign = "end";
     ctx.fillText(`Level ${data.level}`, levelX, levelY);
     ctx.restore();
+    log.info("[ProfileCardService] XP Bar added");
 }
 
 const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: any) => {
@@ -117,6 +121,7 @@ const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.shadowBlur = 8;
     ctx.drawImage(avatarImg, avatarX, avatarY, avatarSide, avatarSide);
     ctx.restore();
+    log.info("[ProfileCardService] Profile Picture added");
 }
 
 const addName = (ctx: CanvasRenderingContext2D, data: any) => {
@@ -127,6 +132,7 @@ const addName = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.fillStyle = "white";
     ctx.fillText(getNameText(data.name), nameX, nameY);
     ctx.restore();
+    log.info("[ProfileCardService] Name added");
 }
 
 const addDiscriminator = (ctx: CanvasRenderingContext2D, data: any) => {
@@ -137,6 +143,7 @@ const addDiscriminator = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.fillStyle = "white";
     ctx.fillText(`#${data.discriminator}`, disNumX, disNumY);
     ctx.restore();
+    log.info("[ProfileCardService] Discriminator added");
 }
 
 const addBetaLogo = (ctx: CanvasRenderingContext2D) => {
@@ -162,6 +169,7 @@ const addBetaLogo = (ctx: CanvasRenderingContext2D) => {
     ctx.font = "bold 12px Helvetica";
     ctx.fillText("BETA", betaTextX, betaTextY);
     ctx.restore();
+    log.info("[ProfileCardService] BETA Logo added");
 }
 
 const WIDTH = 480;

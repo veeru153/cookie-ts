@@ -1,9 +1,10 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
-import { ShopError } from "../utils/enums/Errors";
 import Scope from "../utils/enums/Scope";
-import logger from "../utils/logger";
 import { buyShopItem, getFormattedCatalogue } from "../services/shopService";
+import { CookieException } from "../utils/CookieException";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 const shopFn = async (message: Message, args: string[]) => {
     try {
@@ -21,12 +22,11 @@ const shopFn = async (message: Message, args: string[]) => {
                 break;
         }
     } catch (err) {
-        if (Object.values(ShopError).includes(err.message)) {
+        if (err instanceof CookieException) {
             message.reply(err.message);
-            logger.info(`[ShopService] ${err}`);
         } else {
             message.reply("An error occurred");
-            logger.error(`[ShopService] ${err}`);
+            log.error(sendToLogChannel(`[ShopService] Error : ${err}`))
         }
     }
 }

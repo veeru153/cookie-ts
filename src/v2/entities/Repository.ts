@@ -1,7 +1,5 @@
-import { identity } from "../utils/constants";
 import { db } from "../utils/firebase";
-import logger from "../utils/logger";
-
+import { log } from "../utils/logger";
 
 class Repository {
     name: string;
@@ -29,7 +27,7 @@ class Repository {
     }
 
     initialize = async () => {
-        logger.info(`[Collection/${this.name}] Initialized`);
+        log.info(`[Collection/${this.name}] Initialized`);
     }
 
     get = (key: string) => {

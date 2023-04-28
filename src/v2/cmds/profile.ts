@@ -1,11 +1,13 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
-import logger from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { Errors } from "../utils/enums/Errors";
 import { customizeProfile, getProfileCard } from "../services/profileService";
 import { ShopItemType } from "../utils/schemas/ShopItem";
+import { CookieException } from "../utils/CookieException";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 const profileFn = async (message: Message, args: string[]) => {
     const option = args[0];
@@ -17,19 +19,19 @@ const profileFn = async (message: Message, args: string[]) => {
             await getProfile(message);
         }
     } catch (err) {
-        if (err.message) {
+        if (err instanceof CookieException) {
             message.reply(err.message);
             return;
         }
         message.reply("An error occurred!");
-        logger.error(`[Profile] Error for User : ${getUserLogString(message.author)} - ${err}`)
+        log.error(sendToLogChannel(`[Profile] Error for User : ${getUserLogString(message.author)} - ${err}`))
     }
 }
 
 const updateProfile = async (message: Message, args: string[]) => {
     args.shift();
     if (args.length !== 2)
-        throw new Error(Errors.INSUFFICIENT_ARGS);
+        throw new CookieException(Errors.INSUFFICIENT_ARGS);
     const key = args[0];
     const value = args[1];
     await customizeProfile(message.author.id, key as ShopItemType, value);

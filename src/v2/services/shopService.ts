@@ -5,14 +5,15 @@ import { ShopError } from "../utils/enums/Errors";
 import { UserProfile } from "../utils/schemas/UserProfile";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
-import logger from "../utils/logger";
 import { Asset } from "../utils/schemas/Asset";
 import { CatalogueItem } from "../utils/types/CatalogueItem";
+import { CookieException } from "../utils/CookieException";
+import { log } from "../utils/logger";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {
   if (shopRepo.data[itemId]) {
-    throw new Error(`[ShopService] Item with id : \`${itemData}\` already exists`);
+    throw new CookieException(`[ShopService] Item with id : \`${itemData}\` already exists`);
   }
   await shopRepo.set(itemId, itemData);
 }
@@ -20,7 +21,7 @@ export const addItem = async (itemId: string, itemData: ShopItem) => {
 // Mark as unlisted, keep in list
 export const unlistItem = async (itemId: string) => {
   if (!shopRepo.get(itemId)) {
-    throw new Error(`Item with id : \`${itemId}\` does not exist`);
+    throw new CookieException(`Item with id : \`${itemId}\` does not exist`);
   }
   await shopRepo.set(itemId, { listed: false });
 }
@@ -57,7 +58,7 @@ export const getCatalogue = (getUnlistsed: boolean) => {
     const asset = assetsRepo.get(item.id) as Asset;
 
     if (!asset) {
-      logger.info(`[ShopService.getCatalogue] Could not find asset for item.id : ${item.id}`);
+      log.info(`[ShopService.getCatalogue] Could not find asset for item.id : ${item.id}`);
     } else {
       const shopItem = {
         id: item.id,
@@ -88,10 +89,10 @@ export const buyShopItem = async (member: GuildMember, itemId: string) => {
 
 const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
   if (!item)
-    throw new Error(ShopError.ITEM_NOT_FOUND);
+    throw new CookieException(ShopError.ITEM_NOT_FOUND);
 
   if (!item.listed)
-    throw new Error(ShopError.ITEM_UNLISTED)
+    throw new CookieException(ShopError.ITEM_UNLISTED)
 
   const { level: userLevel } = profileRepo.get(member.id) as UserProfile;
 
@@ -100,31 +101,31 @@ const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: Us
   let memberAgeTs = item.eligibility.memberAgeTs ?? -1;
 
   if (userLevel < level)
-    throw new Error(ShopError.USER_LEVEL_LOW);
+    throw new CookieException(ShopError.USER_LEVEL_LOW);
 
   if (joinedBeforeTs != -1 && member.joinedTimestamp > joinedBeforeTs)
-    throw new Error(ShopError.ITEM_TIME_LIMITED);
+    throw new CookieException(ShopError.ITEM_TIME_LIMITED);
 
   if (memberAgeTs != -1 && (Date.now() - member.joinedTimestamp < memberAgeTs))
-    throw new Error(ShopError.MEMBERSHIP_TIME_TOO_LOW);
+    throw new CookieException(ShopError.MEMBERSHIP_TIME_TOO_LOW);
 
   if (userInventory.coins < item.cost)
-    throw new Error(ShopError.NOT_ENOUGH_COINS);
+    throw new CookieException(ShopError.NOT_ENOUGH_COINS);
 
   if (item.stock == 0)
-    throw new Error(ShopError.ITEM_OUT_OF_STOCK);
+    throw new CookieException(ShopError.ITEM_OUT_OF_STOCK);
 }
 
 const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: UserInventory) => {
   let ownedInventory = getSubInventory(item, userInventory);
   if (ownedInventory === null) {
-    logger.error(`[shopService.completePurchase()] No user inventory exists for this item type. Item : ${item}`);
-    throw new Error(ShopError.UNEXPECTED_ERROR);
+    log.error(`[shopService.completePurchase()] No user inventory exists for this item type. Item : ${item}`);
+    throw new CookieException(ShopError.UNEXPECTED_ERROR);
   }
 
   let ownedSet: Set<string> = new Set(ownedInventory);
   if (ownedSet.has(item.id))
-    throw new Error(ShopError.USER_HAS_ITEM);
+    throw new CookieException(ShopError.USER_HAS_ITEM);
   ownedSet.add(item.id);
   ownedInventory = Array.from(ownedSet);
 
@@ -132,7 +133,6 @@ const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: Use
     await shopRepo.set(item.id, { stock: item.stock - 1 })
   userInventory.coins = - item.cost;
   updateSubInventory(item.type as ShopItemType, userInventory, ownedInventory);
-  console.log(userInventory);
 }
 
 const updateSubInventory = (type: ShopItemType, userInventory: UserInventory, ownedInventory: string[]) => {

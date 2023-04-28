@@ -1,7 +1,10 @@
 import { Message, TextChannel } from "discord.js";
 import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
-import logger from "../utils/logger";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { getChannelMentionFromId } from "../helpers/getChannelMentionFromId";
+import { getUserLogString } from "../helpers/getUserLogString";
 
 const embedFn = async (message: Message, args: string[]) => {
     try {
@@ -25,15 +28,18 @@ const embedFn = async (message: Message, args: string[]) => {
         const content = JSON.parse(args.join(" "));
 
         if (isEdit) {
+            log.info(sendToLogChannel(`[Embed] Updating (${msg.id}) in Channel : ${getChannelMentionFromId(channel.id)} by  User: ${getUserLogString(message.author)}\nContent: ${content}`));
             msg.edit({ embeds: [content] });
-            logger.info(`[Embed] Updated (${msg.id}) in Channel : ${channel.name} (${channel.id})`);
+            await message.reply("Embed updated!");
             return;
         }
 
         channel.send({ embeds: [content] });
-        logger.info(`[Embed] Sent to Channel : ${channel.name} (${channel.id})`);
+        log.info(sendToLogChannel(`[Embed] Sent to Channel : ${getChannelMentionFromId(channel.id)} by User : ${getUserLogString(message.author)}\nContent : ${content}`));
+        await message.reply("Embed sent!");
     } catch (err) {
-        logger.error(`[Embed] ${err}`);
+        await message.reply("Error while sending/updating embed!");
+        log.error(sendToLogChannel(`[Embed] Error : ${err}`));
     }
 }
 

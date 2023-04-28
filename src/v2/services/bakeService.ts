@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { inventoryRepo, profileRepo } from "../utils/repos";
-import logger from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
+import { log } from "../utils/logger";
 
 const HALF_DAY_IN_MS = 43200000;
 const HOUR_IN_MS = 3600000;
@@ -54,19 +54,19 @@ export const bakeCookies = async (message: Message) => {
             replyMsg.deletable && replyMsg.delete();
             message.deletable && message.delete();
         }, 5000);
-        logger.error(`[Bake] ${err}`);
+        log.error(`[Bake] User : ${getUserLogString(message.author)}\nError : ${err}`);
     }
 }
 
 const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookies: number) => {
-    logger.info(`[Bake] ${getUserLogString(message.author)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
+    log.info(`[Bake] ${getUserLogString(message.author)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
     const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
     const msg = `**Cookies Baked!**\nYou baked ${freshCookies} ${cookieStr}.\n**🍪 Total Cookies: ${cookies}**`;
     message.reply(msg);
 }
 
 const sendCooldownMsg = async (message: Message, timeDiff: number, cookies: number) => {
-    logger.info(`[Bake] User : ${getUserLogString(message.author)} is on cooldown`);
+    log.info(`[Bake] User : ${getUserLogString(message.author)} is on cooldown`);
     const remainingMs = HALF_DAY_IN_MS - timeDiff;
 
     if (remainingMs < MINUTE_IN_MS) {
