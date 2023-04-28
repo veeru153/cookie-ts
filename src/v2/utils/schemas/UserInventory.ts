@@ -7,3 +7,18 @@ export interface UserInventory extends DocumentData {
     cookies: number;
     lastBaked: number;
 }
+
+export const DEFAULT_INVENTORY = {
+    backgrounds: ["YUQI_REVEAL"],
+    badges: ["SIGN_YUQI", "IDLE_BLOB"],
+    coins: 0,
+    cookies: 0,
+    lastBaked: -1,
+}
+
+export const getDefaultInventoryForId = (id: string) => {
+    return {
+        id: id,
+        ...DEFAULT_INVENTORY
+    }
+}

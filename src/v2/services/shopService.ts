@@ -9,6 +9,7 @@ import { Asset } from "../utils/schemas/Asset";
 import { CatalogueItem } from "../utils/types/CatalogueItem";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
+import { validateAndPatchInventory, validateAndPatchProfile } from "./inventoryService";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {
@@ -77,7 +78,8 @@ export const getCatalogue = (getUnlistsed: boolean) => {
 // Validate and add item to member's inventory
 export const buyShopItem = async (member: GuildMember, itemId: string) => {
   const item = shopRepo.get(itemId) as ShopItem;
-  const userInventory = inventoryRepo.get(member.id) as UserInventory;
+  let userInventory = inventoryRepo.get(member.id) as UserInventory;
+  userInventory = await validateAndPatchInventory(member.user.id, userInventory);
   validatePurchase(member, item, userInventory);
   await completePurchaseAndDeductFunds(item, userInventory);
   await inventoryRepo.set(member.id, userInventory);
@@ -87,14 +89,16 @@ export const buyShopItem = async (member: GuildMember, itemId: string) => {
   };
 }
 
-const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
+const validatePurchase = async (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
   if (!item)
     throw new CookieException(ShopError.ITEM_NOT_FOUND);
 
   if (!item.listed)
     throw new CookieException(ShopError.ITEM_UNLISTED)
 
-  const { level: userLevel } = profileRepo.get(member.id) as UserProfile;
+  let userProfile = profileRepo.get(member.id) as UserProfile;
+  userProfile = await validateAndPatchProfile(member.id, userProfile);
+  const { level: userLevel } = userProfile;
 
   let level = item.eligibility.level ?? -1;
   let joinedBeforeTs = item.eligibility.joinedBeforeTs ?? -1;

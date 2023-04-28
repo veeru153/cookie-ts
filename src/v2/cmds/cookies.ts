@@ -3,9 +3,11 @@ import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
+import { validateAndPatchInventory } from "../services/inventoryService";
 
 const cookiesFn = async (message: Message) => {
-    const userInv = inventoryRepo.get(message.author.id) as UserInventory;
+    let userInv = inventoryRepo.get(message.author.id) as UserInventory;
+    userInv = await validateAndPatchInventory(message.author.id, userInv);
     const res = `🍪 Total Cookies: ${userInv.cookies}`;
     await message.reply(res);
 }

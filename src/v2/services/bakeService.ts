@@ -2,6 +2,9 @@ import { Message } from "discord.js";
 import { inventoryRepo, profileRepo } from "../utils/repos";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
+import { validateAndPatchInventory, validateAndPatchProfile } from "./inventoryService";
+import { UserInventory } from "../utils/schemas/UserInventory";
+import { UserProfile } from "../utils/schemas/UserProfile";
 
 const HALF_DAY_IN_MS = 43200000;
 const HOUR_IN_MS = 3600000;
@@ -13,20 +16,11 @@ const GUARANTEE = 1;
 export const bakeCookies = async (message: Message) => {
     try {
         const { id } = message.author;
-        const userProfile = profileRepo.get(id);
-        const userInventory = inventoryRepo.get(id);
+        let userProfile = profileRepo.get(id) as UserProfile;
+        userProfile = await validateAndPatchProfile(id, userProfile);
+        let userInventory = (inventoryRepo.get(id) as UserInventory);
+        userInventory = await validateAndPatchInventory(id, userInventory);
         const currTime = Date.now();
-
-        if (userInventory == null) {
-            const freshCookies = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER);
-            inventoryRepo.set(id, {
-                cookies: freshCookies,
-                lastBaked: currTime,
-            })
-
-            await sendBakeSuccessMsg(message, freshCookies, freshCookies);
-            return;
-        }
 
         const { cookies, lastBaked } = userInventory;
         const timeDiff = currTime - lastBaked;
@@ -36,16 +30,14 @@ export const bakeCookies = async (message: Message) => {
             return;
         }
 
-        // TODO: update cookie formula
         const userLevel = userProfile.level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
         const bias = Math.max(0, Math.random() - skew);
         const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
 
-        inventoryRepo.set(id, {
-            cookies: cookies + freshCookies,
-            lastBaked: currTime,
-        })
+        userInventory.cookies = cookies + freshCookies;
+        userInventory.lastBaked = currTime;
+        inventoryRepo.set(id, userInventory);
 
         await sendBakeSuccessMsg(message, freshCookies, cookies + freshCookies);
     } catch (err) {
