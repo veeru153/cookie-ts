@@ -9,7 +9,8 @@ import { Asset } from "../utils/schemas/Asset";
 import { CatalogueItem } from "../utils/types/CatalogueItem";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
-import { validateAndPatchInventory, validateAndPatchProfile } from "./inventoryService";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {

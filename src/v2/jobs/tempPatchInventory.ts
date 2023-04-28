@@ -5,7 +5,8 @@ import { inventoryRepo, profileRepo } from "../utils/repos"
 import { UserInventory } from "../utils/schemas/UserInventory"
 import { UserProfile } from "../utils/schemas/UserProfile"
 import { log } from "../utils/logger"
-import { validateAndPatchInventory, validateAndPatchProfile } from "../services/inventoryService"
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile"
 
 const tempPatchInventoryFn = async (message: Message) => {
     // TODO: Remove profile.bg after deprecating v1

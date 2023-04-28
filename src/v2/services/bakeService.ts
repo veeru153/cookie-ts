@@ -2,7 +2,8 @@ import { Message } from "discord.js";
 import { inventoryRepo, profileRepo } from "../utils/repos";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
-import { validateAndPatchInventory, validateAndPatchProfile } from "./inventoryService";
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
 import { UserInventory } from "../utils/schemas/UserInventory";
 import { UserProfile } from "../utils/schemas/UserProfile";
 

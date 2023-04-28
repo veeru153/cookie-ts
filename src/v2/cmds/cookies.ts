@@ -3,7 +3,7 @@ import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
-import { validateAndPatchInventory } from "../services/inventoryService";
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 
 const cookiesFn = async (message: Message) => {
     let userInv = inventoryRepo.get(message.author.id) as UserInventory;

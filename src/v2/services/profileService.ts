@@ -8,7 +8,8 @@ import { generateCard } from "./profileCardService";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
-import { validateAndPatchInventory, validateAndPatchProfile } from "./inventoryService";
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
 
 export const customizeProfile = async (id: string, key: ShopItemType, value: string) => {
     if (![ShopItemType.BACKGROUND, ShopItemType.BADGE].includes(key))

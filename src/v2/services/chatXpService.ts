@@ -5,7 +5,7 @@ import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { UserProfile } from "../utils/schemas/UserProfile";
-import { validateAndPatchProfile } from "./inventoryService";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1 / MULTIPLIER;
