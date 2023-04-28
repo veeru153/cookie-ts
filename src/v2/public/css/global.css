@@ -29,3 +29,42 @@ a {
     margin-top: -12px;
     margin-bottom: 0;
 }
+
+.modal {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 64%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f0f8ffc7;
+}
+
+.modal .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 36%;
+}
+
+@media screen and (min-width: 700px) {
+    .modal {
+        max-width: 80%;
+    }
+
+    .modal .container {
+        width: 62.5%;
+        height: initial;
+    }
+}
+
+@media screen and (min-width: 1080px) {
+    .modal {
+        max-width: 60%;
+    }
+}

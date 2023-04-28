@@ -18,7 +18,5 @@ shop.get('/badges', (req: Request, res: Response) => {
 })
 
 shop.all('/', (req: Request, res: Response) => {
-    // const catalogue = getCatalogue(false);
-    // res.render(path.join(__dirname, '..', 'views', 'shop.ejs'), { catalogue });
-    res.render(path.join(__dirname, '..', 'views', 'shop', 'main.ejs'));
+    res.render(path.join(__dirname, '..', 'views', 'shop', 'index.ejs'));
 });

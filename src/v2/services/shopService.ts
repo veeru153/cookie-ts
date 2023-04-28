@@ -81,7 +81,7 @@ export const buyShopItem = async (member: GuildMember, itemId: string) => {
   const item = shopRepo.get(itemId) as ShopItem;
   let userInventory = inventoryRepo.get(member.id) as UserInventory;
   userInventory = await validateAndPatchInventory(member.user.id, userInventory);
-  validatePurchase(member, item, userInventory);
+  await validatePurchase(member, item, userInventory);
   await completePurchaseAndDeductFunds(item, userInventory);
   await inventoryRepo.set(member.id, userInventory);
   return {
@@ -114,7 +114,7 @@ const validatePurchase = async (member: GuildMember, item: ShopItem, userInvento
   if (memberAgeTs != -1 && (Date.now() - member.joinedTimestamp < memberAgeTs))
     throw new CookieException(ShopError.MEMBERSHIP_TIME_TOO_LOW);
 
-  if (userInventory.coins < item.cost)
+  if (userInventory.cookies < item.cost)
     throw new CookieException(ShopError.NOT_ENOUGH_COINS);
 
   if (item.stock == 0)
@@ -136,7 +136,7 @@ const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: Use
 
   if (item.stock != -1)
     await shopRepo.set(item.id, { stock: item.stock - 1 })
-  userInventory.coins = - item.cost;
+  userInventory.cookies = userInventory.cookies - item.cost;
   updateSubInventory(item.type as ShopItemType, userInventory, ownedInventory);
 }
 

@@ -18,12 +18,12 @@ export const validateAndPatchProfile = async (id: string, profile: UserProfile) 
         throw new CookieException("User Profile is not in a valid state.");
     }
 
-    if (!profile.bg || profile.bg === "DEFAULT") {
+    if (!profile.bg || profile.bg === "DEFAULT" || profile.bg === "YUQI_REVEAL") {
         profile.bg = DEFAULT_PROFILE.background;
         needsPatch = true;
     }
-    if (!profile.background) {
-        profile.background = profile.bg;
+    if (!profile.background || profile.background === "YUQI_REVEAL") {
+        profile.background = DEFAULT_PROFILE.background;
         needsPatch = true;
     }
     if (!profile.badge1) {

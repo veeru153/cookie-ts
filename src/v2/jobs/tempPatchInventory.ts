@@ -4,28 +4,23 @@ import Scope from "../utils/enums/Scope"
 import { inventoryRepo, profileRepo } from "../utils/repos"
 import { UserInventory } from "../utils/schemas/UserInventory"
 import { UserProfile } from "../utils/schemas/UserProfile"
-import { log } from "../utils/logger"
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile"
 
 const tempPatchInventoryFn = async (message: Message) => {
-    // TODO: Remove profile.bg after deprecating v1
-    message.reply("Unimplemented! Should deregister!");
-    return;
+    const profileData = profileRepo.data;
+    for (const _profile of profileData) {
+        const id = _profile[0];
+        const profile = (_profile[1] as UserProfile);
+        await validateAndPatchProfile(id, profile);
+    }
 
-    // const profileData = profileRepo.data;
-    // for (const _profile of profileData) {
-    //     const id = _profile[0];
-    //     const profile = (_profile[1] as UserProfile);
-    //     await validateAndPatchProfile(id, profile);
-    // }
-
-    // const inventoryData = inventoryRepo.data;
-    // for (const _inventory of inventoryData) {
-    //     const id = _inventory[0];
-    //     const inventory = (_inventory[1] as UserInventory);
-    //     await validateAndPatchInventory(id, inventory);
-    // }
+    const inventoryData = inventoryRepo.data;
+    for (const _inventory of inventoryData) {
+        const id = _inventory[0];
+        const inventory = (_inventory[1] as UserInventory);
+        await validateAndPatchInventory(id, inventory);
+    }
 }
 
 export const tempPatchInventory = new Command({

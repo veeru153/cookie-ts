@@ -12,8 +12,8 @@ export interface UserProfile extends DocumentData {
 export const DEFAULT_PROFILE = {
     level: 0,
     xp: 0,
-    bg: "YUQI_REVEAL",
-    background: "YUQI_REVEAL",
+    bg: "I_AM_YUQI",
+    background: "I_AM_YUQI",
     badge1: "SIGN_YUQI",
     badge2: "IDLE_BLOB",
 }

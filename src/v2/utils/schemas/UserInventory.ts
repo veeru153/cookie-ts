@@ -9,7 +9,7 @@ export interface UserInventory extends DocumentData {
 }
 
 export const DEFAULT_INVENTORY = {
-    backgrounds: ["YUQI_REVEAL"],
+    backgrounds: ["I_AM_YUQI"],
     badges: ["SIGN_YUQI", "IDLE_BLOB"],
     coins: 0,
     cookies: 0,
