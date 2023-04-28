@@ -5,8 +5,14 @@ import { buyShopItem, getFormattedCatalogue } from "../services/shopService";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { SHOP_URL } from "../utils/constants";
 
 const shopFn = async (message: Message, args: string[]) => {
+    if (args.length === 0) {
+        await message.reply(`🛒 Shop: ${SHOP_URL}`);
+        return;
+    }
+
     try {
         switch (args[0]) {
             case "list":

@@ -3,6 +3,8 @@ export * from "./cookies";
 export * from "./embed";
 export * from "./help";
 export * from "./job";
+export * from "./mybag";
 export * from "./ping";
 export * from "./profile";
 export * from "./shop";
+export * from "./wallet";
