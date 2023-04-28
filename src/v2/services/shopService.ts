@@ -9,6 +9,8 @@ import { Asset } from "../utils/schemas/Asset";
 import { CatalogueItem } from "../utils/types/CatalogueItem";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {
@@ -77,8 +79,9 @@ export const getCatalogue = (getUnlistsed: boolean) => {
 // Validate and add item to member's inventory
 export const buyShopItem = async (member: GuildMember, itemId: string) => {
   const item = shopRepo.get(itemId) as ShopItem;
-  const userInventory = inventoryRepo.get(member.id) as UserInventory;
-  validatePurchase(member, item, userInventory);
+  let userInventory = inventoryRepo.get(member.id) as UserInventory;
+  userInventory = await validateAndPatchInventory(member.user.id, userInventory);
+  await validatePurchase(member, item, userInventory);
   await completePurchaseAndDeductFunds(item, userInventory);
   await inventoryRepo.set(member.id, userInventory);
   return {
@@ -87,14 +90,16 @@ export const buyShopItem = async (member: GuildMember, itemId: string) => {
   };
 }
 
-const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
+const validatePurchase = async (member: GuildMember, item: ShopItem, userInventory: UserInventory) => {
   if (!item)
     throw new CookieException(ShopError.ITEM_NOT_FOUND);
 
   if (!item.listed)
     throw new CookieException(ShopError.ITEM_UNLISTED)
 
-  const { level: userLevel } = profileRepo.get(member.id) as UserProfile;
+  let userProfile = profileRepo.get(member.id) as UserProfile;
+  userProfile = await validateAndPatchProfile(member.id, userProfile);
+  const { level: userLevel } = userProfile;
 
   let level = item.eligibility.level ?? -1;
   let joinedBeforeTs = item.eligibility.joinedBeforeTs ?? -1;
@@ -109,7 +114,7 @@ const validatePurchase = (member: GuildMember, item: ShopItem, userInventory: Us
   if (memberAgeTs != -1 && (Date.now() - member.joinedTimestamp < memberAgeTs))
     throw new CookieException(ShopError.MEMBERSHIP_TIME_TOO_LOW);
 
-  if (userInventory.coins < item.cost)
+  if (userInventory.cookies < item.cost)
     throw new CookieException(ShopError.NOT_ENOUGH_COINS);
 
   if (item.stock == 0)
@@ -131,7 +136,7 @@ const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: Use
 
   if (item.stock != -1)
     await shopRepo.set(item.id, { stock: item.stock - 1 })
-  userInventory.coins = - item.cost;
+  userInventory.cookies = userInventory.cookies - item.cost;
   updateSubInventory(item.type as ShopItemType, userInventory, ownedInventory);
 }
 

@@ -1,5 +1,6 @@
 import { db } from "../utils/firebase";
 import { log } from "../utils/logger";
+import { DocumentData } from "./DocumentData";
 
 class Repository {
     name: string;
@@ -35,12 +36,18 @@ class Repository {
     }
 
     set = async (key: string, value: FirebaseFirestore.DocumentData) => {
-        if (!this.data.has(key)) {
-            await this.collection.doc(key).set(value);
-            return;
+        const tempValue = { ...value };
+        if ((tempValue as DocumentData).id) {
+            delete tempValue.id;
         }
 
-        await this.collection.doc(key).update(value);
+        if (!this.data.has(key)) {
+            await this.collection.doc(key).set(tempValue);
+            return value;
+        }
+
+        await this.collection.doc(key).update(tempValue);
+        return value;
     }
 }
 

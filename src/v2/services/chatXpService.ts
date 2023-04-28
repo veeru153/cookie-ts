@@ -4,6 +4,8 @@ import { profileRepo } from "../utils/repos";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { UserProfile } from "../utils/schemas/UserProfile";
+import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1 / MULTIPLIER;
@@ -22,21 +24,12 @@ export const updateChatXp = async (message: Message) => {
     const { id } = message.author;
 
     try {
-        const userProfile = profileRepo.get(id);
-
-        if (userProfile == null) {
-            log.warn(`[ChatXpService] User : (${id}) is null`)
-            await profileRepo.set(id, {
-                xp: Math.floor((Math.random() + GUARANTEE) * MULTIPLIER),
-                level: 0,
-            })
-            return;
-        }
+        let userProfile = profileRepo.get(id) as UserProfile;
+        userProfile = await validateAndPatchProfile(id, userProfile);
 
         let userLevel = userProfile.level;
         let userXp = userProfile.xp;
 
-        // TODO: chat xp formula
         let updatedXp = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER) + userXp;
 
         if (updatedXp >= (userLevel + 1) * LEVEL_LIMIT) {
@@ -46,10 +39,9 @@ export const updateChatXp = async (message: Message) => {
             await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
         }
 
-        await profileRepo.set(id, {
-            xp: updatedXp,
-            level: userLevel,
-        })
+        userProfile.xp = updatedXp;
+        userProfile.level = userLevel;
+        await profileRepo.set(id, userProfile);
     } catch (err) {
         log.error(sendToLogChannel(`[Chat XP] Error while updating xp for User : ${getUserLogString(message.author)} : ${err}`));
     }
