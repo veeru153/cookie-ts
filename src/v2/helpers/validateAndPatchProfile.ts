@@ -13,9 +13,8 @@ export const validateAndPatchProfile = async (id: string, profile: UserProfile) 
     }
 
     let needsPatch = false;
-
     if (profile.id && id !== profile.id) {
-        log.error(sendToLogChannel(`[Inventory Service] Error Patching Profile for User Id : ${id} - Profile Id : ${profile.id} Mismatch`));
+        log.error(sendToLogChannel(`[Profile Validation] Error Patching Profile for User Id : ${id} - Profile Id : ${profile.id} Mismatch`));
         throw new CookieException("User Profile is not in a valid state.");
     }
 
@@ -35,11 +34,11 @@ export const validateAndPatchProfile = async (id: string, profile: UserProfile) 
         profile.badge2 = DEFAULT_PROFILE.badge2;
         needsPatch = true;
     }
-    if (!profile.level) {
+    if (profile.level === null || profile.level === undefined) {
         profile.level = DEFAULT_PROFILE.level;
         needsPatch = true;
     }
-    if (!profile.xp) {
+    if (profile.xp === null || profile.xp === undefined) {
         profile.xp = DEFAULT_PROFILE.xp;
         needsPatch = true;
     }
@@ -48,10 +47,10 @@ export const validateAndPatchProfile = async (id: string, profile: UserProfile) 
         return profile;
 
     try {
-        log.info(`[Inventory Service] Patching profile for User Id: ${id}`);
+        log.info(`[Profile Validation] Patching profile for User Id: ${id}`);
         return (await profileRepo.set(id, profile) as UserProfile);
     } catch (err) {
-        log.error(sendToLogChannel(`[Inventory Service] Error Patching Profile for User Id : ${id}\n${err}`));
+        log.error(sendToLogChannel(`[Profile Validation] Error Patching Profile for User Id : ${id}\n${err}`));
         throw new CookieException("User Profile is not in a valid state.");
     }
 }

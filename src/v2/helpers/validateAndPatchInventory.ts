@@ -14,7 +14,7 @@ export const validateAndPatchInventory = async (id: string, inventory: UserInven
     let needsPatch = false;
 
     if (inventory.id && id !== inventory.id) {
-        log.error(sendToLogChannel(`[Inventory Service] Error Patching Inventory for User Id : ${id} - Inventory Id : ${inventory.id} Mismatch`));
+        log.error(sendToLogChannel(`[Inventory Validation] Error Patching Inventory for User Id : ${id} - Inventory Id : ${inventory.id} Mismatch`));
         throw new CookieException("User Inventory is not in a valid state.");
     }
 
@@ -22,34 +22,31 @@ export const validateAndPatchInventory = async (id: string, inventory: UserInven
         inventory.backgrounds = DEFAULT_INVENTORY.backgrounds;
         needsPatch = true;
     }
-
     if (!inventory.badges || inventory.badges.length === 0) {
         inventory.badges = DEFAULT_INVENTORY.badges;
         needsPatch = true;
     }
-
-    if (!inventory.coins) {
+    if (inventory.coins === null || inventory.coins === undefined) {
         inventory.coins = DEFAULT_INVENTORY.coins;
         needsPatch = true;
     }
-
-    if (!inventory.cookies) {
+    if (inventory.cookies === null || inventory.cookies === undefined) {
         inventory.cookies = DEFAULT_INVENTORY.cookies;
         needsPatch = true;
     }
-    if (!inventory.lastBaked) {
+    if (inventory.lastBaked === null || inventory.cookies === undefined) {
         inventory.lastBaked = DEFAULT_INVENTORY.lastBaked;
         needsPatch = true;
     }
 
     if (!needsPatch)
-        return;
+        return inventory;
 
     try {
-        log.info(`[Inventory Service] Patching Inventory for User Id: ${id}`);
+        log.info(`[Inventory Validation] Patching Inventory for User Id: ${id}`);
         return (await inventoryRepo.set(id, inventory) as UserInventory);
     } catch (err) {
-        log.error(sendToLogChannel(`[Inventory Service] Error Patching Inventory for User Id : ${id}\n${err}`));
+        log.error(sendToLogChannel(`[Inventory Validation] Error Patching Inventory for User Id : ${id}\n${err}`));
         throw new CookieException("User Inventory is not in a valid state.");
     }
 }

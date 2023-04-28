@@ -96,7 +96,7 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.textAlign = "start";
     ctx.fillText("xp", xpLabelX, xpLabelY);
     ctx.textAlign = "end";
-    ctx.fillText(`Level ${data.level}`, levelX, levelY);
+    ctx.fillText(`lvl ${data.level}`, levelX, levelY);
     ctx.restore();
     log.info("[ProfileCardService] XP Bar added");
 }
