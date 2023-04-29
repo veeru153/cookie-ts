@@ -3,7 +3,6 @@ import { assetsRepo, inventoryRepo, profileRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
 import { UserProfile } from "../utils/schemas/UserProfile";
 import { Message } from "discord.js";
-import { Asset } from "../utils/schemas/Asset";
 import { generateCard } from "./profileCardService";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";

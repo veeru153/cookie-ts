@@ -4,8 +4,6 @@ import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { UserInventory } from "../utils/schemas/UserInventory";
-import { UserProfile } from "../utils/schemas/UserProfile";
 
 const HALF_DAY_IN_MS = 43200000;
 const HOUR_IN_MS = 3600000;

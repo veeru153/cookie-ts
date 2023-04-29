@@ -1,10 +1,9 @@
 import { GuildMember } from "discord.js";
 import { assetsRepo, inventoryRepo, profileRepo } from "../utils/repos";
 import { getDefaultProfileForId } from "../utils/schemas/UserProfile";
-import { UserInventory, getDefaultInventoryForId } from "../utils/schemas/UserInventory";
+import { getDefaultInventoryForId } from "../utils/schemas/UserInventory";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { log } from "../utils/logger";
-import { Asset } from "../utils/schemas/Asset";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 export const initializeMemberCollections = async (member: GuildMember) => {

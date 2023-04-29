@@ -18,7 +18,8 @@ export const updateGuildAge = async () => {
 }
 
 export const updateEmotes = async () => {
-    let channel = await client.channels.resolve(Channels.Reception.EMOTES).fetch();
+    const _channel = isDevEnv ? Channels.Cookie.EMOTES_TEST : Channels.Reception.EMOTES;
+    let channel = await client.channels.resolve(_channel).fetch();
     if (!channel.isTextBased())
         throw new CookieException(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);

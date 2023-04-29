@@ -2,10 +2,8 @@ import { GuildMember } from "discord.js";
 import { ShopItemType, ShopItem } from "../utils/schemas/ShopItem"
 import { assetsRepo, profileRepo, shopRepo } from "../utils/repos";
 import { ShopError } from "../utils/enums/Errors";
-import { UserProfile } from "../utils/schemas/UserProfile";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
-import { Asset } from "../utils/schemas/Asset";
 import { CatalogueItem } from "../utils/types/CatalogueItem";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
