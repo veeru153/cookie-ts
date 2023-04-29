@@ -4,8 +4,6 @@ import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { UserInventory } from "../utils/schemas/UserInventory";
-import { UserProfile } from "../utils/schemas/UserProfile";
 
 const HALF_DAY_IN_MS = 43200000;
 const HOUR_IN_MS = 3600000;
@@ -17,9 +15,9 @@ const GUARANTEE = 1;
 export const bakeCookies = async (message: Message) => {
     try {
         const { id } = message.author;
-        let userProfile = profileRepo.get(id) as UserProfile;
+        let userProfile = await profileRepo.get(id);
         userProfile = await validateAndPatchProfile(id, userProfile);
-        let userInventory = (inventoryRepo.get(id) as UserInventory);
+        let userInventory = await inventoryRepo.get(id);
         userInventory = await validateAndPatchInventory(id, userInventory);
         const currTime = Date.now();
 

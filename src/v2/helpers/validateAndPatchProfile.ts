@@ -6,7 +6,6 @@ import { sendToLogChannel } from "./sendToLogChannel";
 
 export const validateAndPatchProfile = async (id: string, profile: UserProfile) => {
     // TODO: Remove profile.bg and DEFAULT entirely after v1 deprecation
-
     if (!profile) {
         profile = getDefaultProfileForId(id);
         return (await profileRepo.set(id, profile) as UserProfile);

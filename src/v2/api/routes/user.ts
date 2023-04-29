@@ -1,7 +1,5 @@
 import { Request, Response, Router } from "express";
 import path from "path";
-import { getCatalogue } from "../../services/shopService";
-import { ShopItemType } from "../../utils/schemas/ShopItem";
 import { getMemberFromId } from "../../services/memberService";
 import { getUserInventoryForPanel } from "../../services/inventoryService";
 

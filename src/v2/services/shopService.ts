@@ -2,10 +2,8 @@ import { GuildMember } from "discord.js";
 import { ShopItemType, ShopItem } from "../utils/schemas/ShopItem"
 import { assetsRepo, profileRepo, shopRepo } from "../utils/repos";
 import { ShopError } from "../utils/enums/Errors";
-import { UserProfile } from "../utils/schemas/UserProfile";
 import { inventoryRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
-import { Asset } from "../utils/schemas/Asset";
 import { CatalogueItem } from "../utils/types/CatalogueItem";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
@@ -22,10 +20,12 @@ export const addItem = async (itemId: string, itemData: ShopItem) => {
 
 // Mark as unlisted, keep in list
 export const unlistItem = async (itemId: string) => {
-  if (!shopRepo.get(itemId)) {
+  const item = await shopRepo.get(itemId);
+  if (!item) {
     throw new CookieException(`Item with id : \`${itemId}\` does not exist`);
   }
-  await shopRepo.set(itemId, { listed: false });
+  item.listed = false;
+  await shopRepo.set(itemId, item);
 }
 
 // Get all listed shop items
@@ -52,13 +52,11 @@ export const getFormattedCatalogue = (): string => {
   return [...header, ...list].join('\n');
 }
 
-export const getCatalogue = (getUnlistsed: boolean) => {
+export const getCatalogue = async (getUnlistsed: boolean) => {
   const list: CatalogueItem[] = [];
-  shopRepo.data.forEach((item: ShopItem, key) => {
+  shopRepo.data.forEach(async (item: ShopItem, key) => {
     if (!getUnlistsed && !item.listed) return;
-
-    const asset = assetsRepo.get(item.id) as Asset;
-
+    const asset = await assetsRepo.get(item.id);
     if (!asset) {
       log.info(`[ShopService.getCatalogue] Could not find asset for item.id : ${item.id}`);
     } else {
@@ -73,13 +71,13 @@ export const getCatalogue = (getUnlistsed: boolean) => {
       list.push(shopItem);
     }
   })
-  return list.sort((a, b) => b.ts - a.ts);
+  return list;
 }
 
 // Validate and add item to member's inventory
 export const buyShopItem = async (member: GuildMember, itemId: string) => {
-  const item = shopRepo.get(itemId) as ShopItem;
-  let userInventory = inventoryRepo.get(member.id) as UserInventory;
+  const item = await shopRepo.get(itemId);
+  let userInventory = await inventoryRepo.get(member.id);
   userInventory = await validateAndPatchInventory(member.user.id, userInventory);
   await validatePurchase(member, item, userInventory);
   await completePurchaseAndDeductFunds(item, userInventory);
@@ -97,7 +95,7 @@ const validatePurchase = async (member: GuildMember, item: ShopItem, userInvento
   if (!item.listed)
     throw new CookieException(ShopError.ITEM_UNLISTED)
 
-  let userProfile = profileRepo.get(member.id) as UserProfile;
+  let userProfile = await profileRepo.get(member.id);
   userProfile = await validateAndPatchProfile(member.id, userProfile);
   const { level: userLevel } = userProfile;
 
@@ -134,8 +132,11 @@ const completePurchaseAndDeductFunds = async (item: ShopItem, userInventory: Use
   ownedSet.add(item.id);
   ownedInventory = Array.from(ownedSet);
 
-  if (item.stock != -1)
-    await shopRepo.set(item.id, { stock: item.stock - 1 })
+  if (item.stock != -1) {
+    item.stock = item.stock - 1;
+    await shopRepo.set(item.id, item);
+  }
+
   userInventory.cookies = userInventory.cookies - item.cost;
   updateSubInventory(item.type as ShopItemType, userInventory, ownedInventory);
 }
