@@ -4,6 +4,7 @@ import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
+import { BOOSTER_MULTIPLIER } from "../utils/constants";
 
 const HALF_DAY_IN_MS = 43200000;
 const HOUR_IN_MS = 3600000;
@@ -32,7 +33,11 @@ export const bakeCookies = async (message: Message) => {
         const userLevel = userProfile.level;
         const skew = Math.floor(Math.random() * (0.13 - 0.03 + 1) + 0.03);
         const bias = Math.max(0, Math.random() - skew);
-        const freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
+        let freshCookies = Math.floor(((bias * userLevel) + GUARANTEE) * MULTIPLIER);
+
+        if (message.member.roles.premiumSubscriberRole) {
+            freshCookies = Math.round(freshCookies * BOOSTER_MULTIPLIER);
+        }
 
         userInventory.cookies = cookies + freshCookies;
         userInventory.lastBaked = currTime;

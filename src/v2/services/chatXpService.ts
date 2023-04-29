@@ -5,10 +5,12 @@ import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
+import { BOOSTER_MULTIPLIER } from "../utils/constants";
 
 const MULTIPLIER = 5;
 const GUARANTEE = 1 / MULTIPLIER;
 const LEVEL_LIMIT = 20;
+
 
 const IGNORED_CHANNELS = [
     Channels.Reception.EMOTES,
@@ -32,6 +34,10 @@ export const updateChatXp = async (message: Message) => {
         let userXp = userProfile.xp;
 
         let updatedXp = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER) + userXp;
+
+        if (message.member.roles.premiumSubscriberRole) {
+            updatedXp = Math.round(updatedXp * BOOSTER_MULTIPLIER);
+        }
 
         if (updatedXp >= (userLevel + 1) * LEVEL_LIMIT) {
             updatedXp -= ((userLevel + 1) * LEVEL_LIMIT);
