@@ -24,7 +24,7 @@ export const updateChatXp = async (message: Message) => {
     const { id } = message.author;
 
     try {
-        let userProfile = profileRepo.get(id) as UserProfile;
+        let userProfile = await profileRepo.get(id);
         userProfile = await validateAndPatchProfile(id, userProfile);
 
         let userLevel = userProfile.level;

@@ -1,19 +1,19 @@
 import { GuildMember } from "discord.js";
 import { assetsRepo, inventoryRepo, profileRepo } from "../utils/repos";
-import { DEFAULT_PROFILE } from "../utils/schemas/UserProfile";
-import { DEFAULT_INVENTORY, UserInventory } from "../utils/schemas/UserInventory";
+import { getDefaultProfileForId } from "../utils/schemas/UserProfile";
+import { UserInventory, getDefaultInventoryForId } from "../utils/schemas/UserInventory";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { log } from "../utils/logger";
 import { Asset } from "../utils/schemas/Asset";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 
 export const initializeMemberCollections = async (member: GuildMember) => {
-    !profileRepo.get(member.id) && await profileRepo.set(member.id, DEFAULT_PROFILE);
-    !inventoryRepo.get(member.id) && await inventoryRepo.set(member.id, DEFAULT_INVENTORY);
+    !(await profileRepo.get(member.id)) && await profileRepo.set(member.id, getDefaultProfileForId(member.id));
+    !(await inventoryRepo.get(member.id)) && await inventoryRepo.set(member.id, getDefaultInventoryForId(member.id));
 }
 
 export const getUserInventoryForPanel = async (id: string) => {
-    let userInventory = inventoryRepo.get(id) as UserInventory;
+    let userInventory = await inventoryRepo.get(id);
     userInventory = await validateAndPatchInventory(id, userInventory);
 
     const inventory = {
@@ -21,7 +21,7 @@ export const getUserInventoryForPanel = async (id: string) => {
     };
 
     for (const background of userInventory.backgrounds) {
-        const backgroundAsset = assetsRepo.get(background) as Asset;
+        const backgroundAsset = await assetsRepo.get(background);
         if (!backgroundAsset) {
             log.warn(sendToLogChannel(`[InventoryService] Asset for background : ${background} not found`));
             continue;

@@ -5,14 +5,14 @@ import { ShopItemType } from "../../utils/schemas/ShopItem";
 
 export const shop = Router();
 
-shop.get('/backgrounds', (req: Request, res: Response) => {
-    const catalogue = getCatalogue(false);
-    const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BACKGROUND);
+shop.get('/backgrounds', async (req: Request, res: Response) => {
+    const catalogue = await getCatalogue(false);
+    const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BACKGROUND).sort((a, b) => b.ts - a.ts);
     res.render(path.join(__dirname, '..', 'views', 'shop', 'backgrounds.ejs'), { backgrounds: filteredCatalogue });
 })
 
-shop.get('/badges', (req: Request, res: Response) => {
-    const catalogue = getCatalogue(false);
+shop.get('/badges', async (req: Request, res: Response) => {
+    const catalogue = await getCatalogue(false);
     const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BADGE);
     res.render(path.join(__dirname, '..', 'views', 'shop', 'badges.ejs'), { badges: filteredCatalogue });
 })

@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { routes } from "./api/routes";
+import routes from "./api/routes";
 import { log } from "./utils/logger";
 import { sendToLogChannel } from "./helpers/sendToLogChannel";
 

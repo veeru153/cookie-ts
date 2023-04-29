@@ -17,9 +17,9 @@ const GUARANTEE = 1;
 export const bakeCookies = async (message: Message) => {
     try {
         const { id } = message.author;
-        let userProfile = profileRepo.get(id) as UserProfile;
+        let userProfile = await profileRepo.get(id);
         userProfile = await validateAndPatchProfile(id, userProfile);
-        let userInventory = (inventoryRepo.get(id) as UserInventory);
+        let userInventory = await inventoryRepo.get(id);
         userInventory = await validateAndPatchInventory(id, userInventory);
         const currTime = Date.now();
 

@@ -1,6 +1,4 @@
 import { Request, Response, Router } from "express";
-import path from "path";
-import { getCatalogue } from "../../services/shopService";
 
 export const test = Router();
 

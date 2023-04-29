@@ -5,6 +5,7 @@ body {
     font-family: cursive;
     text-transform: lowercase;
     margin: 0;
+    padding-bottom: 1px;
 }
 
 a {

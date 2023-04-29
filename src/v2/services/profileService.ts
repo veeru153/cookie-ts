@@ -15,13 +15,13 @@ export const customizeProfile = async (id: string, key: ShopItemType, value: str
     if (![ShopItemType.BACKGROUND, ShopItemType.BADGE].includes(key))
         throw new CookieException('Invalid Key');
 
-    let userInventory = inventoryRepo.get(id) as UserInventory;
+    let userInventory = await inventoryRepo.get(id);
     userInventory = await validateAndPatchInventory(id, userInventory);
     const itemTypeList = getItemTypeList(userInventory, key);
     if (!itemTypeList.includes(value))
         throw new CookieException('Could not find this item in inventory.');
 
-    let userProfile = profileRepo.get(id) as UserProfile;
+    let userProfile = await profileRepo.get(id);
     userProfile = await validateAndPatchProfile(id, userProfile);
     equipItem(userProfile, key, value);
     await profileRepo.set(id, userProfile);
@@ -43,11 +43,11 @@ export const getProfileCard = async (message: Message) => {
     log.info(`[ProfileService] Generating Card for User : ${getUserLogString(message.author)}`)
     const { id, username, discriminator } = message.author;
     const avatar = message.author.displayAvatarURL({ extension: 'png', size: 128, forceStatic: true })
-    let userProfile = profileRepo.get(id) as UserProfile;
+    let userProfile = await profileRepo.get(id);
     userProfile = await validateAndPatchProfile(message.author.id, userProfile);
     const { background, xp, level } = userProfile;
-    const backgroundAsset = assetsRepo.get(background) as Asset;
-    if (!backgroundAsset) {
+    const backgroundAsset = await assetsRepo.get(background);
+    if (!backgroundAsset || !backgroundAsset.src) {
         log.error(`[ProfileService] Background asset : ${background} not found in assets`);
         throw new CookieException("Could not generate profile");
     }
