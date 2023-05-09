@@ -7,20 +7,13 @@ import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
 import { BOOSTER_MULTIPLIER } from "../utils/constants";
 
-const MULTIPLIER = 5;
-const GUARANTEE = 1 / MULTIPLIER;
-const LEVEL_LIMIT = 20;
+const FESTIVAL_MULTIPLIER = 0;
+const PROMOTION_MULTIPLIER = 0;
 
-
-const IGNORED_CHANNELS = [
-    Channels.Reception.EMOTES,
-    Channels.Kitchen.STAFF_BOT,
-    Channels.Cookieland.BOTLAND,
-    Channels.Cookie.TESTING,
-    Channels.Cookie.LOGS,
-    Channels.Cookie.EMOTES_TEST,
-    Channels.Cookie.ASSET_LIBRARY,
-] as string[];
+const CLIMB_CONSTANT = 0.004;
+const CLIMB_POWER = 2.5;
+const CLIMB_BASE = 10;
+const FINAL_XP_CAP = 400;
 
 export const updateChatXp = async (message: Message) => {
     if (IGNORED_CHANNELS.includes(message.channel.id)) return;
@@ -32,15 +25,22 @@ export const updateChatXp = async (message: Message) => {
 
         let userLevel = userProfile.level;
         let userXp = userProfile.xp;
+        // TODO: add userEquipedMultiplier once implemented
+        let userEquipedMultipler = 0;
 
-        let updatedXp = Math.floor((Math.random() + GUARANTEE) * MULTIPLIER) + userXp;
+        let mutliplierSum = FESTIVAL_MULTIPLIER + PROMOTION_MULTIPLIER + userEquipedMultipler;
+        let xpDelta = 1 + mutliplierSum;
 
         if (message.member.roles.premiumSubscriberRole) {
-            updatedXp = Math.round(updatedXp * BOOSTER_MULTIPLIER);
+            xpDelta = xpDelta * BOOSTER_MULTIPLIER;
         }
 
-        if (updatedXp >= (userLevel + 1) * LEVEL_LIMIT) {
-            updatedXp -= ((userLevel + 1) * LEVEL_LIMIT);
+        let updatedXp = userXp + xpDelta;
+        const xpCapAtLevel = Math.round(((CLIMB_CONSTANT * Math.pow(userLevel, CLIMB_POWER))) + CLIMB_BASE);
+        const xpCap = Math.min(xpCapAtLevel, FINAL_XP_CAP);
+        console.log(updatedXp, xpCap);
+        if (updatedXp >= xpCap) {
+            updatedXp -= xpCap;
             userLevel++;
             log.info(`[Chat XP] ${getUserLogString(message.author)} advanced to Level ${userLevel}`);
             await message.channel.send(`${message.author.toString()} **Level Up!**\nYou just advanced to Level ${userLevel}`);
@@ -53,3 +53,13 @@ export const updateChatXp = async (message: Message) => {
         log.error(sendToLogChannel(`[Chat XP] Error while updating xp for User : ${getUserLogString(message.author)} : ${err}`));
     }
 }
+
+const IGNORED_CHANNELS = [
+    Channels.Reception.EMOTES,
+    Channels.Kitchen.STAFF_BOT,
+    Channels.Cookieland.BOTLAND,
+    // Channels.Cookie.TESTING,
+    Channels.Cookie.LOGS,
+    Channels.Cookie.EMOTES_TEST,
+    Channels.Cookie.ASSET_LIBRARY,
+] as string[];

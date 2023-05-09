@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
-import { PREFIX } from "../utils/constants";
+import { PREFIX, devIdList, isDevEnv } from "../utils/constants";
 import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
 import { Command } from "../entities/Command";
@@ -11,6 +11,7 @@ import { sendToLogChannel } from "../helpers/sendToLogChannel";
 export const messageCreate = async (message: Message) => {
     await updateGuildAge();
     if (message.author.bot) return;
+    if (isDevEnv && !devIdList.includes(message.author.id)) return;
     await updateChatXp(message);
     if (!message.content.startsWith(PREFIX)) return;
 
