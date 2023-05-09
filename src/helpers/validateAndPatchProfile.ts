@@ -16,11 +16,6 @@ export const validateAndPatchProfile = async (id: string, profile: UserProfile) 
         log.error(sendToLogChannel(`[Profile Validation] Error Patching Profile for User Id : ${id} - Profile Id : ${profile.id} Mismatch`));
         throw new CookieException("User Profile is not in a valid state.");
     }
-
-    if (!profile.bg || profile.bg === "DEFAULT" || profile.bg === "YUQI_REVEAL") {
-        profile.bg = DEFAULT_PROFILE.background;
-        needsPatch = true;
-    }
     if (!profile.background || profile.background === "YUQI_REVEAL") {
         profile.background = DEFAULT_PROFILE.background;
         needsPatch = true;

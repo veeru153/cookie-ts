@@ -32,10 +32,8 @@ const getItemTypeList = (userInventory: UserInventory, key: ShopItemType) => {
 }
 
 const equipItem = (userProfile: UserProfile, key: ShopItemType, value: string) => {
-    if (key === ShopItemType.BACKGROUND) {
+    if (key === ShopItemType.BACKGROUND)
         userProfile.background = value;
-        userProfile.bg = value;
-    }
 }
 
 export const getProfileCard = async (message: Message) => {
