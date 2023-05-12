@@ -2,6 +2,7 @@ export * from "./bake";
 export * from "./cookies";
 export * from "./embed";
 export * from "./help";
+export * from "./inventory";
 export * from "./job";
 export * from "./mybag";
 export * from "./ping";
