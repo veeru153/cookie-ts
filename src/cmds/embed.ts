@@ -1,44 +1,51 @@
-import { TextChannel, Message } from "discord.js";
-import logger from "../util/logger";
-import Scope from "../util/scope";
-import Command from "./_Command";
+import { Message, TextChannel } from "discord.js";
+import { Command } from "../entities/Command";
+import Scope from "../utils/enums/Scope";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { getChannelMentionFromId } from "../helpers/getChannelMentionFromId";
+import { getUserLogString } from "../helpers/getUserLogString";
 
-export const embed = new Command({
-    name: "embed",
-    desc: "Draws an embed",
-    scope: [ Scope.STAFF ]
-})
-
-embed.run = async (message: Message, args: string[]) => {
+const embedFn = async (message: Message, args: string[]) => {
     try {
         const isDiffChannel = ["-c", "--channel"].includes(args[0]);
         let channel: TextChannel = null;
-        if(isDiffChannel) {
+        if (isDiffChannel) {
             channel = message.mentions.channels.first() as TextChannel;
             args.splice(0, 2);
         } else {
             channel = message.channel as TextChannel;
         }
-        
+
         const isEdit = ["-e", "--edit"].includes(args[0]);
         let msg: Message = null;
-        if(isEdit) {
+        if (isEdit) {
             const msgId = args[1];
             msg = await channel.messages.fetch(msgId);
             args.splice(0, 2);
         }
-    
+
         const content = JSON.parse(args.join(" "));
-        
-        if(isEdit) {
-            msg.edit({ embeds: [ content ]});
-            logger.info(`[Embed] Updated (${msg.id}) in Channel : ${channel.name} (${channel.id})`);
+
+        if (isEdit) {
+            log.info(sendToLogChannel(`[Embed] Updating (${msg.id}) in Channel : ${getChannelMentionFromId(channel.id)} by  User: ${getUserLogString(message.author)}\nContent: ${content}`));
+            msg.edit({ embeds: [content] });
+            await message.reply("Embed updated!");
             return;
         }
-    
-        channel.send({ embeds: [ content ]});
-        logger.info(`[Embed] Sent to Channel : ${channel.name} (${channel.id})`);
+
+        channel.send({ embeds: [content] });
+        log.info(sendToLogChannel(`[Embed] Sent to Channel : ${getChannelMentionFromId(channel.id)} by User : ${getUserLogString(message.author)}\nContent : ${content}`));
+        await message.reply("Embed sent!");
     } catch (err) {
-        logger.error(`[Embed] ${err}`);
+        await message.reply("Error while sending/updating embed!");
+        log.error(sendToLogChannel(`[Embed] Error : ${err}`));
     }
 }
+
+export const embed = new Command({
+    name: "embed",
+    desc: "Draws an embed",
+    scope: [Scope.STAFF],
+    fn: embedFn
+})
