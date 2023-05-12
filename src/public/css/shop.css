@@ -41,7 +41,7 @@
 
     .container {
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         width: 62.5%;
         height: initial;

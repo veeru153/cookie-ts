@@ -6,6 +6,7 @@ export interface UserInventory extends DocumentData {
     coins: number;
     cookies: number;
     lastBaked: number;
+    bakePity: number[];
 }
 
 export const DEFAULT_INVENTORY = {
@@ -14,6 +15,7 @@ export const DEFAULT_INVENTORY = {
     coins: 0,
     cookies: 0,
     lastBaked: -1,
+    bakePity: [0, 0, 0, 0],
 }
 
 export const getDefaultInventoryForId = (id: string) => {

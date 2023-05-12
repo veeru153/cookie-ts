@@ -113,7 +113,7 @@ const validatePurchase = async (member: GuildMember, item: ShopItem, userInvento
     throw new CookieException(ShopError.MEMBERSHIP_TIME_TOO_LOW);
 
   if (userInventory.cookies < item.cost)
-    throw new CookieException(ShopError.NOT_ENOUGH_COINS);
+    throw new CookieException(ShopError.NOT_ENOUGH_COOKIES);
 
   if (item.stock == 0)
     throw new CookieException(ShopError.ITEM_OUT_OF_STOCK);

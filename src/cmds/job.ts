@@ -27,7 +27,6 @@ const runJob = async (message: Message, args: string[]) => {
 
     // only keep job related args in list
     args.shift()
-    console.log(jobs);
     if (Object.keys(jobs).includes(job)) {
         log.info(sendToLogChannel(`[Job] '${job}' ran by User : ${getUserLogString(message.author)}`))
         try {

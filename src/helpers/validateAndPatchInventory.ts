@@ -1,8 +1,8 @@
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
-import { inventoryRepo, profileRepo } from "../utils/repos";
+import { inventoryRepo } from "../utils/repos";
 import { DEFAULT_INVENTORY, UserInventory, getDefaultInventoryForId } from "../utils/schemas/UserInventory";
-import { DEFAULT_PROFILE, UserProfile, getDefaultProfileForId } from "../utils/schemas/UserProfile";
+import { isArrayUnavailable } from "./validators";
 import { sendToLogChannel } from "./sendToLogChannel";
 
 export const validateAndPatchInventory = async (id: string, inventory: UserInventory) => {
@@ -36,6 +36,10 @@ export const validateAndPatchInventory = async (id: string, inventory: UserInven
     }
     if (inventory.lastBaked === null || inventory.cookies === undefined) {
         inventory.lastBaked = DEFAULT_INVENTORY.lastBaked;
+        needsPatch = true;
+    }
+    if (isArrayUnavailable(inventory.bakePity) || inventory.bakePity.length === 0) {
+        inventory.bakePity = DEFAULT_INVENTORY.bakePity;
         needsPatch = true;
     }
 

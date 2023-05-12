@@ -16,7 +16,7 @@ export enum ShopError {
     USER_LEVEL_LOW = "Item Locked. Item can be purchased at a higher level",
     ITEM_TIME_LIMITED = "Limited Item. This item is currently not available",
     MEMBERSHIP_TIME_TOO_LOW = "Item Locked. Spend more time with us to unlock",
-    NOT_ENOUGH_COINS = "Not enough coins",
+    NOT_ENOUGH_COOKIES = "You don't have enough cookies",
     USER_HAS_ITEM = "You already have the item",
     ITEM_OUT_OF_STOCK = "Item is out of stock",
     UNEXPECTED_ERROR = "An unexpected error occurred",
