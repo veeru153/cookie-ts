@@ -1,26 +1,27 @@
 import { Message } from "discord.js";
-import Scope from "../util/scope";
-import Command from "./_Command";
+import { Command } from "../entities/Command";
+import { PREFIX } from "../utils/constants";
+import Scope from "../utils/enums/Scope";
+import { canMemberRunCmd } from "../helpers/canMemberRunCmd";
 import * as cmds from "./index";
-import { PREFIX } from "../util/config";
 
-export const help = new Command({
-    name: "help",
-    desc: "Returns info on every command.",
-    scope: [ Scope.ALL ] 
-})
-
-help.run = async (message: Message, args: string[]) => {
+const helpFn = async (message: Message) => {
     const cmdList = Object.values(cmds);
     let res = "__**Commands:**__"
-    for(let cmd of cmdList) {
+    for (let cmd of cmdList) {
         try {
-            const userCanRunCmd = cmd._canUserInvokeCmd(message.member);
+            const userCanRunCmd = canMemberRunCmd(message.member, cmd);
             userCanRunCmd && (res += `\n\`${PREFIX}${cmd.name}\`\t-\t${cmd.desc}`);
         } catch (err) {
             continue;
         }
     }
-
     message.author.send(res);
 }
+
+export const help = new Command({
+    name: "help",
+    desc: "Returns info on every command.",
+    scope: [Scope.ALL],
+    fn: helpFn
+})
