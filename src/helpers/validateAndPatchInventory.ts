@@ -34,7 +34,7 @@ export const validateAndPatchInventory = async (id: string, inventory: UserInven
         inventory.cookies = DEFAULT_INVENTORY.cookies;
         needsPatch = true;
     }
-    if (inventory.lastBaked === null || inventory.cookies === undefined) {
+    if (inventory.lastBaked === null || inventory.lastBaked === undefined) {
         inventory.lastBaked = DEFAULT_INVENTORY.lastBaked;
         needsPatch = true;
     }
