@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { GuildMember, Message } from "discord.js";
 import { inventoryRepo } from "../utils/repos";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
@@ -46,9 +46,10 @@ export const bakeCookies = async (message: Message) => {
 
         const bakePity = userInventory.bakePity;
         const bakeTier = getBakeTierFromPity(bakePity);
-        const freshCookies = getFreshCookiesFromBakeTier(bakeTier);
-        const multiplier = getMultiplier(message);
-        const updatedCookies = cookies + Math.round(freshCookies * multiplier);
+        const multiplier = getMultiplier(message.member);
+        const baseFreshCookies = getFreshCookiesFromBakeTier(bakeTier);
+        const freshCookies = Math.round(baseFreshCookies * multiplier);
+        const updatedCookies = cookies + freshCookies;
         const updatedBakePity = getUpdatedBakePity(bakeTier, bakePity);
 
         userInventory.cookies = updatedCookies;
@@ -56,9 +57,9 @@ export const bakeCookies = async (message: Message) => {
         userInventory.lastBaked = currTime;
         inventoryRepo.set(id, userInventory);
 
-        await sendBakeSuccessMsg(message, freshCookies, cookies + freshCookies);
+        await sendBakeSuccessMsg(message, freshCookies, updatedCookies);
     } catch (err) {
-        const replyMsg = await message.reply("An error occured!");
+        const replyMsg = await message.reply("An error occurred!");
         setTimeout(() => {
             replyMsg.deletable && replyMsg.delete();
             message.deletable && message.delete();
@@ -76,10 +77,10 @@ const getFreshCookiesFromBakeTier = (tier: number) => {
     throw new CookieException(`[Bake] Invalid Tier : ${tier}`);
 }
 
-const getMultiplier = (message: Message) => {
-    // TODO: Add userEquipedMultiplier once implemented
+const getMultiplier = (member: GuildMember) => {
+    // TODO: Add userEquippedMultiplier once implemented
     let sum = PROMOTIONAL_MULTIPLIER + EVENT_MULTIPLIER;
-    if (message.member.roles.premiumSubscriberRole) {
+    if (member.roles.premiumSubscriberRole) {
         sum += BOOSTER_MULTIPLIER;
     }
     return 1 + sum;
