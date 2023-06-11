@@ -1,15 +1,21 @@
-import { createCanvas, loadImage } from "canvas";
+import { createCanvas, loadImage, registerFont } from "canvas";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
+import path from "path";
 
 export const generateCard = async (payload) => {
+    registerFonts();
     const canvas = createCanvas(WIDTH, HEIGHT);
     const ctx = canvas.getContext('2d');
     await constructCanvas(ctx, payload);
     return canvas.toBuffer('image/png');
 }
 
-const constructCanvas = async (ctx: CanvasRenderingContext2D, data: any) => {
+const registerFonts = () => {
+    registerFont(path.join(__dirname, '..', 'assets', 'twemoji.ttf'), { family: "Twemoji" });
+}
+
+const constructCanvas = async (ctx: any, data: any) => {
     try {
         // makeRoundedEdges(ctx);
         await addBackground(ctx, data);
@@ -17,7 +23,6 @@ const constructCanvas = async (ctx: CanvasRenderingContext2D, data: any) => {
         addXpBar(ctx, data);
         await addProfilePicture(ctx, data);
         addName(ctx, data);
-        addDiscriminator(ctx, data);
         addBetaLogo(ctx);
     } catch (err) {
         throw new CookieException("Error generating profile :(", `[ProfileCardService] Could not create canvas: ${err}`);
@@ -42,7 +47,7 @@ const makeRoundedEdges = (ctx: CanvasRenderingContext2D) => {
 
 const addBackground = async (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.save();
-    const bgImg = await loadImage(data.background) as unknown as CanvasImageSource;
+    const bgImg = await loadImage(data.background) as unknown as HTMLOrSVGImageElement;
     const bgW = bgImg.width as number;
     const bgH = bgImg.height as number;
     const dW = (Math.min(bgW, WIDTH) / Math.max(bgW, WIDTH));
@@ -125,14 +130,35 @@ const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: any) => {
 }
 
 const addName = (ctx: CanvasRenderingContext2D, data: any) => {
+    const userHasUpdatedUsername = data.discriminator === "0";
+    if (userHasUpdatedUsername) {
+        addDisplayName(ctx, data);
+    } else {
+        addLegacyUsername(ctx, data);
+        addDiscriminator(ctx, data);
+    }
+}
+
+const addDisplayName = (ctx: CanvasRenderingContext2D, data: any) => {
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.8)";
+    ctx.shadowBlur = 4;
+    ctx.font = "23px Twemoji, Helvetica";
+    ctx.fillStyle = "white";
+    ctx.fillText(getNameText(data.displayName), displayNameX, displayNameY);
+    ctx.restore();
+    log.info("[ProfileCardService] Display Name added");
+}
+
+const addLegacyUsername = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 4;
     ctx.font = "20px Helvetica";
     ctx.fillStyle = "white";
-    ctx.fillText(getNameText(data.name), nameX, nameY);
+    ctx.fillText(getNameText(data.username), legacyUsernameX, legacyUsernameY);
     ctx.restore();
-    log.info("[ProfileCardService] Name added");
+    log.info("[ProfileCardService] Legacy Username added");
 }
 
 const addDiscriminator = (ctx: CanvasRenderingContext2D, data: any) => {
@@ -141,7 +167,7 @@ const addDiscriminator = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.shadowBlur = 4;
     ctx.font = "16px Helvetica";
     ctx.fillStyle = "white";
-    ctx.fillText(`#${data.discriminator}`, disNumX, disNumY);
+    ctx.fillText(`#${data.discriminator}`, discrimX, dicrimY);
     ctx.restore();
     log.info("[ProfileCardService] Discriminator added");
 }
@@ -197,11 +223,14 @@ const avatarCornerOffset = 10;
 const avatarCornerR = 10;
 
 const getNameText = (str: string) => str.length > 20 ? str.substring(0, 19) + "..." : str;
-const nameX = avatarX + avatarSide + MARGIN;
-const nameY = avatarY + (avatarSide / 2) + 12;
 
-const disNumX = avatarX + avatarSide + MARGIN;
-const disNumY = (nameY + 2 * MARGIN + 1) - 3;
+const legacyUsernameX = avatarX + avatarSide + MARGIN;
+const legacyUsernameY = avatarY + (avatarSide / 2) + 12;
+const discrimX = avatarX + avatarSide + MARGIN;
+const dicrimY = (legacyUsernameY + 2 * MARGIN + 1) - 3;
+
+const displayNameX = avatarX + avatarSide + MARGIN;
+const displayNameY = avatarY + (avatarSide * 0.93);
 
 const betaW = 48;
 const betaH = 20;

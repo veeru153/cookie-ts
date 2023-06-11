@@ -39,6 +39,7 @@ const equipItem = (userProfile: UserProfile, key: ShopItemType, value: string) =
 export const getProfileCard = async (message: Message) => {
     log.info(`[ProfileService] Generating Card for User : ${getUserLogString(message.author)}`)
     const { id, username, discriminator } = message.author;
+    const { displayName } = message.member;
     const avatar = message.author.displayAvatarURL({ extension: 'png', size: 128, forceStatic: true })
     let userProfile = await profileRepo.get(id);
     userProfile = await validateAndPatchProfile(message.author.id, userProfile);
@@ -51,6 +52,8 @@ export const getProfileCard = async (message: Message) => {
 
     const payload = {
         name: username,
+        displayName: displayName,
+        username: username,
         discriminator: discriminator,
         avatar: avatar,
         background: backgroundAsset.src,
