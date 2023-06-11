@@ -9,6 +9,7 @@ import { log } from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
+import { ProfilePayload } from "../utils/types/ProfilePayload";
 
 export const customizeProfile = async (id: string, key: ShopItemType, value: string) => {
     if (![ShopItemType.BACKGROUND, ShopItemType.BADGE].includes(key))
@@ -39,6 +40,7 @@ const equipItem = (userProfile: UserProfile, key: ShopItemType, value: string) =
 export const getProfileCard = async (message: Message) => {
     log.info(`[ProfileService] Generating Card for User : ${getUserLogString(message.author)}`)
     const { id, username, discriminator } = message.author;
+    const { displayName } = message.member;
     const avatar = message.author.displayAvatarURL({ extension: 'png', size: 128, forceStatic: true })
     let userProfile = await profileRepo.get(id);
     userProfile = await validateAndPatchProfile(message.author.id, userProfile);
@@ -49,8 +51,10 @@ export const getProfileCard = async (message: Message) => {
         throw new CookieException("Could not generate profile");
     }
 
-    const payload = {
+    const payload: ProfilePayload = {
         name: username,
+        displayName: displayName,
+        username: username,
         discriminator: discriminator,
         avatar: avatar,
         background: backgroundAsset.src,
