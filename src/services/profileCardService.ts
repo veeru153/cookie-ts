@@ -2,8 +2,9 @@ import { createCanvas, loadImage, registerFont } from "canvas";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
 import path from "path";
+import { ProfilePayload } from "../utils/types/ProfilePayload";
 
-export const generateCard = async (payload) => {
+export const generateCard = async (payload: ProfilePayload) => {
     registerFonts();
     const canvas = createCanvas(WIDTH, HEIGHT);
     const ctx = canvas.getContext('2d');
@@ -15,7 +16,7 @@ const registerFonts = () => {
     registerFont(path.join(__dirname, '..', 'assets', 'twemoji.ttf'), { family: "Twemoji" });
 }
 
-const constructCanvas = async (ctx: any, data: any) => {
+const constructCanvas = async (ctx: any, data: ProfilePayload) => {
     try {
         // makeRoundedEdges(ctx);
         await addBackground(ctx, data);
@@ -45,7 +46,7 @@ const makeRoundedEdges = (ctx: CanvasRenderingContext2D) => {
     ctx.clip();
 }
 
-const addBackground = async (ctx: CanvasRenderingContext2D, data: any) => {
+const addBackground = async (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
     ctx.save();
     const bgImg = await loadImage(data.background) as unknown as HTMLOrSVGImageElement;
     const bgW = bgImg.width as number;
@@ -73,7 +74,7 @@ const addGradient = (ctx: CanvasRenderingContext2D) => {
     log.info("[ProfileCardService] Gradient added");
 }
 
-const addXpBar = (ctx: CanvasRenderingContext2D, data: any) => {
+const addXpBar = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
     ctx.save();
     const xpRatio = data.xp / ((data.level + 1) * 20);
     ctx.beginPath();
@@ -106,7 +107,7 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: any) => {
     log.info("[ProfileCardService] XP Bar added");
 }
 
-const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: any) => {
+const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
     const avatarImg = await loadImage(data.avatar) as unknown as CanvasImageSource;
     ctx.save();
     ctx.beginPath();
@@ -129,7 +130,7 @@ const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: any) => {
     log.info("[ProfileCardService] Profile Picture added");
 }
 
-const addName = (ctx: CanvasRenderingContext2D, data: any) => {
+const addName = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
     const userHasUpdatedUsername = data.discriminator === "0";
     if (userHasUpdatedUsername) {
         addDisplayName(ctx, data);

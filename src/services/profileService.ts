@@ -9,6 +9,7 @@ import { log } from "../utils/logger";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
+import { ProfilePayload } from "../utils/types/ProfilePayload";
 
 export const customizeProfile = async (id: string, key: ShopItemType, value: string) => {
     if (![ShopItemType.BACKGROUND, ShopItemType.BADGE].includes(key))
@@ -50,7 +51,7 @@ export const getProfileCard = async (message: Message) => {
         throw new CookieException("Could not generate profile");
     }
 
-    const payload = {
+    const payload: ProfilePayload = {
         name: username,
         displayName: displayName,
         username: username,
