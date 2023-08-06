@@ -14,7 +14,7 @@ const batchBakeFn = async (message: Message, args: string[]) => {
         const argsMap = getArgsMap(args, argsKeys);
 
         const userId = argsMap.get("userId");
-        const member = message.guild.members.cache.get(userId);
+        const member = message.guild.members.resolve(userId);
         if (!member) {
             throw new CookieException(`Member with user id: ${userId} not found.`);
         }
