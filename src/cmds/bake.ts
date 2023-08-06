@@ -8,7 +8,7 @@ import { log } from "../utils/logger";
 const bakeFn = async (message: Message) => {
     try {
         const response = await bakeCookies(message.member);
-        message.reply(response);
+        await message.reply(response);
     } catch (err) {
         log.error(`[Bake] User : ${getUserLogString(message.author)}\nError : ${err}`);
         const replyMsg = await message.reply("An error occurred!");
