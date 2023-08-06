@@ -107,7 +107,8 @@ const getBakeSuccessMsg = (user: User, freshCookies: number, cookies: number) =>
 const getBatchBakeSuccessMsg = (user: User, freshCookies: number, cookies: number, bakeList: number[]) => {
     log.info(`[Batch Bake] ${getUserLogString(user)} baked ${freshCookies} cookies. Total Cookies : ${cookies}\nBake List: ${bakeList}`);
     const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
-    return `**Cookies Baked!**\n${bakeList.length} batches were baked for ${user.toString()}.\n${freshCookies} ${cookieStr} baked - (${bakeList.join(", ")})\n**🍪 Total Cookies: ${cookies}**`;
+    const batchStr = freshCookies == 1 ? "batch was" : "batches were";
+    return `**Cookies Baked!**\n${bakeList.length} ${batchStr} baked for ${user.toString()}.\n${freshCookies} ${cookieStr} baked - (${bakeList.join(", ")})\n**🍪 Total Cookies: ${cookies}**`;
 }
 
 const getCooldownMsg = (user: User, timeDiff: number, cookies: number) => {
