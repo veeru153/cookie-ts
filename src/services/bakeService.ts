@@ -7,43 +7,23 @@ import { log } from "../utils/logger";
 import { getBakeTierFromPity, getUpdatedBakePity } from "./bakePityService";
 import { getRandomNumberBetween } from "../helpers/getRandomNumberBetween";
 import { CookieException } from "../utils/CookieException";
+import { MINUTE_IN_MS, SECOND_IN_MS, HOUR_IN_MS } from "../common/constants";
+import { COOLDOWN_MS, PROMOTIONAL_MULTIPLIER, EVENT_MULTIPLIER, BOOSTER_MULTIPLIER, COOKIE_TIER_RANGE, BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../common/constants/bake";
 
-const COOLDOWN_HR = isDevEnv ? 0.00111111 : 4;
-const COOLDOWN_MS = COOLDOWN_HR * 60 * 60 * 1000;
-const HOUR_IN_MS = 60 * 60 * 1000;
-const MINUTE_IN_MS = 60 * 1000;
-const SECOND_IN_MS = 1000;
-
-const BOOSTER_MULTIPLIER = 0.1;
-const PROMOTIONAL_MULTIPLIER = 0;
-const EVENT_MULTIPLIER = 0;
-
-const COOKIE_TIER_RANGE = {
-    T0_MIN: 1,
-    T0_MAX: 3,
-    T1_MIN: 7,
-    T1_MAX: 11,
-    T2_MIN: 14,
-    T2_MAX: 18,
-    T3_MIN: 21,
-    T3_MAX: 25,
-}
 
 export const bakeCookies = async (member: GuildMember) => {
-    const { user } = member;
-    const { id } = user;
+    const { user, id } = member;
     let userInventory = await inventoryRepo.get(id);
     userInventory = await validateAndPatchInventory(id, userInventory);
     const currTime = Date.now();
 
-    const { cookies, lastBaked } = userInventory;
+    const { cookies, lastBaked, bakePity } = userInventory;
     const timeDiff = currTime - lastBaked;
 
     if (timeDiff < COOLDOWN_MS) {
         return getCooldownMsg(user, timeDiff, cookies);
     }
 
-    const bakePity = userInventory.bakePity;
     const bakeTier = getBakeTierFromPity(bakePity);
     const multiplier = getMultiplier(member);
     const baseFreshCookies = getFreshCookiesFromBakeTier(bakeTier);
@@ -60,6 +40,44 @@ export const bakeCookies = async (member: GuildMember) => {
     }
 
     return getBakeSuccessMsg(user, freshCookies, cookies);
+}
+
+export const batchBakeCookies = async (member: GuildMember, count: number) => {
+    if (count < BATCH_BAKE_COUNT_MIN || count > BATCH_BAKE_COUNT_MAX) {
+        throw new CookieException(`Invalid Count: ${count}. Count must be in range 1-10.`);
+    }
+
+    const { user, id: userId } = member;
+    let userInventory = await inventoryRepo.get(userId);
+    if (!userInventory) {
+        throw new CookieException(`Inventory for user with id: ${userId} not found.`);
+    }
+    userInventory = await validateAndPatchInventory(userId, userInventory);
+
+    const { cookies, bakePity } = userInventory;
+    const multiplier = getMultiplier(member);
+    let freshCookies = 0;
+    let updatedBakePity = bakePity;
+
+    const bakeList = [];
+
+    for (let i = 0; i < count; i++) {
+        const bakeTier = getBakeTierFromPity(updatedBakePity);
+        const baseFreshCookies = getFreshCookiesFromBakeTier(bakeTier);
+        const newCookies = Math.round(baseFreshCookies * multiplier);
+        bakeList.push(newCookies);
+        freshCookies += newCookies;
+        updatedBakePity = getUpdatedBakePity(bakeTier, updatedBakePity);
+    }
+
+    if (!isDevEnv) {
+        // Only update when not testing!
+        userInventory.cookies = cookies + freshCookies;
+        userInventory.bakePity = updatedBakePity;
+        inventoryRepo.set(member.id, userInventory);
+    }
+
+    return getBatchBakeSuccessMsg(user, freshCookies, cookies, bakeList);
 }
 
 const getMultiplier = (member: GuildMember) => {
@@ -84,6 +102,12 @@ const getBakeSuccessMsg = (user: User, freshCookies: number, cookies: number) =>
     log.info(`[Bake] ${getUserLogString(user)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
     const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
     return `**Cookies Baked!**\nYou baked ${freshCookies} ${cookieStr}.\n**🍪 Total Cookies: ${cookies}**`;
+}
+
+const getBatchBakeSuccessMsg = (user: User, freshCookies: number, cookies: number, bakeList: number[]) => {
+    log.info(`[Batch Bake] ${getUserLogString(user)} baked ${freshCookies} cookies. Total Cookies : ${cookies}\nBake List: ${bakeList}`);
+    const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
+    return `**Cookies Baked!**\n${bakeList.length} batches were baked for ${user.toString()}.\n${freshCookies} ${cookieStr} baked - (${bakeList.join(", ")})\n**🍪 Total Cookies: ${cookies}**`;
 }
 
 const getCooldownMsg = (user: User, timeDiff: number, cookies: number) => {
