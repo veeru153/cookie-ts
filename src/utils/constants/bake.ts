@@ -1,4 +1,4 @@
-import { isDevEnv } from ".";
+import { isDevEnv } from "./common";
 
 export const COOLDOWN_HR = isDevEnv ? 0.00111111 : 4;
 export const COOLDOWN_MS = COOLDOWN_HR * 60 * 60 * 1000;

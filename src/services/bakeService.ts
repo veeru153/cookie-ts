@@ -1,5 +1,5 @@
 import { GuildMember, User } from "discord.js";
-import { isDevEnv } from "../utils/constants";
+import { isDevEnv } from "../utils/constants/common";
 import { inventoryRepo } from "../utils/repos";
 import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { getUserLogString } from "../helpers/getUserLogString";
@@ -7,8 +7,8 @@ import { log } from "../utils/logger";
 import { getBakeTierFromPity, getUpdatedBakePity } from "./bakePityService";
 import { getRandomNumberBetween } from "../helpers/getRandomNumberBetween";
 import { CookieException } from "../utils/CookieException";
-import { MINUTE_IN_MS, SECOND_IN_MS, HOUR_IN_MS } from "../common/constants";
-import { COOLDOWN_MS, PROMOTIONAL_MULTIPLIER, EVENT_MULTIPLIER, BOOSTER_MULTIPLIER, COOKIE_TIER_RANGE, BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../common/constants/bake";
+import { COOLDOWN_MS, PROMOTIONAL_MULTIPLIER, EVENT_MULTIPLIER, BOOSTER_MULTIPLIER, COOKIE_TIER_RANGE } from "../utils/constants/bake";
+import { MINUTE_IN_MS, SECOND_IN_MS, HOUR_IN_MS } from "../utils/constants/common";
 
 
 export const bakeCookies = async (member: GuildMember) => {
@@ -43,10 +43,6 @@ export const bakeCookies = async (member: GuildMember) => {
 }
 
 export const batchBakeCookies = async (member: GuildMember, count: number) => {
-    if (count < BATCH_BAKE_COUNT_MIN || count > BATCH_BAKE_COUNT_MAX) {
-        throw new CookieException(`Invalid Count: ${count}. Count must be in range 1-10.`);
-    }
-
     const { user, id: userId } = member;
     let userInventory = await inventoryRepo.get(userId);
     if (!userInventory) {

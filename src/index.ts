@@ -1,6 +1,6 @@
 import { Events, GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
 import client from "./utils/client";
-import { env, identity, isDevEnv } from "./utils/constants";
+import { env, identity, isDevEnv } from "./utils/constants/common";
 import * as repos from "./utils/repos";
 import { messageCreate, messageDelete, messageUpdate } from "./handlers/messageHandlers";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./handlers/messageReactionHandlers";

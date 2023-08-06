@@ -6,6 +6,7 @@ import { CookieException } from "../utils/CookieException";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { batchBakeCookies } from "../services/bakeService";
+import { BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../utils/constants/bake";
 
 const batchBakeFn = async (message: Message, args: string[]) => {
     try {
@@ -19,8 +20,14 @@ const batchBakeFn = async (message: Message, args: string[]) => {
         }
 
         const count = parseInt(argsMap.get("count"));
+        if (count < BATCH_BAKE_COUNT_MIN || count > BATCH_BAKE_COUNT_MAX) {
+            throw new CookieException(`Invalid Count: ${count}. Count must be in range 1-10.`);
+        }
+
+        const ack = await message.channel.send(`Baking ${count} batches for ${member.toString()}...`);
         const response = await batchBakeCookies(member, count);
         await message.reply(response);
+        ack.deletable && ack.delete();
     } catch (err) {
         log.error(`[Bake] User : ${getUserLogString(message.author)}\nError : ${err}`);
         if (err instanceof CookieException) {
