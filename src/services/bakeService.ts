@@ -49,6 +49,7 @@ export const batchBakeCookies = async (member: GuildMember, count: number) => {
         throw new CookieException(`Inventory for user with id: ${userId} not found.`);
     }
     userInventory = await validateAndPatchInventory(userId, userInventory);
+    const currTime = Date.now();
 
     const { cookies, bakePity } = userInventory;
     const multiplier = getMultiplier(member);
@@ -70,6 +71,7 @@ export const batchBakeCookies = async (member: GuildMember, count: number) => {
         // Only update when not testing!
         userInventory.cookies = cookies + freshCookies;
         userInventory.bakePity = updatedBakePity;
+        userInventory.lastBaked = currTime;
         inventoryRepo.set(member.id, userInventory);
     }
 
