@@ -39,7 +39,7 @@ export const bakeCookies = async (member: GuildMember) => {
         inventoryRepo.set(id, userInventory);
     }
 
-    return getBakeSuccessMsg(user, freshCookies, cookies);
+    return getBakeSuccessMsg(user, freshCookies, updatedCookies);
 }
 
 export const batchBakeCookies = async (member: GuildMember, count: number) => {
@@ -67,15 +67,17 @@ export const batchBakeCookies = async (member: GuildMember, count: number) => {
         updatedBakePity = getUpdatedBakePity(bakeTier, updatedBakePity);
     }
 
+    const updatedCookies = cookies + freshCookies;
+
     if (!isDevEnv) {
         // Only update when not testing!
-        userInventory.cookies = cookies + freshCookies;
+        userInventory.cookies = updatedCookies;
         userInventory.bakePity = updatedBakePity;
         userInventory.lastBaked = currTime;
         inventoryRepo.set(member.id, userInventory);
     }
 
-    return getBatchBakeSuccessMsg(user, freshCookies, cookies, bakeList);
+    return getBatchBakeSuccessMsg(user, freshCookies, updatedCookies, bakeList);
 }
 
 const getMultiplier = (member: GuildMember) => {
