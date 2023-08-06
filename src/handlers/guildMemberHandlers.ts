@@ -1,5 +1,5 @@
 import { GuildMember, TextChannel } from "discord.js";
-import { isDevEnv } from "../utils/constants";
+import { isDevEnv } from "../utils/constants/common";
 import { Channels } from "../utils/enums/Channels";
 import client from "../utils/client";
 import { initializeMemberCollections } from "../services/inventoryService";

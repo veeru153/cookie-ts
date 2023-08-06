@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
-import { buyShopItem, getFormattedCatalogue } from "../services/shopService";
+import { buyShopItem } from "../services/shopService";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { SHOP_URL } from "../utils/constants";
+import { SHOP_URL } from "../utils/constants/common";
 
 const shopFn = async (message: Message, args: string[]) => {
     if (args.length === 0) {
@@ -15,10 +15,6 @@ const shopFn = async (message: Message, args: string[]) => {
 
     try {
         switch (args[0]) {
-            case "list":
-                await getList(message);
-                return;
-
             case "buy":
                 await buyItem(message, args);
                 return;
@@ -35,12 +31,6 @@ const shopFn = async (message: Message, args: string[]) => {
             log.error(sendToLogChannel(`[ShopService] Error : ${err}`))
         }
     }
-}
-
-const getList = async (message: Message) => {
-    const list = getFormattedCatalogue();
-    await message.member.send(list);
-    message.deletable && await message.delete();
 }
 
 const buyItem = async (message: Message, args: string[]) => {

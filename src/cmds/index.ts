@@ -1,4 +1,5 @@
 export * from "./bake";
+export * from "./batchBake";
 export * from "./cookies";
 export * from "./embed";
 export * from "./help";

@@ -1,6 +1,6 @@
 import { Emoji, GuildEmoji, TextChannel } from "discord.js";
 import client from "../utils/client";
-import { isDevEnv } from "../utils/constants";
+import { isDevEnv } from "../utils/constants/common";
 import { Channels } from "../utils/enums/Channels";
 import { Guild } from "../utils/enums/Guilds";
 import { Errors } from "../utils/enums/Errors";

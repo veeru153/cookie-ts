@@ -1,4 +1,4 @@
-import { isDevEnv } from "../../utils/constants";
+import { isDevEnv } from "../../utils/constants/common";
 import { cache } from "./cache";
 import { shop } from "./shop";
 import { test } from "./test";

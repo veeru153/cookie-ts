@@ -2,7 +2,7 @@ import { ShopItemType } from "../utils/schemas/ShopItem";
 import { assetsRepo, inventoryRepo, profileRepo } from "../utils/repos";
 import { UserInventory } from "../utils/schemas/UserInventory";
 import { UserProfile } from "../utils/schemas/UserProfile";
-import { Message } from "discord.js";
+import { GuildMember, Message } from "discord.js";
 import { generateCard } from "./profileCardService";
 import { CookieException } from "../utils/CookieException";
 import { log } from "../utils/logger";
@@ -37,13 +37,14 @@ const equipItem = (userProfile: UserProfile, key: ShopItemType, value: string) =
         userProfile.background = value;
 }
 
-export const getProfileCard = async (message: Message) => {
-    log.info(`[ProfileService] Generating Card for User : ${getUserLogString(message.author)}`)
-    const { id, username, discriminator } = message.author;
-    const { displayName } = message.member;
-    const avatar = message.author.displayAvatarURL({ extension: 'png', size: 128, forceStatic: true })
+export const getProfileCard = async (member: GuildMember) => {
+    const { user } = member;
+    log.info(`[ProfileService] Generating Card for User : ${getUserLogString(user)}`)
+    const { id, username, discriminator } = user;
+    const { displayName } = member;
+    const avatar = user.displayAvatarURL({ extension: 'png', size: 128, forceStatic: true })
     let userProfile = await profileRepo.get(id);
-    userProfile = await validateAndPatchProfile(message.author.id, userProfile);
+    userProfile = await validateAndPatchProfile(member.id, userProfile);
     const { background, xp, level } = userProfile;
     const backgroundAsset = await assetsRepo.get(background);
     if (!backgroundAsset || !backgroundAsset.src) {
@@ -63,6 +64,6 @@ export const getProfileCard = async (message: Message) => {
     }
 
     const buffer = await generateCard(payload);
-    log.info(`[ProfileService] Card Generated for User : ${getUserLogString(message.author)}`)
+    log.info(`[ProfileService] Card Generated for User : ${getUserLogString(user)}`)
     return buffer;
 }

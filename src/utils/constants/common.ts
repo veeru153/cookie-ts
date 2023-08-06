@@ -10,3 +10,7 @@ export const SHOP_URL = BASE_URL + "/shop/backgrounds";
 export const USER_URL = BASE_URL + "/user";
 
 export const BOOSTER_ROLE = "799045188156260413";
+
+export const HOUR_IN_MS = 60 * 60 * 1000;
+export const MINUTE_IN_MS = 60 * 1000;
+export const SECOND_IN_MS = 1000;

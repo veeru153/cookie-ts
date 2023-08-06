@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js";
 import client from "../utils/client";
-import { isDevEnv } from "../utils/constants";
+import { isDevEnv } from "../utils/constants/common";
 import { Channels } from "../utils/enums/Channels";
 
 export const sendToLogChannel = (log: string) => {
