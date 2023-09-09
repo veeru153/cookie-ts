@@ -35,11 +35,11 @@
     font-size: 1.25rem;
 }
 
-.nav div {
+.nav p {
     cursor: pointer;
 }
 
-.nav div:hover {
+.nav p:hover {
     color: var(--active);
 }
 

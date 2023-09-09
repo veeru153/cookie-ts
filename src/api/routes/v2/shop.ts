@@ -8,6 +8,5 @@ export const shop = Router();
 shop.all('/', async (req: Request, res: Response) => {
     const catalogue = await getCatalogue(false);
     const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BACKGROUND).sort((a, b) => b.ts - a.ts);
-    console.log(filteredCatalogue)
     res.render(path.join(__dirname, '..', '..', 'views', 'v2', 'shop.ejs'), { backgrounds: filteredCatalogue });
 })

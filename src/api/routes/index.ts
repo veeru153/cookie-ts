@@ -5,6 +5,7 @@ import { test } from "./test";
 import { user } from "./user";
 
 import { home } from "./v2/home";
+import { info } from "./v2/info";
 import { shop as shopV2 } from "./v2/shop";
 
 let routes = [
@@ -15,7 +16,8 @@ let routes = [
 
 let routesV2 = [
     { url: '/v2/home', router: home },
-    { url: '/v2/shop', router: shopV2 }
+    { url: '/v2/shop', router: shopV2 },
+    { url: '/v2/info', router: info },
 ]
 
 const devRoutes = [
