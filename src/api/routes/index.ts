@@ -7,9 +7,9 @@ import { user } from "./user";
 import { home } from "./v2/home";
 
 let routes = [
-    { url: '/shop', router: shop },
-    { url: '/test', router: test },
-    { url: '/user', router: user },
+    // { url: '/shop', router: shop },
+    // { url: '/test', router: test },
+    // { url: '/user', router: user },
 ]
 
 let routesV2 = [
@@ -17,7 +17,7 @@ let routesV2 = [
 ]
 
 const devRoutes = [
-    { url: '/cache', router: cache }
+    // { url: '/cache', router: cache }
 ]
 
 if (isDevEnv) {

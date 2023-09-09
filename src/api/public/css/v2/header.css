@@ -1,15 +1,14 @@
-:root {
-    --cookie: #da9f83;
-    --chocolate: #894b3b;
-    --active: #ead1dc;
-}
-
-.header {
+.header-wrapper {
     background-color: var(--chocolate);
     color: var(--cookie);
     font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
+}
+
+.header {
     display: flex;
     flex-direction: column;
+    margin: auto;
+    user-select: none;
 }
 
 .logo {
@@ -19,6 +18,13 @@
     align-items: center;
     text-align: center;
     font-size: 1.5rem;
+    cursor: default;
+    font-weight: bold;
+}
+
+.header a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .nav {
@@ -78,17 +84,17 @@
     }
 
     .nav {
-        gap: 8rem;
+        gap: 4rem;
     }
 }
 
 @media (min-width: 1536px) {
     .header {
-        gap: 18rem;
+        gap: 10rem;
+        max-width: 2240px;
     }
 
     .nav {
-        gap: 10rem;
+        gap: 8rem;
     }
-
 }
