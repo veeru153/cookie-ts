@@ -8,17 +8,15 @@ export const user = Router();
 user.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     const member = await getMemberFromId(id);
-    const displayName = member.displayName;
 
-    if (!displayName) {
-        res.render(path.join(__dirname, '..', 'views', 'user', 'error.ejs'));
+    if (!member) {
+        res.render(path.join(__dirname, '..', 'views', 'error.ejs'));
         return;
     }
-    const user = { id, displayName: displayName }
-    const inventory = await getUserInventoryForPanel(id);
-    res.render(path.join(__dirname, '..', 'views', 'user', 'profile.ejs'), { user, inventory });
-})
 
-user.all('/', (req: Request, res: Response) => {
-    res.render(path.join(__dirname, '..', 'views', 'user', 'index.ejs'));
-});
+    const username = member.user.username;
+    const displayName = member.displayName;
+    const user = { id, username, displayName }
+    const inventory = await getUserInventoryForPanel(id);
+    res.render(path.join(__dirname, '..', 'views', 'user.ejs'), { user, inventory });
+})

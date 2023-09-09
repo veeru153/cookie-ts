@@ -10,12 +10,19 @@ for (const route of routes) {
     app.use(route.url, route.router);
 }
 
-app.all('/', (req: Request, res: Response) => {
-    res.send("Ready! Cookie Bot is online!");
+app.get('/', (req: Request, res: Response) => {
+    res.render(path.join(__dirname, 'api', 'views', 'home.ejs'));
 })
 
-app.all('/v2', (req: Request, res: Response) => {
-    res.send("V2");
+app.get('*', (req: Request, res: Response) => {
+    res.status(404).render(path.join(__dirname, 'api', 'views', 'error.ejs'));
+})
+
+app.all('*', (req: Request, res: Response) => {
+    res.status(404).json({
+        status: 404,
+        message: "Not Found"
+    })
 })
 
 const PORT = process.env.PORT || 3000;

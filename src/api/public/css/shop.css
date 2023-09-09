@@ -1,55 +1,83 @@
-.wrapper {
-    text-align: center;
+.shop {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
     align-items: center;
-    height: 64%;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #f0f8ffc7;
 }
 
-.container {
+.shop h1,
+.shop h2 {
+    color: var(--chocolate);
+}
+
+.shop a {
+    text-decoration: underline;
+    color: var(--chocolate);
+}
+
+.shop a:hover {
+    color: var(--cookie);
+}
+
+.shop .catalogue {
+    margin: 1rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 50%;
-    height: 36%;
+    row-gap: 2rem;
+    user-select: none;
 }
 
-.container a {
-    all: unset;
-    padding: 20px 40px;
-    border: 1px solid black;
-    border-radius: 4px;
+.shop .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin-bottom: 0.8rem;
+}
+
+.shop .container .img-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--cookie);
+    min-height: 231px;
+}
+
+.shop .container .img-wrapper img {
+    width: 100%;
+    max-width: 346px;
+}
+
+.shop .container .name {
+    font-size: 1.1rem;
+}
+
+.shop .container .buy-btn {
+    background-color: var(--buy-blue);
+    padding: 0.72rem 1.36rem;
+    border: #00000033 dotted;
     cursor: pointer;
-    transition: background-color 200ms linear;
+    user-select: none;
 }
 
-.container a:hover {
-    background-color: #da9d7f;
+.shop .container .buy-btn:hover {
+    background-color: var(--buy-blue-active);
 }
 
-@media screen and (min-width: 700px) {
-    .wrapper {
-        max-width: 80%;
-    }
+.shop .container .buy-btn p {
+    margin: 0;
+}
 
-    .container {
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        width: 62.5%;
-        height: initial;
+@media (min-width: 768px) {
+    .shop .catalogue {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.4rem;
     }
 }
 
-@media screen and (min-width: 1080px) {
-    .wrapper {
-        max-width: 60%;
+@media (min-width: 1440px) {
+    .shop .catalogue {
+        grid-template-columns: repeat(3, 1fr);
     }
 }

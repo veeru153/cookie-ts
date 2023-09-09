@@ -1,25 +1,18 @@
 import { isDevEnv } from "../../utils/constants/common";
 import { cache } from "./cache";
-import { shop } from "./shop";
-import { test } from "./test";
-// import { user } from "./user";
+import { user } from "./user";
 
-import { home } from "./v2/home";
-import { info } from "./v2/info";
-import { shop as shopV2 } from "./v2/shop";
-import { user as userV2 } from "./v2/user";
+import { home } from "./home";
+import { shop } from "./shop";
+import { info } from "./info";
+import { health } from "./health";
 
 let routes = [
+    { url: '/', router: home },
     { url: '/shop', router: shop },
-    // { url: '/test', router: test },
-    // { url: '/user', router: user },
-]
-
-let routesV2 = [
-    { url: '/v2/home', router: home },
-    { url: '/v2/shop', router: shopV2 },
-    { url: '/v2/info', router: info },
-    { url: '/v2/user', router: userV2 },
+    { url: '/info', router: info },
+    { url: '/user', router: user },
+    { url: '/health', router: health },
 ]
 
 const devRoutes = [
@@ -27,7 +20,7 @@ const devRoutes = [
 ]
 
 if (isDevEnv) {
-    routes = [...routes, ...devRoutes, ...routesV2]
+    routes = [...routes, ...devRoutes];
 }
 
 export default routes;
