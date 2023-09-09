@@ -18,6 +18,5 @@ user.get('/:id', async (req: Request, res: Response) => {
 
     const user = { id, username, displayName }
     const inventory = await getUserInventoryForPanel(id);
-    console.log(user);
     res.render(path.join(__dirname, '..', '..', 'views', 'v2', 'user.ejs'), { user, inventory });
 })
