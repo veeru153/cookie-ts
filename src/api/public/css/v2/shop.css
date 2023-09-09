@@ -4,7 +4,8 @@
     align-items: center;
 }
 
-.shop h1 {
+.shop h1,
+.shop h2 {
     color: var(--chocolate);
 }
 
@@ -39,6 +40,7 @@
     justify-content: center;
     align-items: center;
     background-color: var(--cookie);
+    min-height: 231px;
 }
 
 .shop .container .img-wrapper img {

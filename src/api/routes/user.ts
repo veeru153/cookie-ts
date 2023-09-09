@@ -7,7 +7,8 @@ export const user = Router();
 
 user.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
-    const displayName = await getMemberFromId(id);
+    const member = await getMemberFromId(id);
+    const displayName = member.displayName;
 
     if (!displayName) {
         res.render(path.join(__dirname, '..', 'views', 'user', 'error.ejs'));

@@ -2,11 +2,12 @@ import { isDevEnv } from "../../utils/constants/common";
 import { cache } from "./cache";
 import { shop } from "./shop";
 import { test } from "./test";
-import { user } from "./user";
+// import { user } from "./user";
 
 import { home } from "./v2/home";
 import { info } from "./v2/info";
 import { shop as shopV2 } from "./v2/shop";
+import { user as userV2 } from "./v2/user";
 
 let routes = [
     { url: '/shop', router: shop },
@@ -18,6 +19,7 @@ let routesV2 = [
     { url: '/v2/home', router: home },
     { url: '/v2/shop', router: shopV2 },
     { url: '/v2/info', router: info },
+    { url: '/v2/user', router: userV2 },
 ]
 
 const devRoutes = [
