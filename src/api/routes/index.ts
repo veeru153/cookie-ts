@@ -5,19 +5,21 @@ import { test } from "./test";
 import { user } from "./user";
 
 import { home } from "./v2/home";
+import { shop as shopV2 } from "./v2/shop";
 
 let routes = [
-    // { url: '/shop', router: shop },
+    { url: '/shop', router: shop },
     // { url: '/test', router: test },
     // { url: '/user', router: user },
 ]
 
 let routesV2 = [
-    { url: '/v2/home', router: home }
+    { url: '/v2/home', router: home },
+    { url: '/v2/shop', router: shopV2 }
 ]
 
 const devRoutes = [
-    // { url: '/cache', router: cache }
+    { url: '/cache', router: cache }
 ]
 
 if (isDevEnv) {
