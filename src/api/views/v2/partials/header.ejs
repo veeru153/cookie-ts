@@ -5,16 +5,22 @@
             <p>Yuqi's Cookie House 🍪</p>
         </div>
         <div class="nav">
-            <div class="btn">
-                <p>Home</p>
+            <div class="<%= page === 'home' ? 'active' : '' %>">
+                <a href="/v2/home">
+                    <p>Home</p>
+                </a>
             </div>
-            <div class="btn">
-                <p>Shop</p>
+            <div class="<%= page === 'shop' ? 'active' : '' %>">
+                <a href="/v2/shop">
+                    <p>Shop</p>
+                </a>
             </div>
-            <div class="btn">
-                <p>Info</p>
+            <div class="<%= page === 'info' ? 'active' : '' %>">
+                <a href="/v2/info">
+                    <p>Info</p>
+                </a>
             </div>
-            <div class="btn">
+            <div>
                 <a href="https://discord.gg/DkWhBCv" target="_blank">
                     <p>Discord</p>
                 </a>

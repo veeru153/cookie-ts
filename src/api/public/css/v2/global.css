@@ -11,4 +11,5 @@ body {
     margin: 0;
     background-color: var(--background);
     font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
+    padding-bottom: 4rem;
 }
