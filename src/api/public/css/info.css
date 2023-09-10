@@ -1,0 +1,34 @@
+.info h1 {
+    text-align: center;
+    color: var(--chocolate);
+}
+
+.info .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 0.8rem;
+    margin: auto;
+    max-width: 1280px;
+}
+
+.info section {
+    margin: 1rem 3rem;
+    text-align: justify;
+}
+
+.info li p {
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .info section {
+        margin: 1rem 6rem;
+    }
+
+    .info p,
+    .info li {
+        font-size: 1.1rem;
+    }
+}

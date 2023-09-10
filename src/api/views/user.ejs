@@ -1,0 +1,37 @@
+<%- include('./partials/meta') %>
+    <%- include('./partials/header', { page: 'user' }) %>
+        <link rel="stylesheet" href="/css/shop.css">
+        <div class="shop">
+            <h1>
+                User: <%= user.username %>
+            </h1>
+            <h2>Backgrounds</h2>
+            <div class="catalogue">
+                <% for (item of inventory.backgrounds) {%>
+                    <div class="container">
+                        <div class="img-wrapper">
+                            <img src="<%= item.src %>" alt="<%= item.name %>">
+                        </div>
+                        <div class="name">
+                            <p>
+                                <%= item.name %>
+                            </p>
+                        </div>
+                        <div class="buy-btn" onclick="handleClick(this)" data-item-id="<%= item.id %>">
+                            <p>Equip</p>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+
+        <script>
+            function handleClick(btn) {
+                const itemId = btn.dataset.itemId;
+                navigator.clipboard.writeText(`-profile set background ${itemId}`);
+                btn.innerHTML = "<p>Command Copied!</p>"
+                setTimeout(() => {
+                    btn.innerHTML = "<p>Equip</p>";
+                }, 500);
+            }
+        </script>

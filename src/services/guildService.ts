@@ -5,6 +5,10 @@ import { Channels } from "../utils/enums/Channels";
 import { Guild } from "../utils/enums/Guilds";
 import { Errors } from "../utils/enums/Errors";
 import { CookieException } from "../utils/CookieException";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
+
+let lastUpdatedGuildAge = -1;
 
 export const updateGuildAge = async () => {
     const guild = await client.guilds.fetch(Guild.YUQICORD);
@@ -12,9 +16,19 @@ export const updateGuildAge = async () => {
     const MS_IN_DAY = 86400000
     const age = Math.floor(ageMs / MS_IN_DAY);
 
-    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Reception.INFO;
+    if (lastUpdatedGuildAge === age)
+        return;
+
+    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Reception.ANNOUNCEMENTS;
     const channel = await client.channels.fetch(channelId) as TextChannel;
-    channel.setTopic(`:calendar_spiral: Server Age: ${age} Days`);
+    try {
+        log.info(`Updating Guild Age: ${age} Days`);
+        await channel.setTopic(`:calendar_spiral: Server Age: ${age} Days`);
+        lastUpdatedGuildAge = age;
+    } catch (err) {
+        log.error(err, "Error updating Guild Age");
+        sendToLogChannel(`Error updating Guild Age: ${age} Days.\nError: ${err}`);
+    }
 }
 
 export const updateEmotes = async () => {
