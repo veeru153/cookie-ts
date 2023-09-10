@@ -7,9 +7,14 @@
     --buy-blue-active: #e9e5f4;
 }
 
+@font-face {
+    font-family: 'Comic Sans Cookie';
+    src: url('../assets/ComicSansMS.ttf');
+}
+
 body {
     margin: 0;
     background-color: var(--background);
-    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
+    font-family: 'Comic Sans Cookie';
     padding-bottom: 4rem;
 }
