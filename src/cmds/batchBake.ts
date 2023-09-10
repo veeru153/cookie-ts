@@ -14,7 +14,7 @@ const batchBakeFn = async (message: Message, args: string[]) => {
         const argsMap = getArgsMap(args, argsKeys);
 
         const userId = argsMap.get("userId");
-        const member = message.guild.members.resolve(userId);
+        const member = await message.guild.members.fetch(userId);
         if (!member) {
             throw new CookieException(`Member with user id: ${userId} not found.`);
         }
@@ -24,7 +24,8 @@ const batchBakeFn = async (message: Message, args: string[]) => {
             throw new CookieException(`Invalid Count: ${count}. Count must be in range 1-10.`);
         }
 
-        const ack = await message.channel.send(`Baking ${count} batches for ${member.toString()}...`);
+        const batchStr = count === 1 ? "batch" : "batches"
+        const ack = await message.channel.send(`Baking ${count} ${batchStr} for ${member.toString()}...`);
         const response = await batchBakeCookies(member, count);
         await message.reply(response);
         ack.deletable && ack.delete();

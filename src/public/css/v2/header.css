@@ -1,0 +1,10 @@
+:root {
+    --cookie: #da9f83;
+    --chocolate: #894b3b;
+}
+
+.header {
+    background-color: var(--chocolate);
+    color: var(--cookie);
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
+}
