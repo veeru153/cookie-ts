@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
-import { PREFIX } from "../utils/constants";
+import { PREFIX } from "../utils/constants/common";
 import Scope from "../utils/enums/Scope";
 import { canMemberRunCmd } from "../helpers/canMemberRunCmd";
 import * as cmds from "./index";

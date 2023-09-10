@@ -40,7 +40,7 @@ const updateProfile = async (message: Message, args: string[]) => {
 
 const getProfile = async (message: Message) => {
     const ack = await message.channel.send(`Generating Profile Card for ${message.author.toString()}...`);
-    const card = await getProfileCard(message);
+    const card = await getProfileCard(message.member);
     ack.deletable && await ack.delete();
     await message.reply({
         files: [{

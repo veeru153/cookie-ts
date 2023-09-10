@@ -1,80 +1,83 @@
-import { GuildMember, Message } from "discord.js";
+import { GuildMember, User } from "discord.js";
+import { isDevEnv } from "../utils/constants/common";
 import { inventoryRepo } from "../utils/repos";
+import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
-import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
 import { getBakeTierFromPity, getUpdatedBakePity } from "./bakePityService";
 import { getRandomNumberBetween } from "../helpers/getRandomNumberBetween";
 import { CookieException } from "../utils/CookieException";
-import { isDevEnv } from "../utils/constants";
+import { COOLDOWN_MS, PROMOTIONAL_MULTIPLIER, EVENT_MULTIPLIER, BOOSTER_MULTIPLIER, COOKIE_TIER_RANGE } from "../utils/constants/bake";
+import { MINUTE_IN_MS, SECOND_IN_MS, HOUR_IN_MS } from "../utils/constants/common";
 
-const COOLDOWN_HR = isDevEnv ? 0.00111111 : 4;
-const COOLDOWN_MS = COOLDOWN_HR * 60 * 60 * 1000;
-const HOUR_IN_MS = 60 * 60 * 1000;
-const MINUTE_IN_MS = 60 * 1000;
-const SECOND_IN_MS = 1000;
 
-const BOOSTER_MULTIPLIER = 0.1;
-const PROMOTIONAL_MULTIPLIER = 0;
-const EVENT_MULTIPLIER = 0;
+export const bakeCookies = async (member: GuildMember) => {
+    const { user, id } = member;
+    let userInventory = await inventoryRepo.get(id);
+    userInventory = await validateAndPatchInventory(id, userInventory);
+    const currTime = Date.now();
 
-const COOKIE_TIER_RANGE = {
-    T0_MIN: 1,
-    T0_MAX: 3,
-    T1_MIN: 7,
-    T1_MAX: 11,
-    T2_MIN: 14,
-    T2_MAX: 18,
-    T3_MIN: 21,
-    T3_MAX: 25,
-}
+    const { cookies, lastBaked, bakePity } = userInventory;
+    const timeDiff = currTime - lastBaked;
 
-export const bakeCookies = async (message: Message) => {
-    try {
-        const { id } = message.author;
-        let userInventory = await inventoryRepo.get(id);
-        userInventory = await validateAndPatchInventory(id, userInventory);
-        const currTime = Date.now();
+    if (timeDiff < COOLDOWN_MS) {
+        return getCooldownMsg(user, timeDiff, cookies);
+    }
 
-        const { cookies, lastBaked } = userInventory;
-        const timeDiff = currTime - lastBaked;
+    const bakeTier = getBakeTierFromPity(bakePity);
+    const multiplier = getMultiplier(member);
+    const baseFreshCookies = getFreshCookiesFromBakeTier(bakeTier);
+    const freshCookies = Math.round(baseFreshCookies * multiplier);
+    const updatedCookies = cookies + freshCookies;
+    const updatedBakePity = getUpdatedBakePity(bakeTier, bakePity);
 
-        if (timeDiff < COOLDOWN_MS) {
-            await sendCooldownMsg(message, timeDiff, cookies);
-            return;
-        }
-
-        const bakePity = userInventory.bakePity;
-        const bakeTier = getBakeTierFromPity(bakePity);
-        const multiplier = getMultiplier(message.member);
-        const baseFreshCookies = getFreshCookiesFromBakeTier(bakeTier);
-        const freshCookies = Math.round(baseFreshCookies * multiplier);
-        const updatedCookies = cookies + freshCookies;
-        const updatedBakePity = getUpdatedBakePity(bakeTier, bakePity);
-
+    if (!isDevEnv) {
+        // Only update when not testing!
         userInventory.cookies = updatedCookies;
         userInventory.bakePity = updatedBakePity;
         userInventory.lastBaked = currTime;
         inventoryRepo.set(id, userInventory);
-
-        await sendBakeSuccessMsg(message, freshCookies, updatedCookies);
-    } catch (err) {
-        const replyMsg = await message.reply("An error occurred!");
-        setTimeout(() => {
-            replyMsg.deletable && replyMsg.delete();
-            message.deletable && message.delete();
-        }, 5000);
-        log.error(`[Bake] User : ${getUserLogString(message.author)}\nError : ${err}`);
     }
+
+    return getBakeSuccessMsg(user, freshCookies, updatedCookies);
 }
 
-const getFreshCookiesFromBakeTier = (tier: number) => {
-    if (tier === 0) return getRandomNumberBetween(COOKIE_TIER_RANGE.T0_MIN, COOKIE_TIER_RANGE.T0_MAX);
-    if (tier === 1) return getRandomNumberBetween(COOKIE_TIER_RANGE.T1_MIN, COOKIE_TIER_RANGE.T1_MAX);
-    if (tier === 2) return getRandomNumberBetween(COOKIE_TIER_RANGE.T2_MIN, COOKIE_TIER_RANGE.T2_MAX);
-    if (tier === 3) return getRandomNumberBetween(COOKIE_TIER_RANGE.T3_MIN, COOKIE_TIER_RANGE.T3_MAX);
+export const batchBakeCookies = async (member: GuildMember, count: number) => {
+    const { user, id: userId } = member;
+    let userInventory = await inventoryRepo.get(userId);
+    if (!userInventory) {
+        throw new CookieException(`Inventory for user with id: ${userId} not found.`);
+    }
+    userInventory = await validateAndPatchInventory(userId, userInventory);
+    const currTime = Date.now();
 
-    throw new CookieException(`[Bake] Invalid Tier : ${tier}`);
+    const { cookies, bakePity } = userInventory;
+    const multiplier = getMultiplier(member);
+    let freshCookies = 0;
+    let updatedBakePity = bakePity;
+
+    const bakeList = [];
+
+    for (let i = 0; i < count; i++) {
+        const bakeTier = getBakeTierFromPity(updatedBakePity);
+        const baseFreshCookies = getFreshCookiesFromBakeTier(bakeTier);
+        const newCookies = Math.round(baseFreshCookies * multiplier);
+        bakeList.push(newCookies);
+        freshCookies += newCookies;
+        updatedBakePity = getUpdatedBakePity(bakeTier, updatedBakePity);
+    }
+
+    const updatedCookies = cookies + freshCookies;
+
+    if (!isDevEnv) {
+        // Only update when not testing!
+        userInventory.cookies = updatedCookies;
+        userInventory.bakePity = updatedBakePity;
+        userInventory.lastBaked = currTime;
+        inventoryRepo.set(member.id, userInventory);
+    }
+
+    return getBatchBakeSuccessMsg(user, freshCookies, updatedCookies, bakeList);
 }
 
 const getMultiplier = (member: GuildMember) => {
@@ -86,26 +89,38 @@ const getMultiplier = (member: GuildMember) => {
     return 1 + sum;
 }
 
-const sendBakeSuccessMsg = async (message: Message, freshCookies: number, cookies: number) => {
-    log.info(`[Bake] ${getUserLogString(message.author)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
-    const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
-    const msg = `**Cookies Baked!**\nYou baked ${freshCookies} ${cookieStr}.\n**🍪 Total Cookies: ${cookies}**`;
-    message.reply(msg);
+const getFreshCookiesFromBakeTier = (tier: number) => {
+    if (tier === 0) return getRandomNumberBetween(COOKIE_TIER_RANGE.T0_MIN, COOKIE_TIER_RANGE.T0_MAX);
+    if (tier === 1) return getRandomNumberBetween(COOKIE_TIER_RANGE.T1_MIN, COOKIE_TIER_RANGE.T1_MAX);
+    if (tier === 2) return getRandomNumberBetween(COOKIE_TIER_RANGE.T2_MIN, COOKIE_TIER_RANGE.T2_MAX);
+    if (tier === 3) return getRandomNumberBetween(COOKIE_TIER_RANGE.T3_MIN, COOKIE_TIER_RANGE.T3_MAX);
+
+    throw new CookieException(`[Bake] Invalid Tier : ${tier}`);
 }
 
-const sendCooldownMsg = async (message: Message, timeDiff: number, cookies: number) => {
-    log.info(`[Bake] User : ${getUserLogString(message.author)} is on cooldown`);
+const getBakeSuccessMsg = (user: User, freshCookies: number, cookies: number) => {
+    log.info(`[Bake] ${getUserLogString(user)} baked ${freshCookies} cookies. Total Cookies : ${cookies}`);
+    const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
+    return `**Cookies Baked!**\nYou baked ${freshCookies} ${cookieStr}.\n**🍪 Total Cookies: ${cookies}**`;
+}
+
+const getBatchBakeSuccessMsg = (user: User, freshCookies: number, cookies: number, bakeList: number[]) => {
+    log.info(`[Batch Bake] ${getUserLogString(user)} baked ${freshCookies} cookies. Total Cookies : ${cookies}\nBake List: ${bakeList}`);
+    const cookieStr = freshCookies == 1 ? "cookie" : "cookies";
+    const batchStr = freshCookies == 1 ? "batch was" : "batches were";
+    return `**Cookies Baked!**\n${bakeList.length} ${batchStr} baked for ${user.toString()}.\n${freshCookies} ${cookieStr} baked - (${bakeList.join(", ")})\n**🍪 Total Cookies: ${cookies}**`;
+}
+
+const getCooldownMsg = (user: User, timeDiff: number, cookies: number) => {
+    log.info(`[Bake] User : ${getUserLogString(user)} is on cooldown`);
     const remainingMs = COOLDOWN_MS - timeDiff;
 
     if (remainingMs < MINUTE_IN_MS) {
         const seconds = Math.floor((remainingMs / SECOND_IN_MS) % 60).toString().padStart(2, "0");
-        const msg = `**Oven needs to cool down!**\nYou can bake more cookies in ${seconds} seconds.\n**🍪 Total Cookies: ${cookies}**`;
-        message.reply(msg);
-        return;
+        return `**Oven needs to cool down!**\nYou can bake more cookies in ${seconds} seconds.\n**🍪 Total Cookies: ${cookies}**`;
     }
 
     const hours = Math.floor(remainingMs / HOUR_IN_MS).toString().padStart(2, "0");
     const minutes = Math.floor((remainingMs % HOUR_IN_MS) / MINUTE_IN_MS).toString().padStart(2, "0");
-    const msg = `**Oven needs to cool down!**\nYou can bake more 🍪 in ${hours} hours ${minutes} minutes.\n**🍪 Total Cookies: ${cookies}**`;
-    message.reply(msg);
+    return `**Oven needs to cool down!**\nYou can bake more 🍪 in ${hours} hours ${minutes} minutes.\n**🍪 Total Cookies: ${cookies}**`;
 }

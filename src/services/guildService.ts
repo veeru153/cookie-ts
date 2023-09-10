@@ -1,10 +1,14 @@
 import { Emoji, GuildEmoji, TextChannel } from "discord.js";
 import client from "../utils/client";
-import { isDevEnv } from "../utils/constants";
+import { isDevEnv } from "../utils/constants/common";
 import { Channels } from "../utils/enums/Channels";
 import { Guild } from "../utils/enums/Guilds";
 import { Errors } from "../utils/enums/Errors";
 import { CookieException } from "../utils/CookieException";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
+
+let lastUpdatedGuildAge = -1;
 
 export const updateGuildAge = async () => {
     const guild = await client.guilds.fetch(Guild.YUQICORD);
@@ -12,9 +16,19 @@ export const updateGuildAge = async () => {
     const MS_IN_DAY = 86400000
     const age = Math.floor(ageMs / MS_IN_DAY);
 
-    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Reception.INFO;
+    if (lastUpdatedGuildAge === age)
+        return;
+
+    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Reception.ANNOUNCEMENTS;
     const channel = await client.channels.fetch(channelId) as TextChannel;
-    channel.setTopic(`:calendar_spiral: Server Age: ${age} Days`);
+    try {
+        log.info(`Updating Guild Age: ${age} Days`);
+        await channel.setTopic(`:calendar_spiral: Server Age: ${age} Days`);
+        lastUpdatedGuildAge = age;
+    } catch (err) {
+        log.error(err, "Error updating Guild Age");
+        sendToLogChannel(`Error updating Guild Age: ${age} Days.\nError: ${err}`);
+    }
 }
 
 export const updateEmotes = async () => {
@@ -26,14 +40,20 @@ export const updateEmotes = async () => {
     await clearChannel(channel);
 
     const emotes = await getEmotes();
-    sendEmotes(channel, emotes);
+    await sendEmotes(channel, emotes);
     const animatedEmotes = await getEmotes(true);
-    sendEmotes(channel, animatedEmotes);
+    await sendEmotes(channel, animatedEmotes);
 }
 
 const clearChannel = async (channel: TextChannel) => {
     const msgs = await channel.messages.fetch();
-    await channel.bulkDelete(msgs);
+    msgs.forEach(async msg => {
+        if (!msg.deletable) {
+            log.warn(sendToLogChannel(`Cannot delete message in channel: ${channel.toString()}`));
+        } else {
+            await msg.delete();
+        }
+    })
 }
 
 const getEmotes = async (animated = false) => {
@@ -49,11 +69,11 @@ const getEmotes = async (animated = false) => {
     return emotes;
 }
 
-const sendEmotes = (channel: TextChannel, emoteArr: Emoji[]) => {
+const sendEmotes = async (channel: TextChannel, emoteArr: Emoji[]) => {
     const threshold = 6;
     while (emoteArr.length > 0) {
         const end = Math.min(emoteArr.length, threshold);
         const consumed = emoteArr.splice(0, end);
-        channel.send(consumed.join("  "));
+        await channel.send(consumed.join("  "));
     }
 }

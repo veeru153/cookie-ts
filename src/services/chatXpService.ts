@@ -5,7 +5,7 @@ import { getUserLogString } from "../helpers/getUserLogString";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { isDevEnv } from "../utils/constants";
+import { isDevEnv } from "../utils/constants/common";
 
 const BOOSTER_MULTIPLIER = 1.25
 const EVENT_MULTIPLIER = 0;

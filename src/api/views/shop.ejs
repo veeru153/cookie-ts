@@ -1,0 +1,34 @@
+<%- include('./partials/meta') %>
+    <%- include('./partials/header', { page: 'shop' }) %>
+        <link rel="stylesheet" href="/css/shop.css">
+        <div class="shop">
+            <h1>Backgrounds</h1>
+            <div class="catalogue">
+                <% for (item of backgrounds) {%>
+                    <div class="container">
+                        <div class="img-wrapper">
+                            <img src="<%= item.src %>" alt="<%= item.name %>">
+                        </div>
+                        <div class="name">
+                            <p>
+                                <%= item.name %> - <%= item.cost %> 🍪
+                            </p>
+                        </div>
+                        <div class="buy-btn" onclick="handleClick(this)" data-item-id="<%= item.id %>">
+                            <p>Buy</p>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+
+        <script>
+            function handleClick(btn) {
+                const itemId = btn.dataset.itemId;
+                navigator.clipboard.writeText(`-shop buy ${itemId}`);
+                btn.innerHTML = "<p>Command Copied!</p>"
+                setTimeout(() => {
+                    btn.innerHTML = "<p>Buy</p>";
+                }, 500);
+            }
+        </script>

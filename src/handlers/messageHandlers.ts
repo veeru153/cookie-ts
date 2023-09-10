@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
-import { PREFIX, devIdList, isDevEnv } from "../utils/constants";
+import { PREFIX, devIdList, isDevEnv } from "../utils/constants/common";
 import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
 import { Command } from "../entities/Command";

@@ -1,0 +1,20 @@
+:root {
+    --background: #f4cccc;
+    --cookie: #da9f83;
+    --chocolate: #894b3b;
+    --active: #ead1dc;
+    --buy-blue: #d9d2e9;
+    --buy-blue-active: #e9e5f4;
+}
+
+@font-face {
+    font-family: 'Comic Sans Cookie';
+    src: url('../assets/ComicSansMS.ttf');
+}
+
+body {
+    margin: 0;
+    background-color: var(--background);
+    font-family: 'Comic Sans Cookie', 'Comic Sans MS', 'Comic Sans', 'Trebuchet MS', Arial, sans-serif;
+    padding-bottom: 4rem;
+}
