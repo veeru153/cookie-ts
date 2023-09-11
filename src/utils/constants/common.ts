@@ -1,4 +1,7 @@
 export const isDevEnv = process.env.NODE_ENV == "dev";
+export const TOKEN = isDevEnv ? process.env.DEV_TOKEN : process.env.TOKEN;
+export const CLIENT_ID = isDevEnv ? process.env.DEV_CLIENT_ID : process.env.CLIENT_ID;
+
 export const env = isDevEnv ? "Development" : "Production";
 export const identity = isDevEnv ? "Cookie Dough" : "Cookie";
 export const devIdList = ["252748033287127041"];

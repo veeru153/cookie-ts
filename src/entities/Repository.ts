@@ -14,7 +14,7 @@ export class Repository<T> {
         this.data = new Map();
     }
 
-    initialize = async () => {
+    initialize = () => {
         log.info(`[Repository/${this.name}] Initialized`);
     }
 

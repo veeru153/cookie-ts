@@ -1,4 +1,4 @@
-import { Events, GuildEmoji, GuildMember, Message, MessageReaction, User } from "discord.js";
+import { Events, GuildEmoji, GuildMember, Interaction, Message, MessageReaction, User } from "discord.js";
 import client from "./utils/client";
 import { env, identity, isDevEnv } from "./utils/constants/common";
 import * as repos from "./utils/repos";
@@ -9,19 +9,17 @@ import { emojiAddHandler, emojiRemoveHandler, emojiUpdateHandler } from "./handl
 import { server } from "./server";
 import { log } from "./utils/logger";
 import { sendToLogChannel } from "./helpers/sendToLogChannel";
+import { interactionCreate, registerCommands } from "./handlers/interactionHandlers";
 
 client.on(Events.ClientReady, async () => {
+    log.info(`Starting ${identity}...`);
+    Object.values(repos).forEach(repo => repo.initialize());
+    log.info(sendToLogChannel('Repositories Initialized!'));
+    await registerCommands();
+    server();
     log.info(`READY! Logged in as ${identity}.`);
     log.info(`- Environment: ${env}`);
     log.info(sendToLogChannel(`${identity} is online!`));
-    // TODO: Event Service
-    // EventService.triggerEvent();
-    for (let repo of Object.values(repos)) {
-        await repo.initialize();
-    }
-    log.info(sendToLogChannel('Repositories Initialized!'));
-    server();
-    sendToLogChannel('Server is ready!');
 })
 
 isDevEnv && client.on(Events.Error, console.log);
@@ -30,6 +28,8 @@ isDevEnv && client.on(Events.Debug, console.log);
 client.on(Events.MessageCreate, async (message: Message) => await messageCreate(message));
 client.on(Events.MessageDelete, async (message: Message) => await messageDelete(message));
 client.on(Events.MessageUpdate, async (message: Message) => await messageUpdate(message));
+
+client.on(Events.InteractionCreate, async (interaction: Interaction) => await interactionCreate(interaction));
 
 client.on(Events.GuildEmojiCreate, async (emoji: GuildEmoji) => await emojiAddHandler(emoji));
 client.on(Events.GuildEmojiDelete, async (emoji: GuildEmoji) => await emojiRemoveHandler(emoji));
