@@ -1,42 +1,37 @@
-import { Interaction, REST, Routes } from "discord.js";
+import { Interaction } from "discord.js";
 import { updateGuildAge } from "../services/guildService";
-import { CLIENT_ID, TOKEN, isDevEnv } from "../utils/constants/common";
-import { Guild } from "../utils/enums/Guilds";
 import * as cmds from "../cmds/v2/index";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { HybridCommand } from "../utils/types/HybridCommand";
-
-const rest = new REST().setToken(TOKEN);
-
-export const registerCommands = async () => {
-    try {
-        log.info("Registering Slash Commands...");
-        await rest.put(
-            Routes.applicationGuildCommands(CLIENT_ID, Guild.YUQICORD),
-            { body: Object.values(cmds).map((cmd: HybridCommand) => cmd.info) }
-        )
-        log.info("Slash Commands Registered!")
-    } catch (err) {
-        log.error(err, "Error registering Slash Commands!");
-        sendToLogChannel(`Error registering Slash Commands : ${err}`);
-    }
-}
-
-export const syncCommands = async () => {
-    if (isDevEnv) {
-        log.info("Skipping auto sync due to dev environment.");
-        return;
-    }
-
-    await registerCommands();
-}
+import { canMemberRunCmdV2 } from "../helpers/canMemberRunCmd";
+import { CookieException } from "../utils/CookieException";
 
 export const interactionCreate = async (interaction: Interaction) => {
     await updateGuildAge();
 
+    if (!interaction.inCachedGuild()) {
+        log.warn("Interaction in uncached guild. Skipping...");
+        return;
+    }
+
     if (interaction.isChatInputCommand()) {
-        const cmd = cmds[interaction.commandName] as HybridCommand;
-        cmd.slash(interaction);
+        const { member, commandName } = interaction;
+        try {
+            const cmd: HybridCommand = cmds[commandName];
+            if (canMemberRunCmdV2(member, cmd)) {
+                cmd.slash(interaction);
+            } else {
+                log.warn(`Member: ${member.toString()} could not run command: ${commandName}. Reason: Scope`);
+                interaction.reply("You don't have permissions to run this command");
+            }
+        } catch (err) {
+            if (err instanceof CookieException) {
+                interaction.reply(err.message);
+            } else {
+                log.error(err, sendToLogChannel(`Error running command: ${commandName} by member: ${member.toString()}`));
+                interaction.reply("An error occurred!");
+            }
+        }
     }
 }

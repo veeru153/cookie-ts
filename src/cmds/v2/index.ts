@@ -1,3 +1,4 @@
+export * from "./bake";
 export * from "./inventory";
 export * from "./mybag";
 export * from "./ping";

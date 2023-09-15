@@ -3,24 +3,24 @@ import { inventoryRepo } from "../../utils/repos";
 import { HybridCommand } from "../../utils/types/HybridCommand";
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
-const walletFn = async (member: GuildMember) => {
+const cookiesFn = async (member: GuildMember) => {
     let userInv = await inventoryRepo.get(member.id);
     userInv = await validateAndPatchInventory(member.id, userInv);
     return `🍪 Total Cookies: ${userInv.cookies}`;
 }
 
 const legacy = async (message: Message) => {
-    message.reply(await walletFn(message.member));
+    message.reply(await cookiesFn(message.member));
 }
 
 const slash = async (interaction: ChatInputCommandInteraction) => {
-    interaction.reply(await walletFn(interaction.member as GuildMember))
+    interaction.reply(await cookiesFn(interaction.member as GuildMember))
 }
 
-export const wallet: HybridCommand = {
+export const cookies: HybridCommand = {
     info: {
-        name: "wallet",
-        description: "(Alias: cookies) Get number of cookies"
+        name: "cookies",
+        description: "(Alias: wallet) Get number of cookies"
     },
     legacy: async (message: Message) => await legacy(message),
     slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),

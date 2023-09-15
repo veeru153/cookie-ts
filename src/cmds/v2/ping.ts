@@ -17,7 +17,7 @@ const slash = async (interaction: ChatInputCommandInteraction) => {
 export const ping: HybridCommand = {
     info: {
         name: "ping",
-        description: "Pong! Returns Network Latency."
+        description: "Pong! Returns Network Latency"
     },
     legacy: async (message: Message) => await legacy(message),
     slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),

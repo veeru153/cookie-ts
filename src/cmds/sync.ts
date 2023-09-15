@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
-import { registerCommands } from "../handlers/interactionHandlers";
+import { registerCommands } from "../services/interactionService";
 
 const syncFn = async (message: Message) => {
     await registerCommands();

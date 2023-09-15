@@ -9,7 +9,8 @@ import { emojiAddHandler, emojiRemoveHandler, emojiUpdateHandler } from "./handl
 import { server } from "./server";
 import { log } from "./utils/logger";
 import { sendToLogChannel } from "./helpers/sendToLogChannel";
-import { interactionCreate, syncCommands } from "./handlers/interactionHandlers";
+import { interactionCreate } from "./handlers/interactionHandlers";
+import { syncCommands } from "./services/interactionService";
 
 client.on(Events.ClientReady, async () => {
     log.info(`Starting ${identity}...`);

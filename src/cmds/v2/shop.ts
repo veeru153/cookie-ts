@@ -5,13 +5,13 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember,
 import { buyShopItem } from "../../services/shopService";
 import { log } from "../../utils/logger";
 import { sendToLogChannel } from "../../helpers/sendToLogChannel";
-import { CookieException } from "../../utils/CookieException";
 
 enum ShopAction {
     LINK = "link",
     BUY = "buy"
 }
 
+// TODO: Changed commands copied from the shop to remove "type"
 const shopFn = async (member: GuildMember, action?: ShopAction, itemId?: string) => {
     if (action == null || action === ShopAction.LINK) {
         return `🛒 Shop: ${SHOP_URL}`;
@@ -49,17 +49,7 @@ const legacy = async (message: Message, args: string[]) => {
     } else if (args.length === 2) {
         if (args[0] === ShopAction.BUY) {
             const itemId = args[1];
-            try {
-                res = await shopFn(message.member, ShopAction.BUY, itemId);
-            } catch (err) {
-                if (err instanceof CookieException) {
-                    res = err.message;
-                } else {
-                    res = "An error occurred!";
-                    sendToLogChannel(`[Shop] Error: ${err}`);
-                    log.error(err);
-                }
-            }
+            res = await shopFn(message.member, ShopAction.BUY, itemId);
         } else if (args[0] === ShopAction.LINK) {
             res = await shopFn(message.member, ShopAction.LINK);
         } else {
@@ -71,31 +61,18 @@ const legacy = async (message: Message, args: string[]) => {
 }
 
 const slash = async (interaction: ChatInputCommandInteraction) => {
-    if (!interaction.inCachedGuild()) {
-        log.warn(sendToLogChannel("[shop] Slash Command executed in uncached guild. Skipping."));
-        return;
-    }
     let res: string = null;
-
     const action = interaction.options.getSubcommand();
+    const member = (interaction.member as GuildMember);
+
     if (action === ShopAction.LINK) {
-        res = await shopFn(interaction.member, ShopAction.LINK);
+        res = await shopFn(member, ShopAction.LINK);
     } else if (action === ShopAction.BUY) {
         const itemId = interaction.options.getString("item_id");
         if (isStringBlank(itemId)) {
             res = "Please enter a valid `item_id`";
         } else {
-            try {
-                res = await shopFn(interaction.member, ShopAction.BUY, itemId);
-            } catch (err) {
-                if (err instanceof CookieException) {
-                    res = err.message;
-                } else {
-                    res = "An error occurred!";
-                    sendToLogChannel(`[Shop] Error: ${err}`);
-                    log.error(err);
-                }
-            }
+            res = await shopFn(member, ShopAction.BUY, itemId);
         }
     } else {
         res = "Please enter a valid action: `link | buy`";
@@ -111,7 +88,7 @@ export const shop: HybridCommand = {
         options: [
             {
                 name: "link",
-                description: "Get the link to the shop",
+                description: "Get link to the shop",
                 required: false,
                 type: ApplicationCommandOptionType.Subcommand,
             },
