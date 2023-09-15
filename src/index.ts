@@ -10,13 +10,13 @@ import { server } from "./server";
 import { log } from "./utils/logger";
 import { sendToLogChannel } from "./helpers/sendToLogChannel";
 import { interactionCreate } from "./handlers/interactionHandlers";
-import { syncCommands } from "./services/interactionService";
+import { registerCommands } from "./services/interactionService";
 
 client.on(Events.ClientReady, async () => {
     log.info(`Starting ${identity}...`);
     Object.values(repos).forEach(repo => repo.initialize());
     log.info(sendToLogChannel('Repositories Initialized!'));
-    await syncCommands();
+    await registerCommands();
     server();
     log.info(`READY! Logged in as ${identity}.`);
     log.info(`- Environment: ${env}`);

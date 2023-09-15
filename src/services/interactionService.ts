@@ -8,24 +8,24 @@ import { Guild } from "../utils/enums/Guilds";
 
 const rest = new REST().setToken(TOKEN);
 
-export const registerCommands = async () => {
+export const syncCommands = async () => {
     try {
-        log.info("Registering Slash Commands...");
+        log.info("Syncing Slash Commands...");
         await rest.put(
             Routes.applicationGuildCommands(CLIENT_ID, Guild.YUQICORD),
             { body: Object.values(cmds).map((cmd: HybridCommand) => cmd.info) }
         )
-        log.info("Slash Commands Registered!")
+        log.info("Slash Commands Synced!")
     } catch (err) {
-        log.error(err, "Error registering Slash Commands!");
-        sendToLogChannel(`Error registering Slash Commands : ${err}`);
+        log.error(err, "Error syncing Slash Commands!");
+        sendToLogChannel(`Error syncing Slash Commands : ${err}`);
     }
 }
 
-export const syncCommands = async () => {
+export const registerCommands = async () => {
     if (isDevEnv) {
-        log.info("Skipping auto sync due to dev environment.");
+        log.info("Skipping slash command auto registration due to dev environment.");
         return;
     }
-    await registerCommands();
+    await syncCommands();
 }

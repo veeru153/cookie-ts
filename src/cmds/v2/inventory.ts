@@ -18,7 +18,7 @@ const slash = async (interaction: ChatInputCommandInteraction) => {
 export const inventory: HybridCommand = {
     info: {
         name: "inventory",
-        description: "(Alias: mybag) Returns link to user's inventory."
+        description: "(Alias: mybag) Get link to inventory"
     },
     legacy: async (message: Message) => await legacy(message),
     slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),

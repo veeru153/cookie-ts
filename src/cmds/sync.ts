@@ -1,10 +1,11 @@
 import { Message } from "discord.js";
 import { Command } from "../entities/Command";
 import Scope from "../utils/enums/Scope";
-import { registerCommands } from "../services/interactionService";
+import { syncCommands } from "../services/interactionService";
 
 const syncFn = async (message: Message) => {
-    await registerCommands();
+    await syncCommands();
+    message.reply("Commands synchronized!");
 }
 
 export const sync = new Command({
