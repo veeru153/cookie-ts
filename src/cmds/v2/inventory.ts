@@ -7,19 +7,19 @@ const inventoryFn = (member: GuildMember) => {
     return `🎒 Inventory: ${url}`;
 }
 
-const legacy = (message: Message) => {
+const legacy = async (message: Message) => {
     message.reply(inventoryFn(message.member));
 }
 
-const slash = (interaction: ChatInputCommandInteraction) => {
+const slash = async (interaction: ChatInputCommandInteraction) => {
     interaction.reply(inventoryFn(interaction.member as GuildMember))
 }
 
 export const inventory: HybridCommand = {
     info: {
         name: "inventory",
-        description: "Returns link to user's inventory."
+        description: "(Alias: mybag) Returns link to user's inventory."
     },
-    legacy: legacy,
-    slash: slash,
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
 }

@@ -6,12 +6,12 @@ const pingFn = (createdTs: number) => {
     return `Pong! Network Latency: \`${ping}ms\``;
 }
 
-const legacy = (message: Message) => {
-    message.reply(pingFn(message.createdTimestamp));
+const legacy = async (message: Message) => {
+    await message.reply(pingFn(message.createdTimestamp));
 }
 
-const slash = (interaction: ChatInputCommandInteraction) => {
-    interaction.reply(pingFn(interaction.createdTimestamp))
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    await interaction.reply(pingFn(interaction.createdTimestamp))
 }
 
 export const ping: HybridCommand = {
@@ -19,6 +19,6 @@ export const ping: HybridCommand = {
         name: "ping",
         description: "Pong! Returns Network Latency."
     },
-    legacy: legacy,
-    slash: slash,
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
 }

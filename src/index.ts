@@ -9,13 +9,13 @@ import { emojiAddHandler, emojiRemoveHandler, emojiUpdateHandler } from "./handl
 import { server } from "./server";
 import { log } from "./utils/logger";
 import { sendToLogChannel } from "./helpers/sendToLogChannel";
-import { interactionCreate, registerCommands } from "./handlers/interactionHandlers";
+import { interactionCreate, syncCommands } from "./handlers/interactionHandlers";
 
 client.on(Events.ClientReady, async () => {
     log.info(`Starting ${identity}...`);
     Object.values(repos).forEach(repo => repo.initialize());
     log.info(sendToLogChannel('Repositories Initialized!'));
-    await registerCommands();
+    await syncCommands();
     server();
     log.info(`READY! Logged in as ${identity}.`);
     log.info(`- Environment: ${env}`);

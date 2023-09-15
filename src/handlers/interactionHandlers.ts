@@ -1,6 +1,6 @@
 import { Interaction, REST, Routes } from "discord.js";
 import { updateGuildAge } from "../services/guildService";
-import { CLIENT_ID, TOKEN } from "../utils/constants/common";
+import { CLIENT_ID, TOKEN, isDevEnv } from "../utils/constants/common";
 import { Guild } from "../utils/enums/Guilds";
 import * as cmds from "../cmds/v2/index";
 import { log } from "../utils/logger";
@@ -21,6 +21,15 @@ export const registerCommands = async () => {
         log.error(err, "Error registering Slash Commands!");
         sendToLogChannel(`Error registering Slash Commands : ${err}`);
     }
+}
+
+export const syncCommands = async () => {
+    if (isDevEnv) {
+        log.info("Skipping auto sync due to dev environment.");
+        return;
+    }
+
+    await registerCommands();
 }
 
 export const interactionCreate = async (interaction: Interaction) => {

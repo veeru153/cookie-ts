@@ -1,24 +1,27 @@
+import { validateAndPatchInventory } from "../../helpers/validateAndPatchInventory";
+import { inventoryRepo } from "../../utils/repos";
 import { HybridCommand } from "../../utils/types/HybridCommand";
-import { ChatInputCommandInteraction, Message } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 
-const pingFn = (createdTs: number) => {
-    const ping = Date.now() - createdTs;
-    return `Pong! Network Latency: \`${ping}ms\``;
+const walletFn = async (member: GuildMember) => {
+    let userInv = await inventoryRepo.get(member.id);
+    userInv = await validateAndPatchInventory(member.id, userInv);
+    return `🍪 Total Cookies: ${userInv.cookies}`;
 }
 
-const legacy = (message: Message) => {
-    message.reply(pingFn(message.createdTimestamp));
+const legacy = async (message: Message) => {
+    message.reply(await walletFn(message.member));
 }
 
-const slash = (interaction: ChatInputCommandInteraction) => {
-    interaction.reply(pingFn(interaction.createdTimestamp))
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    interaction.reply(await walletFn(interaction.member as GuildMember))
 }
 
-export const ping: HybridCommand = {
+export const wallet: HybridCommand = {
     info: {
-        name: "ping",
+        name: "wallet",
         description: "Returns the number of cookies the user has."
     },
-    legacy: legacy,
-    slash: slash,
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
 }

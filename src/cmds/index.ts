@@ -9,4 +9,5 @@ export * from "./mybag";
 export * from "./ping";
 export * from "./profile";
 export * from "./shop";
+export * from "./sync";
 export * from "./wallet";
