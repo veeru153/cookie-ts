@@ -22,7 +22,7 @@ export const interactionCreate = async (interaction: Interaction) => {
             const cmd: HybridCommand = cmds[commandName];
             if (canMemberRunCmdV2(member, cmd)) {
                 log.info(`[Slash Command] '${commandName}' ran by User : ${getUserLogString(interaction.member.user)}`);
-                cmd.slash(interaction);
+                await cmd.slash(interaction);
             } else {
                 log.warn(`Member: ${member.toString()} could not run command: ${commandName}. Reason: Scope`);
                 interaction.reply("You don't have permissions to run this command");

@@ -30,7 +30,7 @@ export const messageCreate = async (message: Message) => {
     try {
         log.info(`[Command] '${commandName}' ran by User : ${getUserLogString(message.author)}`);
         if (canMemberRunCmdV2(message.member, cmd)) {
-            cmd.legacy(message, args);
+            await cmd.legacy(message, args);
         }
     } catch (err) {
         if (err instanceof CookieException) {
