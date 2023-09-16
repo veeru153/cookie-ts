@@ -2,11 +2,14 @@ import { Message } from "discord.js";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
 import { PREFIX, devIdList, isDevEnv } from "../utils/constants/common";
-import * as cmds from "../cmds";
+import * as cmds from "../cmds/v2";
 import { updateGuildAge } from "../services/guildService";
 import { Command } from "../entities/Command";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { HybridCommand } from "../utils/types/HybridCommand";
+import { canMemberRunCmdV2 } from "../helpers/canMemberRunCmd";
+import { CookieException } from "../utils/CookieException";
 
 export const messageCreate = async (message: Message) => {
     await updateGuildAge();
@@ -16,15 +19,25 @@ export const messageCreate = async (message: Message) => {
     if (!message.content.startsWith(PREFIX)) return;
 
     let msg = message.content.slice(PREFIX.length).split(" ");
-    let cmd = msg.shift();
+    let commandName = msg.shift();
     let args = [...msg];
 
-    if (Object.keys(cmds).includes(cmd)) {
-        log.info(`[Command] '${cmd}' ran by User : ${getUserLogString(message.author)}`);
-        try {
-            (cmds[cmd] as Command).run(message, args);
-        } catch (err) {
-            log.error(sendToLogChannel(`[Command] Error while running ${cmd} by User : ${getUserLogString(message.author)} : ${err}`));
+    const cmd: HybridCommand = cmds[commandName]
+    if (cmd == null) {
+        return;
+    }
+
+    try {
+        log.info(`[Command] '${commandName}' ran by User : ${getUserLogString(message.author)}`);
+        if (canMemberRunCmdV2(message.member, cmd)) {
+            cmd.legacy(message, args);
+        }
+    } catch (err) {
+        if (err instanceof CookieException) {
+            message.reply(err.message);
+        } else {
+            log.error(err, sendToLogChannel(`[Command] Error while running ${commandName} by User : ${getUserLogString(message.author)}`));
+            message.reply("An error occurred :(");
         }
     }
 }

@@ -6,6 +6,7 @@ import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { HybridCommand } from "../utils/types/HybridCommand";
 import { canMemberRunCmdV2 } from "../helpers/canMemberRunCmd";
 import { CookieException } from "../utils/CookieException";
+import { getUserLogString } from "../helpers/getUserLogString";
 
 export const interactionCreate = async (interaction: Interaction) => {
     await updateGuildAge();
@@ -20,6 +21,7 @@ export const interactionCreate = async (interaction: Interaction) => {
         try {
             const cmd: HybridCommand = cmds[commandName];
             if (canMemberRunCmdV2(member, cmd)) {
+                log.info(`[Slash Command] '${commandName}' ran by User : ${getUserLogString(interaction.member.user)}`);
                 cmd.slash(interaction);
             } else {
                 log.warn(`Member: ${member.toString()} could not run command: ${commandName}. Reason: Scope`);

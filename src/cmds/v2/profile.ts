@@ -4,7 +4,6 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember,
 import { log } from "../../utils/logger";
 import { sendToLogChannel } from "../../helpers/sendToLogChannel";
 import { customizeProfileV2, getProfileCard } from "../../services/profileService";
-import { CookieException } from "../../utils/CookieException";
 
 enum ProfileAction {
     GET = "get",
@@ -15,11 +14,11 @@ enum ProfileAction {
 const setProfile = async (member: GuildMember, itemId?: string) => {
     if (member == null) {
         log.error(sendToLogChannel("[Profile] Could not find member"));
-        throw new CookieException("An error occurred!");
+        return "An error occurred!";
     }
 
     if (isStringBlank(itemId)) {
-        throw new CookieException("Please enter a valid `item_id`");
+        return "Please enter a valid `item_id`";
     }
 
     await customizeProfileV2(member.id, itemId);
@@ -65,12 +64,12 @@ const legacy = async (message: Message, args: string[]) => {
 }
 
 const slash = async (interaction: ChatInputCommandInteraction) => {
-    await interaction.deferReply();
     let res: string = null;
     const action = interaction.options.getSubcommand();
     const member = (interaction.member as GuildMember);
 
     if (action === ProfileAction.GET) {
+        await interaction.deferReply();
         const card = await getProfileCard(member);
         return await interaction.editReply({
             files: [{
@@ -85,7 +84,7 @@ const slash = async (interaction: ChatInputCommandInteraction) => {
         res = "Please enter a valid action: `get | set`";
     }
 
-    interaction.editReply(res);
+    await interaction.reply(res);
 }
 
 export const profile: HybridCommand = {
