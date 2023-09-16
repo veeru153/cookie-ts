@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
-import { HybridCommand } from "../utils/types/HybridCommand";
+import { HybridCommand } from "../common/types/HybridCommand";
 
 const pingFn = (createdTs: number) => {
     const ping = Date.now() - createdTs;

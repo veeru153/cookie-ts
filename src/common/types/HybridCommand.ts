@@ -1,4 +1,4 @@
-import { APIApplicationCommand, RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord.js";
+import { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord.js";
 import Scope from "../enums/Scope"
 
 export interface HybridCommand {

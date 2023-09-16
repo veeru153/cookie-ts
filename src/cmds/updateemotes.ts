@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
-import { HybridCommand } from "../utils/types/HybridCommand";
-import Scope from "../utils/enums/Scope";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { HybridCommand } from "../common/types/HybridCommand";
+import Scope from "../common/enums/Scope";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 import { updateEmotes } from "../services/guildService";
 
 const legacy = async (message: Message) => {

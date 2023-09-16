@@ -1,5 +1,5 @@
 import { getCatalogue } from "../../services/shopService";
-import { ShopItemType } from "../../utils/schemas/ShopItem";
+import { ShopItemType } from "../../common/schemas/ShopItem";
 import { Request, Response, Router } from "express";
 import path from "path";
 

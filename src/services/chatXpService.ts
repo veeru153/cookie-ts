@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
-import { Channels } from "../utils/enums/Channels";
-import { profileRepo } from "../utils/repos";
-import { getUserLogString } from "../helpers/getUserLogString";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { isDevEnv } from "../utils/constants/common";
+import { Channels } from "../common/enums/Channels";
+import { profileRepo } from "../common/repos";
+import { getUserLogString } from "../utils/getUserLogString";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { validateAndPatchProfile } from "../utils/validateAndPatchProfile";
+import { isDevEnv } from "../common/constants/common";
 
 const BOOSTER_MULTIPLIER = 1.25
 const EVENT_MULTIPLIER = 0;

@@ -1,10 +1,10 @@
 import { Routes, REST } from "discord.js";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { CLIENT_ID, TOKEN, isDevEnv } from "../utils/constants/common";
-import { log } from "../utils/logger";
-import { HybridCommand } from "../utils/types/HybridCommand";
-import * as cmds from "../cmds/v2";
-import { Guild } from "../utils/enums/Guilds";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { CLIENT_ID, TOKEN, isDevEnv } from "../common/constants/common";
+import { log } from "../common/logger";
+import { HybridCommand } from "../common/types/HybridCommand";
+import * as cmds from "../cmds";
+import { Guild } from "../common/enums/Guilds";
 
 const rest = new REST().setToken(TOKEN);
 

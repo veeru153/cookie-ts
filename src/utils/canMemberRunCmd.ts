@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { HybridCommand } from "../utils/types/HybridCommand";
+import { HybridCommand } from "../common/types/HybridCommand";
 
 export const canMemberRunCmd = (member: GuildMember, cmd: HybridCommand) => {
     if (cmd.scope == null || cmd.scope.length == 0)

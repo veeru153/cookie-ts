@@ -1,8 +1,8 @@
 import { createCanvas, loadImage, registerFont } from "canvas";
-import { CookieException } from "../utils/CookieException";
-import { log } from "../utils/logger";
+import { CookieException } from "../common/CookieException";
+import { log } from "../common/logger";
 import path from "path";
-import { ProfilePayload } from "../utils/types/ProfilePayload";
+import { ProfilePayload } from "../common/types/ProfilePayload";
 
 export const generateCard = async (payload: ProfilePayload) => {
     registerFonts();

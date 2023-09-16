@@ -1,14 +1,14 @@
 import { Message } from "discord.js";
-import { getUserLogString } from "../helpers/getUserLogString";
+import { getUserLogString } from "../utils/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
-import { PREFIX, devIdList, isDevEnv } from "../utils/constants/common";
+import { PREFIX, devIdList, isDevEnv } from "../common/constants/common";
 import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { HybridCommand } from "../utils/types/HybridCommand";
-import { canMemberRunCmd } from "../helpers/canMemberRunCmd";
-import { CookieException } from "../utils/CookieException";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { HybridCommand } from "../common/types/HybridCommand";
+import { canMemberRunCmd } from "../utils/canMemberRunCmd";
+import { CookieException } from "../common/CookieException";
 
 export const messageCreate = async (message: Message) => {
     await updateGuildAge();

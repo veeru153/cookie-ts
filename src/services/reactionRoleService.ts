@@ -1,6 +1,6 @@
 import { MessageReaction, User } from "discord.js";
-import { BiasRoles } from "../utils/enums/BiasRoles";
-import { BiasEmbed } from "../utils/enums/Embeds";
+import { BiasRoles } from "../common/enums/BiasRoles";
+import { BiasEmbed } from "../common/enums/Embeds";
 
 const RoleMsgIds = [BiasEmbed.MAIN, BiasEmbed.SUB] as string[];
 

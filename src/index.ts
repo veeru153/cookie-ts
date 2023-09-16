@@ -1,13 +1,13 @@
 import { Events, GuildEmoji, GuildMember, Interaction, Message, MessageReaction, User } from "discord.js";
-import client from "./utils/client";
-import { env, identity, isDevEnv } from "./utils/constants/common";
-import * as repos from "./utils/repos";
+import client from "./common/client";
+import { env, identity, isDevEnv } from "./common/constants/common";
+import * as repos from "./common/repos";
 import { messageCreate, messageDelete, messageUpdate } from "./handlers/messageHandlers";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./handlers/messageReactionHandlers";
 import { guildMemberAddHandler } from "./handlers/guildMemberHandlers";
 import { server } from "./server";
-import { log } from "./utils/logger";
-import { sendToLogChannel } from "./helpers/sendToLogChannel";
+import { log } from "./common/logger";
+import { sendToLogChannel } from "./utils/sendToLogChannel";
 import { interactionCreate } from "./handlers/interactionHandlers";
 import { registerCommands } from "./services/interactionService";
 

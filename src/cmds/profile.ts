@@ -1,8 +1,8 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { isArrayUnavailable, isStringBlank } from "../helpers/validators";
-import { HybridCommand } from "../utils/types/HybridCommand";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { isArrayUnavailable, isStringBlank } from "../utils/validators";
+import { HybridCommand } from "../common/types/HybridCommand";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 import { customizeProfileV2, getProfileCard } from "../services/profileService";
 
 enum ProfileAction {

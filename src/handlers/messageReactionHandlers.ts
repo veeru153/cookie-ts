@@ -1,7 +1,7 @@
 import { MessageReaction, User } from "discord.js";
 import { addReactionRole, removeReactionRole } from "../services/reactionRoleService";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 
 export const messageReactionAddHandler = async (reaction: MessageReaction, user: User) => {
     try {

@@ -1,10 +1,10 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { SHOP_URL } from "../utils/constants/common";
-import { isArrayUnavailable, isStringBlank } from "../helpers/validators";
-import { HybridCommand } from "../utils/types/HybridCommand";
+import { SHOP_URL } from "../common/constants/common";
+import { isArrayUnavailable, isStringBlank } from "../utils/validators";
+import { HybridCommand } from "../common/types/HybridCommand";
 import { buyShopItem } from "../services/shopService";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 
 enum ShopAction {
     LINK = "link",

@@ -1,8 +1,8 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { HybridCommand } from "../utils/types/HybridCommand";
-import Scope from "../utils/enums/Scope";
-import { BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../utils/constants/bake";
-import { CookieException } from "../utils/CookieException";
+import { HybridCommand } from "../common/types/HybridCommand";
+import Scope from "../common/enums/Scope";
+import { BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../common/constants/bake";
+import { CookieException } from "../common/CookieException";
 import { batchBakeCookies } from "../services/bakeService";
 
 const legacy = async (message: Message, args: string[]) => {

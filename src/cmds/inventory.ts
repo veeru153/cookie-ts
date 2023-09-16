@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { getInventoryLinkForUserId } from "../helpers/getInventoryLinkForUserId";
-import { HybridCommand } from "../utils/types/HybridCommand";
+import { getInventoryLinkForUserId } from "../utils/getInventoryLinkForUserId";
+import { HybridCommand } from "../common/types/HybridCommand";
 
 const inventoryFn = (member: GuildMember) => {
     const url = getInventoryLinkForUserId(member.id);

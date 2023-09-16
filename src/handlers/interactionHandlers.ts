@@ -1,12 +1,12 @@
 import { Interaction } from "discord.js";
 import { updateGuildAge } from "../services/guildService";
 import * as cmds from "../cmds";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { HybridCommand } from "../utils/types/HybridCommand";
-import { canMemberRunCmd } from "../helpers/canMemberRunCmd";
-import { CookieException } from "../utils/CookieException";
-import { getUserLogString } from "../helpers/getUserLogString";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { HybridCommand } from "../common/types/HybridCommand";
+import { canMemberRunCmd } from "../utils/canMemberRunCmd";
+import { CookieException } from "../common/CookieException";
+import { getUserLogString } from "../utils/getUserLogString";
 
 export const interactionCreate = async (interaction: Interaction) => {
     await updateGuildAge();

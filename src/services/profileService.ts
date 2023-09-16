@@ -1,16 +1,16 @@
-import { ShopItem, ShopItemType } from "../utils/schemas/ShopItem";
-import { assetsRepo, inventoryRepo, profileRepo, shopRepo } from "../utils/repos";
-import { UserInventory } from "../utils/schemas/UserInventory";
-import { UserProfile } from "../utils/schemas/UserProfile";
+import { ShopItem, ShopItemType } from "../common/schemas/ShopItem";
+import { assetsRepo, inventoryRepo, profileRepo, shopRepo } from "../common/repos";
+import { UserInventory } from "../common/schemas/UserInventory";
+import { UserProfile } from "../common/schemas/UserProfile";
 import { GuildMember, Message } from "discord.js";
 import { generateCard } from "./profileCardService";
-import { CookieException } from "../utils/CookieException";
-import { log } from "../utils/logger";
-import { getUserLogString } from "../helpers/getUserLogString";
-import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
-import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { ProfilePayload } from "../utils/types/ProfilePayload";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { CookieException } from "../common/CookieException";
+import { log } from "../common/logger";
+import { getUserLogString } from "../utils/getUserLogString";
+import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
+import { validateAndPatchProfile } from "../utils/validateAndPatchProfile";
+import { ProfilePayload } from "../common/types/ProfilePayload";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 
 export const customizeProfile = async (userId: string, key: ShopItemType, value: string) => {
     if (![ShopItemType.BACKGROUND, ShopItemType.BADGE].includes(key))

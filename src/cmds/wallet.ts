@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
-import { inventoryRepo } from "../utils/repos";
-import { HybridCommand } from "../utils/types/HybridCommand";
+import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
+import { inventoryRepo } from "../common/repos";
+import { HybridCommand } from "../common/types/HybridCommand";
 
 const walletFn = async (member: GuildMember) => {
     let userInv = await inventoryRepo.get(member.id);

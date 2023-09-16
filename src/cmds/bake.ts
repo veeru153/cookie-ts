@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js"
-import { HybridCommand } from "../utils/types/HybridCommand"
+import { HybridCommand } from "../common/types/HybridCommand"
 import { bakeCookies } from "../services/bakeService"
 
 const bakeFn = async (member: GuildMember) => {

@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { syncCommands } from "../services/interactionService";
-import { HybridCommand } from "../utils/types/HybridCommand";
+import { HybridCommand } from "../common/types/HybridCommand";
 
 const syncFn = async () => {
     const synced = await syncCommands();
