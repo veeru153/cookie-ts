@@ -1,15 +1,24 @@
-import { Message } from "discord.js";
-import { Command } from "../entities/Command";
-import Scope from "../utils/enums/Scope";
+import { ChatInputCommandInteraction, Message } from "discord.js";
+import { HybridCommand } from "../utils/types/HybridCommand";
 
-const pingFn = (message: Message) => {
-    const ping = Date.now() - message.createdTimestamp;
-    message.reply(`Pong! Network Latency: \`${ping}ms\``);
+const pingFn = (createdTs: number) => {
+    const ping = Date.now() - createdTs;
+    return `Pong! Network Latency: \`${ping}ms\``;
 }
 
-export const ping = new Command({
-    name: "ping",
-    desc: "Pong! Returns Network Latency.",
-    scope: [Scope.ALL],
-    fn: pingFn
-});
+const legacy = async (message: Message) => {
+    await message.reply(pingFn(message.createdTimestamp));
+}
+
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    await interaction.reply(pingFn(interaction.createdTimestamp))
+}
+
+export const ping: HybridCommand = {
+    info: {
+        name: "ping",
+        description: "Pong! Returns Network Latency"
+    },
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
+}

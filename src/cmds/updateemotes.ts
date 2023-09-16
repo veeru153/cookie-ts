@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
-import { HybridCommand } from "../../utils/types/HybridCommand";
-import Scope from "../../utils/enums/Scope";
-import { log } from "../../utils/logger";
-import { sendToLogChannel } from "../../helpers/sendToLogChannel";
-import { updateEmotes } from "../../services/guildService";
+import { HybridCommand } from "../utils/types/HybridCommand";
+import Scope from "../utils/enums/Scope";
+import { log } from "../utils/logger";
+import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { updateEmotes } from "../services/guildService";
 
 const legacy = async (message: Message) => {
     log.info(sendToLogChannel(`Member: ${message.member.toString()} ran update emote job`));

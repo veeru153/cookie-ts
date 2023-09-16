@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { HybridCommand } from "../../utils/types/HybridCommand";
-import Scope from "../../utils/enums/Scope";
-import { BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../../utils/constants/bake";
-import { CookieException } from "../../utils/CookieException";
-import { batchBakeCookies } from "../../services/bakeService";
+import { HybridCommand } from "../utils/types/HybridCommand";
+import Scope from "../utils/enums/Scope";
+import { BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../utils/constants/bake";
+import { CookieException } from "../utils/CookieException";
+import { batchBakeCookies } from "../services/bakeService";
 
 const legacy = async (message: Message, args: string[]) => {
     if (args == null || args.length != 2) {

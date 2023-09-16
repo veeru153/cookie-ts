@@ -28,7 +28,7 @@
         <script>
             function handleClick(btn) {
                 const itemId = btn.dataset.itemId;
-                navigator.clipboard.writeText(`-profile set background ${itemId}`);
+                navigator.clipboard.writeText(`-profile set ${itemId}`);
                 btn.innerHTML = "<p>Command Copied!</p>"
                 setTimeout(() => {
                     btn.innerHTML = "<p>Equip</p>";

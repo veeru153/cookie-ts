@@ -1,7 +1,6 @@
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { db } from "../utils/firebase";
 import { log } from "../utils/logger";
-import { DocumentData } from "./DocumentData";
 
 export class Repository<T> {
     name: string;

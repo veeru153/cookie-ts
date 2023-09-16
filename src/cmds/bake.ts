@@ -1,28 +1,25 @@
-import { Message } from "discord.js";
-import { Command } from "../entities/Command";
-import Scope from "../utils/enums/Scope";
-import { bakeCookies } from "../services/bakeService";
-import { getUserLogString } from "../helpers/getUserLogString";
-import { log } from "../utils/logger";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js"
+import { HybridCommand } from "../utils/types/HybridCommand"
+import { bakeCookies } from "../services/bakeService"
 
-const bakeFn = async (message: Message) => {
-    try {
-        const response = await bakeCookies(message.member);
-        await message.reply(response);
-    } catch (err) {
-        log.error(`[Bake] User : ${getUserLogString(message.author)}\nError : ${err}`);
-        const replyMsg = await message.reply("An error occurred!");
-        setTimeout(() => {
-            replyMsg.deletable && replyMsg.delete();
-            message.deletable && message.delete();
-        }, 5000);
-    }
+const bakeFn = async (member: GuildMember) => {
+    return await bakeCookies(member);
 }
 
+const legacy = async (message: Message) => {
+    message.reply(await bakeFn(message.member));
+}
 
-export const bake = new Command({
-    name: "bake",
-    desc: "Bake Cookies 🍪",
-    scope: [Scope.ALL],
-    fn: bakeFn
-})
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    const member = (interaction.member as GuildMember);
+    interaction.reply(await bakeFn(member));
+}
+
+export const bake: HybridCommand = {
+    info: {
+        name: "bake",
+        description: "Bake Cookies 🍪",
+    },
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
+}

@@ -1,10 +1,10 @@
 import { Interaction } from "discord.js";
 import { updateGuildAge } from "../services/guildService";
-import * as cmds from "../cmds/v2/index";
+import * as cmds from "../cmds";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { HybridCommand } from "../utils/types/HybridCommand";
-import { canMemberRunCmdV2 } from "../helpers/canMemberRunCmd";
+import { canMemberRunCmd } from "../helpers/canMemberRunCmd";
 import { CookieException } from "../utils/CookieException";
 import { getUserLogString } from "../helpers/getUserLogString";
 
@@ -20,7 +20,7 @@ export const interactionCreate = async (interaction: Interaction) => {
         const { member, commandName } = interaction;
         try {
             const cmd: HybridCommand = cmds[commandName];
-            if (canMemberRunCmdV2(member, cmd)) {
+            if (canMemberRunCmd(member, cmd)) {
                 log.info(`[Slash Command] '${commandName}' ran by User : ${getUserLogString(interaction.member.user)}`);
                 await cmd.slash(interaction);
             } else {

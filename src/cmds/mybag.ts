@@ -1,16 +1,25 @@
-import { Message } from "discord.js";
-import { Command } from "../entities/Command";
-import Scope from "../utils/enums/Scope";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 import { getInventoryLinkForUserId } from "../helpers/getInventoryLinkForUserId";
+import { HybridCommand } from "../utils/types/HybridCommand";
 
-const myBagFn = (message: Message) => {
-    const url = getInventoryLinkForUserId(message.author.id)
-    message.reply(`🎒 Inventory: ${url}`);
+const myBagFn = (member: GuildMember) => {
+    const url = getInventoryLinkForUserId(member.id);
+    return `🎒 Inventory: ${url}`;
 }
 
-export const mybag = new Command({
-    name: "mybag",
-    desc: "[BETA] Get link to inventory.",
-    scope: [Scope.ALL],
-    fn: myBagFn
-});
+const legacy = async (message: Message) => {
+    message.reply(myBagFn(message.member));
+}
+
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    interaction.reply(myBagFn(interaction.member as GuildMember))
+}
+
+export const mybag: HybridCommand = {
+    info: {
+        name: "mybag",
+        description: "(Alias: inventory) Get link to inventory"
+    },
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
+}

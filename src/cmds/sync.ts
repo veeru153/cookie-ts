@@ -1,16 +1,25 @@
-import { Message } from "discord.js";
-import { Command } from "../entities/Command";
-import Scope from "../utils/enums/Scope";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { syncCommands } from "../services/interactionService";
+import { HybridCommand } from "../utils/types/HybridCommand";
 
-const syncFn = async (message: Message) => {
-    await syncCommands();
-    message.reply("Commands synchronized!");
+const syncFn = async () => {
+    const synced = await syncCommands();
+    return synced ? "Commands synchronized!" : "Error syncing Commands!";
 }
 
-export const sync = new Command({
-    name: "sync",
-    desc: "Synchronize Slash Commands",
-    scope: [Scope.ADMIN],
-    fn: async (message: Message) => await syncFn(message)
-});
+const legacy = async (message: Message) => {
+    await message.reply(await syncFn());
+}
+
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    await interaction.reply(await syncFn())
+}
+
+export const sync: HybridCommand = {
+    info: {
+        name: "sync",
+        description: "Synchronize Slash Commands"
+    },
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
+}

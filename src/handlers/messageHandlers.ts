@@ -2,13 +2,12 @@ import { Message } from "discord.js";
 import { getUserLogString } from "../helpers/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
 import { PREFIX, devIdList, isDevEnv } from "../utils/constants/common";
-import * as cmds from "../cmds/v2";
+import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
-import { Command } from "../entities/Command";
 import { log } from "../utils/logger";
 import { sendToLogChannel } from "../helpers/sendToLogChannel";
 import { HybridCommand } from "../utils/types/HybridCommand";
-import { canMemberRunCmdV2 } from "../helpers/canMemberRunCmd";
+import { canMemberRunCmd } from "../helpers/canMemberRunCmd";
 import { CookieException } from "../utils/CookieException";
 
 export const messageCreate = async (message: Message) => {
@@ -29,7 +28,7 @@ export const messageCreate = async (message: Message) => {
 
     try {
         log.info(`[Command] '${commandName}' ran by User : ${getUserLogString(message.author)}`);
-        if (canMemberRunCmdV2(message.member, cmd)) {
+        if (canMemberRunCmd(message.member, cmd)) {
             await cmd.legacy(message, args);
         }
     } catch (err) {

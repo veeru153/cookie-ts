@@ -5,7 +5,6 @@ import * as repos from "./utils/repos";
 import { messageCreate, messageDelete, messageUpdate } from "./handlers/messageHandlers";
 import { messageReactionAddHandler, messageReactionRemoveHandler } from "./handlers/messageReactionHandlers";
 import { guildMemberAddHandler } from "./handlers/guildMemberHandlers";
-import { emojiAddHandler, emojiRemoveHandler, emojiUpdateHandler } from "./handlers/emojiHandlers";
 import { server } from "./server";
 import { log } from "./utils/logger";
 import { sendToLogChannel } from "./helpers/sendToLogChannel";
@@ -31,10 +30,6 @@ client.on(Events.MessageDelete, async (message: Message) => await messageDelete(
 client.on(Events.MessageUpdate, async (message: Message) => await messageUpdate(message));
 
 client.on(Events.InteractionCreate, async (interaction: Interaction) => await interactionCreate(interaction));
-
-client.on(Events.GuildEmojiCreate, async (emoji: GuildEmoji) => await emojiAddHandler(emoji));
-client.on(Events.GuildEmojiDelete, async (emoji: GuildEmoji) => await emojiRemoveHandler(emoji));
-client.on(Events.GuildEmojiUpdate, async (_: GuildEmoji, newEmoji: GuildEmoji) => await emojiUpdateHandler(newEmoji));
 
 client.on(Events.GuildMemberAdd, async (member: GuildMember) => await guildMemberAddHandler(member));
 
