@@ -3,8 +3,8 @@ import { HybridCommand } from "../../utils/types/HybridCommand";
 import { ChatInputCommandInteraction, Message } from "discord.js";
 
 const syncFn = async () => {
-    await syncCommands();
-    return "Commands synchronized!";
+    const synced = await syncCommands();
+    return synced ? "Commands synchronized!" : "Error syncing Commands!";
 }
 
 const legacy = async (message: Message) => {

@@ -29,10 +29,18 @@ export const interactionCreate = async (interaction: Interaction) => {
             }
         } catch (err) {
             if (err instanceof CookieException) {
-                interaction.reply(err.message);
+                if (interaction.deferred) {
+                    interaction.editReply(err.message);
+                } else {
+                    interaction.reply(err.message);
+                }
             } else {
                 log.error(err, sendToLogChannel(`Error running command: ${commandName} by member: ${member.toString()}`));
-                interaction.reply("An error occurred!");
+                if (interaction.deferred) {
+                    interaction.editReply("An error occurred!");
+                } else {
+                    interaction.reply("An error occurred!");
+                }
             }
         }
     }

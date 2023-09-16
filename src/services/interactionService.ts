@@ -15,10 +15,12 @@ export const syncCommands = async () => {
             Routes.applicationGuildCommands(CLIENT_ID, Guild.YUQICORD),
             { body: Object.values(cmds).map((cmd: HybridCommand) => cmd.info) }
         )
-        log.info("Slash Commands Synced!")
+        log.info("Slash Commands Synced!");
+        return true;
     } catch (err) {
         log.error(err, "Error syncing Slash Commands!");
         sendToLogChannel(`Error syncing Slash Commands : ${err}`);
+        return false;
     }
 }
 
