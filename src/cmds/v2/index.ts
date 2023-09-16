@@ -7,4 +7,5 @@ export * from "./ping";
 export * from "./profile";
 export * from "./shop";
 export * from "./sync";
+export * from "./updateemotes";
 export * from "./wallet";
