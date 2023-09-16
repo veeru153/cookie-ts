@@ -11,7 +11,7 @@ enum ShopAction {
     BUY = "buy"
 }
 
-// TODO: Changed commands copied from the shop to remove "type"
+// TODO: Changed commands copied from the shop to remove "background"
 const shopFn = async (member: GuildMember, action?: ShopAction, itemId?: string) => {
     if (action == null || action === ShopAction.LINK) {
         return `🛒 Shop: ${SHOP_URL}`;
