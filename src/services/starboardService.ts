@@ -70,7 +70,7 @@ const getEmbed = (message: Message, starCount: number) => {
         .setColor(EMBED_HEX)
         .setAuthor({ name: message.author.username, iconURL: message.author.avatarURL() })
         .setDescription(desc)
-        .setFooter({ text: starCount.toString(), iconURL: "https://cdn.discordapp.com/attachments/1101090386954424350/1152893068111003668/star_2b50.png" })
+        .setFooter({ text: `⭐ ${starCount}` })
         .setTimestamp(message.createdTimestamp);
 
     embeds.push(firstEmbed);
