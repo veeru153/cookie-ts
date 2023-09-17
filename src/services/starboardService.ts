@@ -3,7 +3,7 @@ import { Channels } from "../common/enums/Channels";
 import { log } from "../common/logger";
 import { sendToLogChannel } from "../utils/sendToLogChannel";
 import { isDevEnv } from "../common/constants/common";
-import { getOneRandomlyFromArray } from "../utils/getRandomNumberBetween";
+import { getOneRandomlyFromArray } from "../utils/randomUtils";
 
 const EMOJI = "⭐";
 const THRESHOLD = isDevEnv ? 1 : 3;

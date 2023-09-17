@@ -5,7 +5,7 @@ import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
 import { getUserLogString } from "../utils/getUserLogString";
 import { log } from "../common/logger";
 import { getBakeTierFromPity, getUpdatedBakePity } from "./bakePityService";
-import { getRandomNumberBetween } from "../utils/getRandomNumberBetween";
+import { getRandomNumberBetween } from "../utils/randomUtils";
 import { CookieException } from "../common/CookieException";
 import { COOLDOWN_MS, PROMOTIONAL_MULTIPLIER, EVENT_MULTIPLIER, BOOSTER_MULTIPLIER, COOKIE_TIER_RANGE } from "../common/constants/bake";
 import { MINUTE_IN_MS, SECOND_IN_MS, HOUR_IN_MS } from "../common/constants/common";
