@@ -23,6 +23,7 @@ const constructCanvas = async (ctx: any, data: ProfilePayload) => {
         await addBackground(ctx, data);
         addGradient(ctx);
         addXpBar(ctx, data);
+        addLevel(ctx, data);
         await addProfilePicture(ctx, data);
         addName(ctx, data);
         // addBetaLogo(ctx);
@@ -99,13 +100,24 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
 
     // ctx.fillStyle = "black";
     // ctx.shadowColor = "black";
-    // ctx.font = "16px Helvetica";
+    // ctx.font = `10px ${FONT}`;
     // ctx.textAlign = "start";
     // ctx.fillText("xp", xpLabelX, xpLabelY);
     // ctx.textAlign = "end";
-    // ctx.fillText(`lvl ${data.level}`, levelX, levelY);
+    // ctx.fillText(`Level ${data.level}`, levelX, levelY);
     ctx.restore();
     log.info("[ProfileCardService] XP Bar added");
+}
+
+const addLevel = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
+    ctx.save();
+    ctx.fillStyle = "black";
+    ctx.shadowColor = "black";
+    ctx.font = `11px ${FONT}`;
+    ctx.textAlign = "end";
+    ctx.fillText(`Level ${data.level}`, levelX, levelY);
+    ctx.restore();
+    log.info("[ProfileCardService] Level added");
 }
 
 const addProfilePicture = async (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
@@ -145,7 +157,7 @@ const addDisplayName = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 4;
-    ctx.font = "20px Helvetica";
+    ctx.font = `20px ${FONT}`;
     ctx.fillStyle = "white";
     ctx.fillText(getNameText(data.displayName), displayNameX, displayNameY);
     ctx.restore();
@@ -156,7 +168,7 @@ const addLegacyUsername = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 4;
-    ctx.font = "18px Helvetica";
+    ctx.font = `18px ${FONT}`;
     ctx.fillStyle = "white";
     ctx.fillText(getNameText(data.username), legacyUsernameX, legacyUsernameY);
     ctx.restore();
@@ -167,7 +179,7 @@ const addDiscriminator = (ctx: CanvasRenderingContext2D, data: any) => {
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,0.8)";
     ctx.shadowBlur = 4;
-    ctx.font = "14px Helvetica";
+    ctx.font = `14px ${FONT}`;
     ctx.fillStyle = "white";
     ctx.fillText(`#${data.discriminator}`, discrimX, discrimY);
     ctx.restore();
@@ -194,7 +206,7 @@ const addBetaLogo = (ctx: CanvasRenderingContext2D) => {
     ctx.fillRect(betaX, betaY, betaW, betaH);
 
     ctx.fillStyle = "white";
-    ctx.font = "bold 12px Helvetica";
+    ctx.font = `bold 12px ${FONT}`;
     ctx.fillText("BETA", betaTextX, betaTextY);
     ctx.restore();
     log.info("[ProfileCardService] BETA Logo added");
@@ -205,18 +217,19 @@ const HEIGHT = 332;
 const PADDING = 20;
 const MARGIN = 12;
 const RADIUS = 16;
+const FONT = "Ubuntu";
 
 const xpBarW = WIDTH - (2 * PADDING);
-const xpBarH = 10;
+const xpBarH = 16;
 const xpBarX = PADDING;
 const xpBarY = HEIGHT - PADDING - xpBarH;
 const xpCornerOffset = 10;
-const xpCornerR = 5;
+const xpCornerR = 8;
 
 const xpLabelX = PADDING + MARGIN;
 const xpLabelY = xpBarY + (xpBarH / 2) + 4.5;
 const levelX = WIDTH - (1.75 * PADDING);
-const levelY = xpLabelY + 1;
+const levelY = xpLabelY - 0.2;
 
 const avatarSide = 64;
 const avatarX = PADDING;
