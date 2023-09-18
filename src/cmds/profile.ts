@@ -4,6 +4,7 @@ import { HybridCommand } from "../common/types/HybridCommand";
 import { log } from "../common/logger";
 import { sendToLogChannel } from "../utils/sendToLogChannel";
 import { customizeProfileV2, getProfileCard } from "../services/profileService";
+import { CookieException } from "../common/CookieException";
 
 enum ProfileAction {
     GET = "get",
@@ -57,6 +58,8 @@ const legacy = async (message: Message, args: string[]) => {
         } else {
             res = "Please enter a valid action: `get | set`";
         }
+    } else {
+        throw new CookieException("Invalid arguments");
     }
 
     await message.reply(res);

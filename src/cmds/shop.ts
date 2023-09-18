@@ -5,6 +5,7 @@ import { HybridCommand } from "../common/types/HybridCommand";
 import { buyShopItem } from "../services/shopService";
 import { log } from "../common/logger";
 import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { CookieException } from "../common/CookieException";
 
 enum ShopAction {
     LINK = "link",
@@ -54,6 +55,8 @@ const legacy = async (message: Message, args: string[]) => {
         } else {
             res = "Please enter a valid action: `link | buy`";
         }
+    } else {
+        throw new CookieException("Invalid arguments")
     }
 
     await message.reply(res);
