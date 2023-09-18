@@ -4,7 +4,12 @@ export const CLIENT_ID = isDevEnv ? process.env.DEV_CLIENT_ID : process.env.CLIE
 
 export const env = isDevEnv ? "Development" : "Production";
 export const identity = isDevEnv ? "Cookie Dough" : "Cookie";
-export const devIdList = ["252748033287127041"];
+export const DEV_ENV_WHITELIST_IDS = [
+    "252748033287127041",
+    "325332841212674048",
+    "356505334673571841",
+    "312275376422387723",
+]
 
 export const PREFIX = isDevEnv ? "+" : "-";
 

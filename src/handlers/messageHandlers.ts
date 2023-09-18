@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { getUserLogString } from "../utils/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
-import { PREFIX, devIdList, isDevEnv } from "../common/constants/common";
+import { PREFIX, DEV_ENV_WHITELIST_IDS, isDevEnv } from "../common/constants/common";
 import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
 import { log } from "../common/logger";
@@ -13,7 +13,7 @@ import { CookieException } from "../common/CookieException";
 export const messageCreate = async (message: Message) => {
     await updateGuildAge();
     if (message.author.bot) return;
-    if (isDevEnv && !devIdList.includes(message.author.id)) return;
+    if (isDevEnv && !DEV_ENV_WHITELIST_IDS.includes(message.author.id)) return;
     await updateChatXp(message);
     if (!message.content.startsWith(PREFIX)) return;
 

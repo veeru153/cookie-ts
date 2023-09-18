@@ -98,13 +98,6 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
     ctx.fillStyle = "rgba(255,255,255,0.58)";
     ctx.fillRect(xpBarX, xpBarY, xpBarW * xpRatio, xpBarH);
 
-    // ctx.fillStyle = "black";
-    // ctx.shadowColor = "black";
-    // ctx.font = `10px ${FONT}`;
-    // ctx.textAlign = "start";
-    // ctx.fillText("xp", xpLabelX, xpLabelY);
-    // ctx.textAlign = "end";
-    // ctx.fillText(`Level ${data.level}`, levelX, levelY);
     ctx.restore();
     log.info("[ProfileCardService] XP Bar added");
 }
@@ -112,10 +105,10 @@ const addXpBar = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
 const addLevel = (ctx: CanvasRenderingContext2D, data: ProfilePayload) => {
     ctx.save();
     ctx.fillStyle = "black";
-    ctx.shadowColor = "black";
-    ctx.font = `11px ${FONT}`;
+    ctx.shadowColor = "rgba(0,0,0,0)";
+    ctx.font = `bold 11px ${FONT}`;
     ctx.textAlign = "end";
-    ctx.fillText(`Level ${data.level}`, levelX, levelY);
+    ctx.fillText(`LEVEL ${data.level}`, levelX, levelY);
     ctx.restore();
     log.info("[ProfileCardService] Level added");
 }
@@ -214,7 +207,7 @@ const addBetaLogo = (ctx: CanvasRenderingContext2D) => {
 
 const WIDTH = 480;
 const HEIGHT = 332;
-const PADDING = 20;
+const PADDING = 10;
 const MARGIN = 12;
 const RADIUS = 16;
 const FONT = "Ubuntu";
@@ -231,7 +224,7 @@ const xpLabelY = xpBarY + (xpBarH / 2) + 4.5;
 const levelX = WIDTH - (1.75 * PADDING);
 const levelY = xpLabelY - 0.2;
 
-const avatarSide = 64;
+const avatarSide = 40;
 const avatarX = PADDING;
 const avatarY = xpBarY - MARGIN - avatarSide;
 const avatarCornerOffset = 10;
