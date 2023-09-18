@@ -1,12 +1,12 @@
 import { Emoji, GuildEmoji, TextChannel } from "discord.js";
-import client from "../utils/client";
-import { isDevEnv } from "../utils/constants/common";
-import { Channels } from "../utils/enums/Channels";
-import { Guild } from "../utils/enums/Guilds";
-import { Errors } from "../utils/enums/Errors";
-import { CookieException } from "../utils/CookieException";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import client from "../common/client";
+import { isDevEnv } from "../common/constants/common";
+import { Channels } from "../common/enums/Channels";
+import { Guild } from "../common/enums/Guilds";
+import { Errors } from "../common/enums/Errors";
+import { CookieException } from "../common/CookieException";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 
 let lastUpdatedGuildAge = -1;
 
@@ -32,8 +32,8 @@ export const updateGuildAge = async () => {
 }
 
 export const updateEmotes = async () => {
-    const _channel = isDevEnv ? Channels.Cookie.EMOTES_TEST : Channels.Reception.EMOTES;
-    let channel = await client.channels.resolve(_channel).fetch();
+    const channelId = isDevEnv ? Channels.Cookie.EMOTES_TEST : Channels.Reception.EMOTES;
+    let channel = await client.channels.resolve(channelId).fetch();
     if (!channel.isTextBased())
         throw new CookieException(Errors.CHANNEL_TYPE_NOT_TEXT);
     channel = (channel as TextChannel);

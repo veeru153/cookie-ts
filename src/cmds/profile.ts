@@ -1,45 +1,32 @@
-import { Message } from "discord.js";
-import { Command } from "../entities/Command";
-import Scope from "../utils/enums/Scope";
-import { getUserLogString } from "../helpers/getUserLogString";
-import { Errors } from "../utils/enums/Errors";
-import { customizeProfile, getProfileCard } from "../services/profileService";
-import { ShopItemType } from "../utils/schemas/ShopItem";
-import { CookieException } from "../utils/CookieException";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
+import { isArrayUnavailable, isStringBlank } from "../utils/validators";
+import { HybridCommand } from "../common/types/HybridCommand";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { customizeProfileV2, getProfileCard } from "../services/profileService";
+import { CookieException } from "../common/CookieException";
 
-const profileFn = async (message: Message, args: string[]) => {
-    const option = args[0];
+enum ProfileAction {
+    GET = "get",
+    SET = "set"
+}
 
-    try {
-        if (option === "set") {
-            await updateProfile(message, args);
-        } else {
-            await getProfile(message);
-        }
-    } catch (err) {
-        if (err instanceof CookieException) {
-            message.reply(err.message);
-            return;
-        }
-        message.reply("An error occurred!");
-        log.error(sendToLogChannel(`[Profile] Error for User : ${getUserLogString(message.author)} - ${err}`))
+const setProfile = async (member: GuildMember, itemId?: string) => {
+    if (member == null) {
+        log.error(sendToLogChannel("[Profile] Could not find member"));
+        return "An error occurred!";
     }
+
+    if (isStringBlank(itemId)) {
+        return "Please enter a valid `item_id`";
+    }
+
+    await customizeProfileV2(member.id, itemId);
+    return "Profile Updated!"
 }
 
-const updateProfile = async (message: Message, args: string[]) => {
-    args.shift();
-    if (args.length !== 2)
-        throw new CookieException(Errors.INSUFFICIENT_ARGS);
-    const key = args[0];
-    const value = args[1];
-    await customizeProfile(message.author.id, key as ShopItemType, value);
-    await message.reply('Profile updated');
-}
-
-const getProfile = async (message: Message) => {
-    const ack = await message.channel.send(`Generating Profile Card for ${message.author.toString()}...`);
+const getProfileLegacy = async (message: Message) => {
+    const ack = await message.channel.send(`Generating Profile Card for ${message.member.toString()}...`);
     const card = await getProfileCard(message.member);
     ack.deletable && await ack.delete();
     await message.reply({
@@ -50,9 +37,85 @@ const getProfile = async (message: Message) => {
     })
 }
 
-export const profile = new Command({
-    name: "profile",
-    desc: "[BETA] Get or Update Profile.",
-    scope: [Scope.ALL],
-    fn: profileFn
-});
+const legacy = async (message: Message, args: string[]) => {
+    let res: string = null;
+    if (isArrayUnavailable(args) || args.length === 0) {
+        return await getProfileLegacy(message);
+    } else if (args.length === 1) {
+        if (args[0] === ProfileAction.GET) {
+            return await getProfileLegacy(message);
+        } else if (args[0] === ProfileAction.SET) {
+            res = "Please enter an `item_id`";
+        } else {
+            res = "Please enter a valid action: `get | set`";
+        }
+    } else if (args.length === 2) {
+        if (args[0] === ProfileAction.SET) {
+            const itemId = args[1];
+            res = await setProfile(message.member, itemId);
+        } else if (args[0] === ProfileAction.GET) {
+            return await getProfileLegacy(message);
+        } else {
+            res = "Please enter a valid action: `get | set`";
+        }
+    } else {
+        throw new CookieException("Invalid arguments");
+    }
+
+    await message.reply(res);
+}
+
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    let res: string = null;
+    const action = interaction.options.getSubcommand();
+    const member = (interaction.member as GuildMember);
+
+    if (action === ProfileAction.GET) {
+        await interaction.deferReply();
+        const card = await getProfileCard(member);
+        return await interaction.editReply({
+            files: [{
+                attachment: card,
+                name: `Profile_${member.id}.png`
+            }]
+        })
+    } else if (action === ProfileAction.SET) {
+        const itemId = interaction.options.getString("item_id");
+        res = await setProfile(member, itemId);
+    } else {
+        res = "Please enter a valid action: `get | set`";
+    }
+
+    await interaction.reply(res);
+}
+
+export const profile: HybridCommand = {
+    info: {
+        name: "profile",
+        description: "A place to spend cookies to upgrade your profile",
+        options: [
+            {
+                name: "get",
+                description: "Generate profile",
+                required: false,
+                type: ApplicationCommandOptionType.Subcommand,
+            },
+            {
+                name: "set",
+                description: "Equip an item with the item_id",
+                required: false,
+                type: ApplicationCommandOptionType.Subcommand,
+                options: [
+                    {
+                        name: "item_id",
+                        description: "The ID of the item in the shop",
+                        required: true,
+                        type: ApplicationCommandOptionType.String
+                    }
+                ]
+            },
+        ]
+    },
+    legacy: async (message: Message, args: any[]) => await legacy(message, args),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
+}

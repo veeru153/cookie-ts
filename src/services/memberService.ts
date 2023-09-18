@@ -1,6 +1,6 @@
-import client from "../utils/client"
-import { Guild } from "../utils/enums/Guilds";
-import { log } from "../utils/logger";
+import client from "../common/client"
+import { Guild } from "../common/enums/Guilds";
+import { log } from "../common/logger";
 
 export const getMemberFromId = async (id: string) => {
     try {

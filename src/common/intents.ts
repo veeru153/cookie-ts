@@ -3,7 +3,7 @@ import { IntentsBitField } from 'discord.js';
 const flags = [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
-    IntentsBitField.Flags.GuildBans,
+    IntentsBitField.Flags.GuildModeration,
     IntentsBitField.Flags.GuildEmojisAndStickers,
     IntentsBitField.Flags.GuildWebhooks,
     IntentsBitField.Flags.GuildMessages,

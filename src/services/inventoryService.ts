@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js";
-import { assetsRepo, inventoryRepo, profileRepo } from "../utils/repos";
-import { getDefaultProfileForId } from "../utils/schemas/UserProfile";
-import { getDefaultInventoryForId } from "../utils/schemas/UserInventory";
-import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { assetsRepo, inventoryRepo, profileRepo } from "../common/repos";
+import { getDefaultProfileForId } from "../common/schemas/UserProfile";
+import { getDefaultInventoryForId } from "../common/schemas/UserInventory";
+import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 
 export const initializeMemberCollections = async (member: GuildMember) => {
     !(await profileRepo.get(member.id)) && await profileRepo.set(member.id, getDefaultProfileForId(member.id));

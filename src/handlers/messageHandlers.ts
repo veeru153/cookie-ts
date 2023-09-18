@@ -1,30 +1,42 @@
 import { Message } from "discord.js";
-import { getUserLogString } from "../helpers/getUserLogString";
+import { getUserLogString } from "../utils/getUserLogString";
 import { updateChatXp } from "../services/chatXpService";
-import { PREFIX, devIdList, isDevEnv } from "../utils/constants/common";
+import { PREFIX, DEV_ENV_WHITELIST_IDS, isDevEnv } from "../common/constants/common";
 import * as cmds from "../cmds";
 import { updateGuildAge } from "../services/guildService";
-import { Command } from "../entities/Command";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { HybridCommand } from "../common/types/HybridCommand";
+import { canMemberRunCmd } from "../utils/canMemberRunCmd";
+import { CookieException } from "../common/CookieException";
 
 export const messageCreate = async (message: Message) => {
     await updateGuildAge();
     if (message.author.bot) return;
-    if (isDevEnv && !devIdList.includes(message.author.id)) return;
+    if (isDevEnv && !DEV_ENV_WHITELIST_IDS.includes(message.author.id)) return;
     await updateChatXp(message);
     if (!message.content.startsWith(PREFIX)) return;
 
     let msg = message.content.slice(PREFIX.length).split(" ");
-    let cmd = msg.shift();
+    let commandName = msg.shift();
     let args = [...msg];
 
-    if (Object.keys(cmds).includes(cmd)) {
-        log.info(`[Command] '${cmd}' ran by User : ${getUserLogString(message.author)}`);
-        try {
-            (cmds[cmd] as Command).run(message, args);
-        } catch (err) {
-            log.error(sendToLogChannel(`[Command] Error while running ${cmd} by User : ${getUserLogString(message.author)} : ${err}`));
+    const cmd: HybridCommand = cmds[commandName]
+    if (cmd == null) {
+        return;
+    }
+
+    try {
+        log.info(`[Command] '${commandName}' ran by User : ${getUserLogString(message.author)}`);
+        if (canMemberRunCmd(message.member, cmd)) {
+            await cmd.legacy(message, args);
+        }
+    } catch (err) {
+        if (err instanceof CookieException) {
+            message.reply(err.message);
+        } else {
+            log.error(err, sendToLogChannel(`[Command] Error while running ${commandName} by User : ${getUserLogString(message.author)}`));
+            message.reply("An error occurred :(");
         }
     }
 }

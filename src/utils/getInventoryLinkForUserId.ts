@@ -1,4 +1,4 @@
-import { USER_URL } from "../utils/constants/common"
+import { USER_URL } from "../common/constants/common"
 
 export const getInventoryLinkForUserId = (id: string) => {
     return `${USER_URL}/${id}`;

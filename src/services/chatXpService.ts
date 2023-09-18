@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
-import { Channels } from "../utils/enums/Channels";
-import { profileRepo } from "../utils/repos";
-import { getUserLogString } from "../helpers/getUserLogString";
-import { log } from "../utils/logger";
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { isDevEnv } from "../utils/constants/common";
+import { Channels } from "../common/enums/Channels";
+import { profileRepo } from "../common/repos";
+import { getUserLogString } from "../utils/getUserLogString";
+import { log } from "../common/logger";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { validateAndPatchProfile } from "../utils/validateAndPatchProfile";
+import { isDevEnv } from "../common/constants/common";
 
 const BOOSTER_MULTIPLIER = 1.25
 const EVENT_MULTIPLIER = 0;
@@ -38,7 +38,7 @@ export const updateChatXp = async (message: Message) => {
         }
 
         let updatedXp = userXp + xpDelta;
-        const xpCapAtLevel = Math.round(((CLIMB_CONSTANT * Math.pow(userLevel, CLIMB_POWER))) + CLIMB_BASE);
+        const xpCapAtLevel = getXpCapAtLevel(userLevel);
         const xpCap = Math.min(xpCapAtLevel, FINAL_XP_CAP);
         if (updatedXp >= xpCap) {
             updatedXp -= xpCap;
@@ -53,6 +53,10 @@ export const updateChatXp = async (message: Message) => {
     } catch (err) {
         log.error(sendToLogChannel(`[Chat XP] Error while updating xp for User : ${getUserLogString(message.author)} : ${err}`));
     }
+}
+
+export const getXpCapAtLevel = (level: number) => {
+    return Math.round(((CLIMB_CONSTANT * Math.pow(level, CLIMB_POWER))) + CLIMB_BASE);
 }
 
 const IGNORED_CHANNELS = [

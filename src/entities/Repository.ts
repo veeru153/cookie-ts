@@ -1,7 +1,6 @@
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
-import { db } from "../utils/firebase";
-import { log } from "../utils/logger";
-import { DocumentData } from "./DocumentData";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
+import { db } from "../common/firebase";
+import { log } from "../common/logger";
 
 export class Repository<T> {
     name: string;
@@ -14,7 +13,7 @@ export class Repository<T> {
         this.data = new Map();
     }
 
-    initialize = async () => {
+    initialize = () => {
         log.info(`[Repository/${this.name}] Initialized`);
     }
 
