@@ -36,12 +36,21 @@ export const handleStars = async (reaction: MessageReaction, user: User) => {
     }
 
     const channel = await message.guild.channels.fetch(CHANNEL_ID);
+
+    if (message.channel === channel) {
+        return;
+    }
+
     if (channel.type !== ChannelType.GuildText) {
         log.warn(sendToLogChannel(`Starboard channel: ${channel.toString} is not a Text Channel. Not handling stars!`));
         return;
     }
 
     const starEmbeds = getEmbed(message as Message, reaction.count);
+    if (starEmbeds == null || starEmbeds.length === 0) {
+        log.info("[Starboard Service] No embeds received to send. Skipping.");
+        return;
+    }
     const messagePayload = { content: message.url, embeds: starEmbeds };
     const prevStarEmbed = await getPrevStarEmbed(message as Message, channel);
 
@@ -60,8 +69,13 @@ const getPrevStarEmbed = async (starredMessage: Message, channel: TextChannel) =
 const getEmbed = (message: Message, starCount: number) => {
     let desc = message.content;
     const attachments = message.attachments;
-    if (message.content.length === 0 && attachments.size > 0) {
+    if (desc.length === 0 && attachments.size > 0) {
         desc = `Attachments: ${message.attachments.size}`;
+    }
+
+    if (desc.length === 0) {
+        log.warn(`[Starboard Service] Could not find any description. Skipping. Message Id: ${message.id}`);
+        return null;
     }
 
     const embeds: EmbedBuilder[] = [];
@@ -69,7 +83,7 @@ const getEmbed = (message: Message, starCount: number) => {
         .setURL(message.url)
         .setColor(EMBED_HEX)
         .setAuthor({ name: message.author.username, iconURL: message.author.avatarURL() })
-        .setDescription(desc)
+        .setDescription(desc ?? "")
         .setFooter({ text: `⭐ ${starCount}` })
         .setTimestamp(message.createdTimestamp);
 
