@@ -38,7 +38,7 @@ export const updateChatXp = async (message: Message) => {
         }
 
         let updatedXp = userXp + xpDelta;
-        const xpCapAtLevel = Math.round(((CLIMB_CONSTANT * Math.pow(userLevel, CLIMB_POWER))) + CLIMB_BASE);
+        const xpCapAtLevel = getXpCapAtLevel(userLevel);
         const xpCap = Math.min(xpCapAtLevel, FINAL_XP_CAP);
         if (updatedXp >= xpCap) {
             updatedXp -= xpCap;
@@ -53,6 +53,10 @@ export const updateChatXp = async (message: Message) => {
     } catch (err) {
         log.error(sendToLogChannel(`[Chat XP] Error while updating xp for User : ${getUserLogString(message.author)} : ${err}`));
     }
+}
+
+export const getXpCapAtLevel = (level: number) => {
+    return Math.round(((CLIMB_CONSTANT * Math.pow(level, CLIMB_POWER))) + CLIMB_BASE);
 }
 
 const IGNORED_CHANNELS = [
