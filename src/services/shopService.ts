@@ -1,14 +1,14 @@
 import { GuildMember } from "discord.js";
-import { ShopItemType, ShopItem } from "../utils/schemas/ShopItem"
-import { assetsRepo, profileRepo, shopRepo } from "../utils/repos";
-import { ShopError } from "../utils/enums/Errors";
-import { inventoryRepo } from "../utils/repos";
-import { UserInventory } from "../utils/schemas/UserInventory";
-import { CatalogueItem } from "../utils/types/CatalogueItem";
-import { CookieException } from "../utils/CookieException";
-import { log } from "../utils/logger";
-import { validateAndPatchProfile } from "../helpers/validateAndPatchProfile";
-import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
+import { ShopItemType, ShopItem } from "../common/schemas/ShopItem"
+import { assetsRepo, profileRepo, shopRepo } from "../common/repos";
+import { ShopError } from "../common/enums/Errors";
+import { inventoryRepo } from "../common/repos";
+import { UserInventory } from "../common/schemas/UserInventory";
+import { CatalogueItem } from "../common/types/CatalogueItem";
+import { CookieException } from "../common/CookieException";
+import { log } from "../common/logger";
+import { validateAndPatchProfile } from "../utils/validateAndPatchProfile";
+import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
 
 // Add to list
 export const addItem = async (itemId: string, itemData: ShopItem) => {

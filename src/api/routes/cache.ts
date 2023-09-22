@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { assetsRepo, inventoryRepo, profileRepo, shopRepo } from "../../utils/repos";
+import { assetsRepo, inventoryRepo, profileRepo, shopRepo } from "../../common/repos";
 
 export const cache = Router();
 

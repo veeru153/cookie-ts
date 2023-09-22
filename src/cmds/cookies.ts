@@ -1,19 +1,27 @@
-import { Message } from "discord.js"
-import { Command } from "../entities/Command";
-import Scope from "../utils/enums/Scope";
-import { inventoryRepo } from "../utils/repos";
-import { validateAndPatchInventory } from "../helpers/validateAndPatchInventory";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
+import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
+import { inventoryRepo } from "../common/repos";
+import { HybridCommand } from "../common/types/HybridCommand";
 
-const cookiesFn = async (message: Message) => {
-    let userInv = await inventoryRepo.get(message.author.id);
-    userInv = await validateAndPatchInventory(message.author.id, userInv);
-    const res = `🍪 Total Cookies: ${userInv.cookies}`;
-    await message.reply(res);
+const cookiesFn = async (member: GuildMember) => {
+    let userInv = await inventoryRepo.get(member.id);
+    userInv = await validateAndPatchInventory(member.id, userInv);
+    return `🍪 Total Cookies: ${userInv.cookies}`;
 }
 
-export const cookies = new Command({
-    name: "cookies",
-    desc: "[BETA] Returns number of cookies",
-    scope: [Scope.ALL],
-    fn: cookiesFn
-})
+const legacy = async (message: Message) => {
+    message.reply(await cookiesFn(message.member));
+}
+
+const slash = async (interaction: ChatInputCommandInteraction) => {
+    interaction.reply(await cookiesFn(interaction.member as GuildMember))
+}
+
+export const cookies: HybridCommand = {
+    info: {
+        name: "cookies",
+        description: "(Alias: wallet) Get number of cookies"
+    },
+    legacy: async (message: Message) => await legacy(message),
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
+}

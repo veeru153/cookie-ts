@@ -1,7 +1,7 @@
-import { CookieException } from "../utils/CookieException";
-import { log } from "../utils/logger";
-import { profileRepo } from "../utils/repos";
-import { DEFAULT_PROFILE, UserProfile, getDefaultProfileForId } from "../utils/schemas/UserProfile";
+import { CookieException } from "../common/CookieException";
+import { log } from "../common/logger";
+import { profileRepo } from "../common/repos";
+import { DEFAULT_PROFILE, UserProfile, getDefaultProfileForId } from "../common/schemas/UserProfile";
 import { sendToLogChannel } from "./sendToLogChannel";
 
 export const validateAndPatchProfile = async (id: string, profile: UserProfile) => {

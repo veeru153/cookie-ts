@@ -12,6 +12,11 @@
     src: url('../assets/ComicSansMS.ttf');
 }
 
+@font-face {
+    font-family: 'Trebuchet MS Cookie';
+    src: url('../assets/TrebuchetMS.ttf');
+}
+
 body {
     margin: 0;
     background-color: var(--background);

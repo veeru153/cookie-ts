@@ -1,4 +1,4 @@
-import { sendToLogChannel } from "../helpers/sendToLogChannel";
+import { sendToLogChannel } from "../utils/sendToLogChannel";
 
 export class CookieException extends Error {
     constructor(message?: string, err?: any) {

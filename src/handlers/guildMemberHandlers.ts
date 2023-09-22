@@ -1,9 +1,9 @@
 import { GuildMember, TextChannel } from "discord.js";
-import { isDevEnv } from "../utils/constants/common";
-import { Channels } from "../utils/enums/Channels";
-import client from "../utils/client";
+import { isDevEnv } from "../common/constants/common";
+import { Channels } from "../common/enums/Channels";
+import client from "../common/client";
 import { initializeMemberCollections } from "../services/inventoryService";
-import { getChannelMentionFromId } from "../helpers/getChannelMentionFromId";
+import { getChannelMentionFromId } from "../utils/getChannelMentionFromId";
 
 export const guildMemberAddHandler = async (member: GuildMember) => {
     let greeting =
