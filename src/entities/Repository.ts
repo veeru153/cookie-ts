@@ -75,11 +75,11 @@ export class Repository<T> {
     }
 
     __subscribe = async (key: string) => {
+        log.info(`[Repository/${this.name}] Subscribing to document : ${key}`)
         this.collection.doc(key).onSnapshot(snapshot => {
             this.data.set(key, { id: key, ...snapshot.data() } as T);
-            log.info(`[Repository/${this.name}] Fetched latest snapshot for document : ${key}`);
         }, err => {
-            log.error(`${sendToLogChannel(`[Repository/${this.name}] Could not subscribe to document : ${key}`)}\n${err}`);
+            log.error(`${sendToLogChannel(`[Repository/${this.name}] Could not subscribe to or get document : ${key}`)}\n${err}`);
         });
     }
 }

@@ -1,18 +1,40 @@
 import { Channels } from "../../common/enums/Channels"
 import client from "../../common/client"
 import { getOneRandomlyFromArray, getRandomNumberBetween } from "../../utils/randomUtils"
-import { Guild, Message, TextChannel } from "discord.js"
+import { Guild, Message, TextChannel, User } from "discord.js"
 import { Guilds } from "../../common/enums/Guilds"
 import { log } from "../../common/logger"
 import { CookieException } from "../../common/CookieException"
 import { PREFIX, isDevEnv } from "../../common/constants/common"
 import { getUserLogString } from "../../utils/getUserLogString"
 import { halloweenRepo } from "../../common/repos"
-import { HalloweenInventory } from "../../common/schemas/HalloweenInventory"
+import { HalloweenInventory, getDefaultHalloweenInventoryForId } from "../../common/schemas/HalloweenInventory"
 import { sendToLogChannel } from "../../utils/sendToLogChannel"
 
-export const halloween2023 = () => {
+const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
+const DROP_DURATION_SECONDS_MIN = 15;
+const DROP_DURATION_SECONDS_MAX = 20;
+const CANDY_DROP_MIN = 5;
+const CANDY_DROP_MAX = 10;
 
+const SPIRIT_EMOTES = ["👻", "🧟", "🧛", "👺", "👹"];
+const SUMMON_DURATION_SECONDS_MIN = 15;
+const SUMMON_DURATION_SECONDS_MAX = 20;
+const CANDY_REQUEST_MIN = 2;
+const CANDY_REQUEST_MAX = 6;
+
+export const halloween = async () => {
+    const guildId = Guilds.YUQICORD;
+    const guild: Guild = await client.guilds.fetch(guildId);
+    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
+    const guildChannel = await guild.channels.fetch(channelId);
+
+    if (!guildChannel.isTextBased()) {
+        log.error("[Halloween 2023] Channel is not a text channel");
+        throw new CookieException("Channel is not a text channel");
+    }
+
+    const channel = guildChannel as TextChannel;
 }
 
 const dropCandies = async () => {
@@ -27,9 +49,8 @@ const dropCandies = async () => {
     }
     const channel = guildChannel as TextChannel;
 
-    const candyEmotes = ["🍬", "🍭", "🍫"];
-    const emote = candyEmotes[getOneRandomlyFromArray(candyEmotes)];
-    const dropDurationMs = getRandomNumberBetween(15, 20) * 1000;
+    const emote = CANDY_EMOTES[getOneRandomlyFromArray(CANDY_EMOTES)];
+    const dropDurationMs = getRandomNumberBetween(DROP_DURATION_SECONDS_MIN, DROP_DURATION_SECONDS_MAX) * 1000;
     const dropMessage = await channel.send(`${emote} **A mysterious bag of candies has appeared!**`);
 
     let alreadyCollectedUserIdList = [];
@@ -65,9 +86,9 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
 
         alreadyCollectedUserIdList.push(userId);
 
-        const userHalloweenInventory = await halloweenRepo.get(userId);
+        const userHalloweenInventory = await getUserHalloweenInventory(user);
         const prevCandies = userHalloweenInventory.candies;
-        const candyCount = getRandomNumberBetween(5, 10);
+        const candyCount = getRandomNumberBetween(CANDY_DROP_MIN, CANDY_DROP_MAX);
         const totalCandies = prevCandies + candyCount;
 
         userHalloweenInventory.candies = totalCandies;
@@ -84,10 +105,9 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
 const summonSpirit = async () => {
     const channel: TextChannel = null;
 
-    const spiritEmotes = ["👻", "🧟", "🧛", "👺", "👹"];
-    const emote = spiritEmotes[Math.floor(Math.random() * spiritEmotes.length)];
-    const summonDurationMs = getRandomNumberBetween(15, 20) * 1000;
-    const candiesRequested = getRandomNumberBetween(2, 6);
+    const emote = SPIRIT_EMOTES[Math.floor(Math.random() * SPIRIT_EMOTES.length)];
+    const summonDurationMs = getRandomNumberBetween(SUMMON_DURATION_SECONDS_MIN, SUMMON_DURATION_SECONDS_MAX) * 1000;
+    const candiesRequested = getRandomNumberBetween(CANDY_REQUEST_MIN, CANDY_REQUEST_MAX);
     const summonMessage = await channel.send(`${emote} **A mysterious spirit has appeared!** They want **${candiesRequested}** candies.`);
 
     let alreadyInteractedUserIdList = [];
@@ -120,7 +140,7 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
             return;
         }
 
-        const userHalloweenInventory = await halloweenRepo.get(userId);
+        const userHalloweenInventory = await getUserHalloweenInventory(user);
 
         if (action === "trick") {
             await handleTrick(message, userHalloweenInventory);
@@ -151,7 +171,7 @@ const handleTrick = async (message: Message, userHalloweenInventory: HalloweenIn
 }
 
 const handleTreat = async (message: Message, candiesRequested: number, userHalloweenInventory: HalloweenInventory) => {
-    const userCandies = userHalloweenInventory.candies; // TODO: get candies
+    const userCandies = userHalloweenInventory.candies;
     const userCoins = userHalloweenInventory.coins;
 
     if (userCandies < candiesRequested) {
@@ -161,7 +181,6 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
         return;
     }
 
-    // TODO: update coins, appreciation, candies
     userHalloweenInventory.candies -= candiesRequested;
     userHalloweenInventory.coins += 1;
     userHalloweenInventory.points += 1;
@@ -170,4 +189,14 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
         + `Total Candies: ${userCandies - candiesRequested}`
         + `Total Coins: ${userCoins + 1} 🪙`;
     await message.reply(treatResponse);
+}
+
+const getUserHalloweenInventory = async (user: User) => {
+    const inventory = await halloweenRepo.get(user.id);
+    if (inventory != null) {
+        return inventory;
+    }
+
+    log.info(`[Halloween 2023] ${getUserLogString(user)} does not have Halloween inventory. Providing and setting default.`);
+    return getDefaultHalloweenInventoryForId(user.id);
 }
