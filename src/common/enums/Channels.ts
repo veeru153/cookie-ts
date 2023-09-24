@@ -35,6 +35,7 @@ export enum Yuqi {
 export enum Events {
     FANFIC = "566680739744317450",
     FANFIC_2 = "1151212687309676666",
+    HALLOWEEN = "1155563451108835369",
 }
 
 export enum Stats {

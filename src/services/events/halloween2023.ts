@@ -23,14 +23,14 @@ const SUMMON_INTERVAL_MS_MAX = isDevEnv ? 60 * 1000 : 75 * 60 * 1000;
 const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
 const DROP_DURATION_MS_MIN = isDevEnv ? 24 * 1000 : 15 * 1000;
 const DROP_DURATION_MS_MAX = isDevEnv ? 25 * 1000 : 20 * 1000;
-const CANDY_DROP_MIN = 5;
+const CANDY_DROP_MIN = 6;
 const CANDY_DROP_MAX = 10;
 
 const SPIRIT_EMOTES = ["👻", "🧟", "🧛", "👺", "👹"];
 const SUMMON_DURATION_MS_MIN = isDevEnv ? 24 * 1000 : 15 * 1000;
 const SUMMON_DURATION_MS_MAX = isDevEnv ? 25 * 1000 : 20 * 1000;
-const CANDY_REQUEST_MIN = 2;
-const CANDY_REQUEST_MAX = 6;
+const CANDY_REQUEST_MIN = 1;
+const CANDY_REQUEST_MAX = 25;
 
 let TRIGGER_INTERVAL: NodeJS.Timeout = null;
 let DROP_INTERVAL_LIST: NodeJS.Timeout[] = [];
@@ -77,7 +77,7 @@ const startHalloween = async () => {
 
     const guildId = Guilds.YUQICORD;
     const guild: Guild = await client.guilds.fetch(guildId);
-    const channelId = isDevEnv ? Channels.Kitchen.HALLOWEEN_TEST : Channels.Cookieland.GENERAL;
+    const channelId = isDevEnv ? Channels.Kitchen.HALLOWEEN_TEST : Channels.Events.HALLOWEEN;
     const guildChannel = await guild.channels.fetch(channelId);
 
     if (!guildChannel.isTextBased()) {
@@ -232,7 +232,7 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
         const userHalloweenInventory = await getUserHalloweenInventory(user);
 
         if (action === "trick") {
-            await handleTrick(message, userHalloweenInventory);
+            await handleTrick(message, candiesRequested, userHalloweenInventory);
             alreadyInteractedUserIdList.push(userId);
             log.info(`[Halloween 2023] ${getUserLogString(user)} tricked spirit. Latest inventory: ${JSON.stringify(userHalloweenInventory)}`);
         } else if (action === "treat") {
@@ -248,15 +248,20 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
     }
 }
 
-const handleTrick = async (message: Message, userHalloweenInventory: HalloweenInventory) => {
+const handleTrick = async (message: Message, candiesRequested: number, userHalloweenInventory: HalloweenInventory) => {
     const appreciation = getRandomNumberBetween(-2, 3);
-    let trickResponse = "😒 The spirit was not amused...";
+    let trickResponse: string = null;
+
     if (appreciation > 0) {
         trickResponse = `👏 The spirit was amused and has given you **${appreciation}** 🪙!`;
+        const coinsReceived = 2 * Math.ceil(candiesRequested / 5);
+        userHalloweenInventory.coins += coinsReceived;
+        userHalloweenInventory.points += coinsReceived;
+    } else {
+        trickResponse = "😒 The spirit was not amused...";
+        const currCandies = userHalloweenInventory.candies;
+        userHalloweenInventory.candies = Math.max(0, currCandies - (2 * candiesRequested));
     }
-
-    userHalloweenInventory.points += appreciation;
-    userHalloweenInventory.coins += Math.max(0, appreciation);
 
     await message.reply(trickResponse);
 }
@@ -272,11 +277,13 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
         return false;
     }
 
+    const coinsReceived = Math.ceil(candiesRequested / 5);
+
     userHalloweenInventory.candies -= candiesRequested;
-    userHalloweenInventory.coins += 1;
+    userHalloweenInventory.coins += coinsReceived;
     userHalloweenInventory.points += 1;
 
-    const treatResponse = `You exchanged ${candiesRequested} candies with the spirit for 1 🪙.\n`
+    const treatResponse = `You exchanged ${candiesRequested} candies with the spirit for ${coinsReceived} 🪙.\n`
         + `Total Candies: ${userCandies - candiesRequested}\n`
         + `Total Coins: ${userCoins + 1} 🪙`;
     await message.reply(treatResponse);
