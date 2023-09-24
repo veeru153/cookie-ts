@@ -11,19 +11,33 @@ import { halloweenRepo } from "../../common/repos"
 import { HalloweenInventory, getDefaultHalloweenInventoryForId } from "../../common/schemas/HalloweenInventory"
 import { sendToLogChannel } from "../../utils/sendToLogChannel"
 
+const START_DATE = new Date("2023-10-01T00:00:00.000+09:00");
+const END_DATE = new Date("2023-10-31T23:59:59.000+09:00");
+
+const DROP_INTERVAL_MS_MIN = 6 * 60 * 1000;
+const DROP_INTERVAL_MS_MAX = 11 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MIN = 35 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MAX = 75 * 60 * 1000;
+
 const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
-const DROP_DURATION_SECONDS_MIN = 15;
-const DROP_DURATION_SECONDS_MAX = 20;
+const DROP_DURATION_MS_MIN = 15 * 1000;
+const DROP_DURATION_MS_MAX = 20 * 1000;
 const CANDY_DROP_MIN = 5;
 const CANDY_DROP_MAX = 10;
 
 const SPIRIT_EMOTES = ["👻", "🧟", "🧛", "👺", "👹"];
-const SUMMON_DURATION_SECONDS_MIN = 15;
-const SUMMON_DURATION_SECONDS_MAX = 20;
+const SUMMON_DURATION_MS_MIN = 15 * 1000;
+const SUMMON_DURATION_MS_MAX = 20 * 1000;
 const CANDY_REQUEST_MIN = 2;
 const CANDY_REQUEST_MAX = 6;
 
 export const halloween = async () => {
+    const currDate = Date.now();
+    if (currDate < START_DATE.getTime() || currDate > END_DATE.getTime()) {
+        log.info("[Halloween 2023] Event has not started or has already ended.");
+        return;
+    }
+
     const guildId = Guilds.YUQICORD;
     const guild: Guild = await client.guilds.fetch(guildId);
     const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
@@ -33,24 +47,37 @@ export const halloween = async () => {
         log.error("[Halloween 2023] Channel is not a text channel");
         throw new CookieException("Channel is not a text channel");
     }
-
     const channel = guildChannel as TextChannel;
+
+    log.info("[Halloween 2023] Starting event");
+
+    const dropTs = getRandomNumberBetween(DROP_INTERVAL_MS_MIN, DROP_INTERVAL_MS_MAX);
+    log.info(`[Halloween 2023] Next candy drop in ${Math.round(dropTs / 1000)} seconds.`);
+    setTimeout(async () => await dropCandiesWrapper(channel), dropTs);
+
+    const summonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
+    log.info(`[Halloween 2023] Next spirit summon in ${Math.round(summonTs / 1000)} seconds.`);
+    setTimeout(async () => await summonSpiritWrapper(channel), summonTs);
+
 }
 
-const dropCandies = async () => {
-    const guildId = Guilds.YUQICORD;
-    const guild: Guild = await client.guilds.fetch(guildId);
-    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
-    const guildChannel = await guild.channels.fetch(channelId);
+const dropCandiesWrapper = async (channel: TextChannel) => {
+    await dropCandies(channel);
+    const nextDropTs = getRandomNumberBetween(DROP_INTERVAL_MS_MIN, DROP_INTERVAL_MS_MAX);
+    log.info(`[Halloween 2023] Next candy drop in ${Math.round(nextDropTs / 1000)} seconds.`);
+    setTimeout(async () => await dropCandiesWrapper(channel), nextDropTs);
+}
 
-    if (!guildChannel.isTextBased()) {
-        log.error("[Halloween 2023] Channel is not a text channel");
-        throw new CookieException("Channel is not a text channel");
-    }
-    const channel = guildChannel as TextChannel;
+const summonSpiritWrapper = async (channel: TextChannel) => {
+    await summonSpirit(channel);
+    const nextSummonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
+    log.info(`[Halloween 2023] Next spirit summon in ${Math.round(nextSummonTs / 1000)} seconds.`);
+    setTimeout(dropCandiesWrapper, nextSummonTs);
+}
 
+const dropCandies = async (channel: TextChannel) => {
     const emote = CANDY_EMOTES[getOneRandomlyFromArray(CANDY_EMOTES)];
-    const dropDurationMs = getRandomNumberBetween(DROP_DURATION_SECONDS_MIN, DROP_DURATION_SECONDS_MAX) * 1000;
+    const dropDurationMs = getRandomNumberBetween(DROP_DURATION_MS_MIN, DROP_DURATION_MS_MAX);
     const dropMessage = await channel.send(`${emote} **A mysterious bag of candies has appeared!**`);
 
     let alreadyCollectedUserIdList = [];
@@ -102,11 +129,9 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
     }
 }
 
-const summonSpirit = async () => {
-    const channel: TextChannel = null;
-
+const summonSpirit = async (channel: TextChannel) => {
     const emote = SPIRIT_EMOTES[Math.floor(Math.random() * SPIRIT_EMOTES.length)];
-    const summonDurationMs = getRandomNumberBetween(SUMMON_DURATION_SECONDS_MIN, SUMMON_DURATION_SECONDS_MAX) * 1000;
+    const summonDurationMs = getRandomNumberBetween(SUMMON_DURATION_MS_MIN, SUMMON_DURATION_MS_MAX);
     const candiesRequested = getRandomNumberBetween(CANDY_REQUEST_MIN, CANDY_REQUEST_MAX);
     const summonMessage = await channel.send(`${emote} **A mysterious spirit has appeared!** They want **${candiesRequested}** candies.`);
 
