@@ -4,5 +4,4 @@ export interface EventDetail {
     trigger: Function,
     start: Function,
     end: Function,
-    status: boolean
 }

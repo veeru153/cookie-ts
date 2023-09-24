@@ -15,12 +15,7 @@ const startEvent = async (eventId: string) => {
         return `Event: ${event.name} not found`;
     }
 
-    if (event.status) {
-        return `Event: ${event.name} is already live`
-    }
-
-    await event.start();
-    return `Starting event: ${event.name}`;
+    return await event.start();
 }
 
 const endEvent = async (eventId: string) => {
@@ -29,12 +24,7 @@ const endEvent = async (eventId: string) => {
         return `Event: ${event.name} not found`;
     }
 
-    if (!event.status) {
-        return `Event: ${event.name} is not live`
-    }
-
-    await event.end();
-    return `Ending event: ${event.name}`;
+    return await event.end();
 }
 
 const legacy = async (message: Message, args: string[]) => {
@@ -82,11 +72,11 @@ export const event: HybridCommand = {
                 type: ApplicationCommandOptionType.String,
                 choices: [
                     {
-                        name: "Start",
+                        name: "Start Event",
                         value: EventAction.START
                     },
                     {
-                        name: "End",
+                        name: "End Event",
                         value: EventAction.END
                     }
                 ]

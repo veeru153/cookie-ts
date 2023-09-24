@@ -15,35 +15,34 @@ import { EventDetail } from "../../common/types/EventDetail"
 const START_DATE = new Date("2023-10-01T00:00:00.000+09:00");
 const END_DATE = new Date("2023-10-31T23:59:59.000+09:00");
 
-const DROP_INTERVAL_MS_MIN = isDevEnv ? 60 * 1000 : 6 * 60 * 1000;
-const DROP_INTERVAL_MS_MAX = isDevEnv ? 1.5 * 60 * 1000 : 11 * 60 * 1000;
-const SUMMON_INTERVAL_MS_MIN = isDevEnv ? 2 * 60 * 1000 : 35 * 60 * 1000;
-const SUMMON_INTERVAL_MS_MAX = isDevEnv ? 2.5 * 60 * 1000 : 75 * 60 * 1000;
+const DROP_INTERVAL_MS_MIN = isDevEnv ? 20 * 1000 : 6 * 60 * 1000;
+const DROP_INTERVAL_MS_MAX = isDevEnv ? 25 * 1000 : 11 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MIN = isDevEnv ? 55 * 1000 : 35 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MAX = isDevEnv ? 60 * 1000 : 75 * 60 * 1000;
 
 const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
-const DROP_DURATION_MS_MIN = 15 * 1000;
-const DROP_DURATION_MS_MAX = 20 * 1000;
+const DROP_DURATION_MS_MIN = isDevEnv ? 24 * 1000 : 15 * 1000;
+const DROP_DURATION_MS_MAX = isDevEnv ? 25 * 1000 : 20 * 1000;
 const CANDY_DROP_MIN = 5;
 const CANDY_DROP_MAX = 10;
 
 const SPIRIT_EMOTES = ["👻", "🧟", "🧛", "👺", "👹"];
-const SUMMON_DURATION_MS_MIN = 15 * 1000;
-const SUMMON_DURATION_MS_MAX = 20 * 1000;
+const SUMMON_DURATION_MS_MIN = isDevEnv ? 24 * 1000 : 15 * 1000;
+const SUMMON_DURATION_MS_MAX = isDevEnv ? 25 * 1000 : 20 * 1000;
 const CANDY_REQUEST_MIN = 2;
 const CANDY_REQUEST_MAX = 6;
 
 let TRIGGER_INTERVAL: NodeJS.Timeout = null;
-let DROP_INTERVAL: NodeJS.Timeout = null;
-let SUMMON_INTERVAL: NodeJS.Timeout = null;
+let DROP_INTERVAL_LIST: NodeJS.Timeout[] = [];
+let SUMMON_INTERVAL_LIST: NodeJS.Timeout[] = [];
 let IS_LIVE = false;
 
 export const halloween2023: EventDetail = {
-    id: "halloween_2023",
+    id: "halloween2023",
     name: "Halloween 2023",
     trigger: async () => await triggerHalloween(),
     start: async () => await startHalloween(),
-    end: () => endHalloween(),
-    status: IS_LIVE,
+    end: () => endHalloween()
 }
 
 const triggerHalloween = async () => {
@@ -64,14 +63,21 @@ const triggerHalloween = async () => {
 
 const startHalloween = async () => {
     const currDate = Date.now();
-    if (!isDevEnv && currDate < START_DATE.getTime() || currDate > END_DATE.getTime()) {
+    if (!isDevEnv && (currDate < START_DATE.getTime() || currDate > END_DATE.getTime())) {
         log.info("[Halloween 2023] Event has not started or has already ended.");
-        return;
+        return "[Halloween 2023] Event has not started or has already ended.";
     }
+
+    if (IS_LIVE) {
+        log.info("[Halloween 2023] Event is already live.");
+        return "[Halloween 2023] Event is already live.";
+    }
+
+    IS_LIVE = true;
 
     const guildId = Guilds.YUQICORD;
     const guild: Guild = await client.guilds.fetch(guildId);
-    const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
+    const channelId = isDevEnv ? Channels.Kitchen.HALLOWEEN_TEST : Channels.Cookieland.GENERAL;
     const guildChannel = await guild.channels.fetch(channelId);
 
     if (!guildChannel.isTextBased()) {
@@ -84,54 +90,65 @@ const startHalloween = async () => {
 
     const dropTs = getRandomNumberBetween(DROP_INTERVAL_MS_MIN, DROP_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next candy drop in ${Math.round(dropTs / 1000)} seconds.`);
-    DROP_INTERVAL = setTimeout(async () => await dropCandiesWrapper(channel), dropTs);
+    DROP_INTERVAL_LIST.push(setTimeout(async () => await dropCandiesWrapper(channel), dropTs));
 
     const summonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next spirit summon in ${Math.round(summonTs / 1000)} seconds.`);
-    SUMMON_INTERVAL = setTimeout(async () => await summonSpiritWrapper(channel), summonTs);
+    SUMMON_INTERVAL_LIST.push(setTimeout(async () => await summonSpiritWrapper(channel), summonTs));
+
+    return "[Halloween 2023] Event started!";
 }
 
 const endHalloween = () => {
+    if (!IS_LIVE) {
+        return "[Halloween 2023] Event is not live!"
+    }
+
     if (TRIGGER_INTERVAL != null) {
         clearTimeout(TRIGGER_INTERVAL);
         TRIGGER_INTERVAL = null;
     }
 
-    if (DROP_INTERVAL != null) {
-        clearTimeout(DROP_INTERVAL);
-        DROP_INTERVAL = null;
+    if (DROP_INTERVAL_LIST.length > 0) {
+        DROP_INTERVAL_LIST.map(drop => clearTimeout(drop));
+        DROP_INTERVAL_LIST = [];
     }
 
-    if (SUMMON_INTERVAL != null) {
-        clearTimeout(SUMMON_INTERVAL);
-        SUMMON_INTERVAL = null;
+    if (SUMMON_INTERVAL_LIST.length > 0) {
+        SUMMON_INTERVAL_LIST.map(summon => clearTimeout(summon));
+        SUMMON_INTERVAL_LIST = [];
     }
 
     log.info(sendToLogChannel("[Halloween 2023] Event has ended"));
+    return "[Halloween 2023] Event ended!";
 }
 
 const dropCandiesWrapper = async (channel: TextChannel) => {
+    DROP_INTERVAL_LIST.shift();
     await dropCandies(channel);
     const nextDropTs = getRandomNumberBetween(DROP_INTERVAL_MS_MIN, DROP_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next candy drop in ${Math.round(nextDropTs / 1000)} seconds.`);
-    DROP_INTERVAL = setTimeout(async () => await dropCandiesWrapper(channel), nextDropTs);
+    const nextDrop = setTimeout(async () => await dropCandiesWrapper(channel), nextDropTs);
+    DROP_INTERVAL_LIST.push(nextDrop);
 }
 
 const summonSpiritWrapper = async (channel: TextChannel) => {
+    SUMMON_INTERVAL_LIST.shift();
     await summonSpirit(channel);
     const nextSummonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next spirit summon in ${Math.round(nextSummonTs / 1000)} seconds.`);
-    SUMMON_INTERVAL = setTimeout(async () => await dropCandiesWrapper(channel), nextSummonTs);
+    const nextSummon = setTimeout(async () => await dropCandiesWrapper(channel), nextSummonTs);
+    SUMMON_INTERVAL_LIST.push(nextSummon);
 }
 
 const dropCandies = async (channel: TextChannel) => {
-    const emote = CANDY_EMOTES[getOneRandomlyFromArray(CANDY_EMOTES)];
+    const emote = getOneRandomlyFromArray(CANDY_EMOTES);
     const dropDurationMs = getRandomNumberBetween(DROP_DURATION_MS_MIN, DROP_DURATION_MS_MAX);
     const dropMessage = await channel.send(`${emote} **A mysterious bag of candies has appeared!**`);
 
     let alreadyCollectedUserIdList = [];
     const collectCommands = ["pick", "collect"];
-    const filter = (message: Message) => collectCommands.includes(PREFIX + message.content);
+    const filter = (message: Message) => collectCommands.includes(message.content.substring(PREFIX.length));
 
     const collector = channel.createMessageCollector({ filter, time: dropDurationMs });
     collector.on('collect', async (message: Message) => {
@@ -154,9 +171,7 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
 
     try {
         if (alreadyCollectedUserIdList.includes(userId)) {
-            const reply = await message.reply("You have already collected candies from this bag!");
-            reply.deletable && await reply.delete();
-            message.deletable && await message.delete();
+            await message.reply("You have already collected candies from this bag!");
             return;
         }
 
@@ -170,23 +185,23 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
         userHalloweenInventory.candies = totalCandies;
         !isDevEnv && await halloweenRepo.set(userId, userHalloweenInventory);
 
-        await message.reply(`You collected ${candyCount} candies.\n**Total Candies: ${totalCandies}**`);
+        await message.reply(`You collected ${candyCount} candies.\nTotal Candies: ${totalCandies}`);
         log.info(`[Halloween 2023] ${getUserLogString(user)} collected ${candyCount}. Total Candies: ${totalCandies}`);
     } catch (err) {
-        log.error(sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not collect candies.`));
+        log.error(err, sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not collect candies.`));
         await message.reply("An error occurred!");
     }
 }
 
 const summonSpirit = async (channel: TextChannel) => {
-    const emote = SPIRIT_EMOTES[Math.floor(Math.random() * SPIRIT_EMOTES.length)];
+    const emote = getOneRandomlyFromArray(SPIRIT_EMOTES);
     const summonDurationMs = getRandomNumberBetween(SUMMON_DURATION_MS_MIN, SUMMON_DURATION_MS_MAX);
     const candiesRequested = getRandomNumberBetween(CANDY_REQUEST_MIN, CANDY_REQUEST_MAX);
-    const summonMessage = await channel.send(`${emote} **A mysterious spirit has appeared!** They want **${candiesRequested}** candies.`);
+    const summonMessage = await channel.send(`${emote} **A mysterious spirit has appeared!**\nThey want **${candiesRequested}** candies.`);
 
     let alreadyInteractedUserIdList = [];
     const spiritCommands = ["trick", "treat"];
-    const filter = (message: Message) => spiritCommands.includes(PREFIX + message.content);
+    const filter = (message: Message) => spiritCommands.includes(message.content.substring(PREFIX.length));
 
     const collector = channel.createMessageCollector({ filter, time: summonDurationMs });
     collector.on('collect', async (message: Message) => {
@@ -218,15 +233,17 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
 
         if (action === "trick") {
             await handleTrick(message, userHalloweenInventory);
+            alreadyInteractedUserIdList.push(userId);
             log.info(`[Halloween 2023] ${getUserLogString(user)} tricked spirit. Latest inventory: ${userHalloweenInventory}`);
         } else if (action === "treat") {
-            await handleTreat(message, candiesRequested, userHalloweenInventory);
+            const userTreated = await handleTreat(message, candiesRequested, userHalloweenInventory);
+            userTreated && alreadyInteractedUserIdList.push(userId);
             log.info(`[Halloween 2023] ${getUserLogString(user)} treated spirit. Latest inventory: ${userHalloweenInventory}`);
         }
 
         !isDevEnv && await halloweenRepo.set(userId, userHalloweenInventory);
     } catch (err) {
-        log.error(sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not ${action} spirits.`));
+        log.error(err, sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not ${action} spirits.`));
         await message.reply("An error occurred!");
     }
 }
@@ -252,7 +269,7 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
         const sadEmotes = ["😭", "😖", "😦", "😢"];
         const emote = sadEmotes[Math.floor(Math.random() * sadEmotes.length)];
         await message.reply(`${emote} You don't have enough candies...`);
-        return;
+        return false;
     }
 
     userHalloweenInventory.candies -= candiesRequested;
@@ -260,9 +277,10 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
     userHalloweenInventory.points += 1;
 
     const treatResponse = `You exchanged ${candiesRequested} candies with the spirit for 1 🪙.\n`
-        + `Total Candies: ${userCandies - candiesRequested}`
+        + `Total Candies: ${userCandies - candiesRequested}\n`
         + `Total Coins: ${userCoins + 1} 🪙`;
     await message.reply(treatResponse);
+    return true;
 }
 
 const getUserHalloweenInventory = async (user: User) => {

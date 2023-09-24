@@ -10,20 +10,22 @@ import { log } from "./common/logger";
 import { sendToLogChannel } from "./utils/sendToLogChannel";
 import { interactionCreate } from "./handlers/interactionHandlers";
 import { registerCommands } from "./services/interactionService";
+import { triggerEvents } from "./services/eventService";
 
 client.on(Events.ClientReady, async () => {
     log.info(`Starting ${identity}...`);
-    Object.values(repos).forEach(repo => repo.initialize());
+    Object.values(repos).forEach(repo => repo != null && repo.initialize());
     log.info(sendToLogChannel('Repositories Initialized!'));
     await registerCommands();
+    await triggerEvents();
     server();
     log.info(`READY! Logged in as ${identity}.`);
     log.info(`- Environment: ${env}`);
     log.info(sendToLogChannel(`${identity} is online!`));
 })
 
-isDevEnv && client.on(Events.Error, console.log);
-isDevEnv && client.on(Events.Debug, console.log);
+isDevEnv && client.on(Events.Error, log.error);
+isDevEnv && client.on(Events.Debug, log.debug);
 
 client.on(Events.MessageCreate, async (message: Message) => await messageCreate(message));
 client.on(Events.MessageDelete, async (message: Message) => await messageDelete(message));
