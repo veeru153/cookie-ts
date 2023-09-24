@@ -137,7 +137,7 @@ const summonSpiritWrapper = async (channel: TextChannel) => {
     await summonSpirit(channel);
     const nextSummonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next spirit summon in ${Math.round(nextSummonTs / 1000)} seconds.`);
-    const nextSummon = setTimeout(async () => await dropCandiesWrapper(channel), nextSummonTs);
+    const nextSummon = setTimeout(async () => await summonSpiritWrapper(channel), nextSummonTs);
     SUMMON_INTERVAL_LIST.push(nextSummon);
 }
 
@@ -183,7 +183,7 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
         const totalCandies = prevCandies + candyCount;
 
         userHalloweenInventory.candies = totalCandies;
-        !isDevEnv && await halloweenRepo.set(userId, userHalloweenInventory);
+        halloweenRepo.set(userId, userHalloweenInventory);
 
         await message.reply(`You collected ${candyCount} candies.\nTotal Candies: ${totalCandies}`);
         log.info(`[Halloween 2023] ${getUserLogString(user)} collected ${candyCount}. Total Candies: ${totalCandies}`);
@@ -234,14 +234,14 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
         if (action === "trick") {
             await handleTrick(message, userHalloweenInventory);
             alreadyInteractedUserIdList.push(userId);
-            log.info(`[Halloween 2023] ${getUserLogString(user)} tricked spirit. Latest inventory: ${userHalloweenInventory}`);
+            log.info(`[Halloween 2023] ${getUserLogString(user)} tricked spirit. Latest inventory: ${JSON.stringify(userHalloweenInventory)}`);
         } else if (action === "treat") {
             const userTreated = await handleTreat(message, candiesRequested, userHalloweenInventory);
             userTreated && alreadyInteractedUserIdList.push(userId);
-            log.info(`[Halloween 2023] ${getUserLogString(user)} treated spirit. Latest inventory: ${userHalloweenInventory}`);
+            log.info(`[Halloween 2023] ${getUserLogString(user)} treated spirit. Latest inventory: ${JSON.stringify(userHalloweenInventory)}`);
         }
 
-        !isDevEnv && await halloweenRepo.set(userId, userHalloweenInventory);
+        await halloweenRepo.set(userId, userHalloweenInventory);
     } catch (err) {
         log.error(err, sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not ${action} spirits.`));
         await message.reply("An error occurred!");
