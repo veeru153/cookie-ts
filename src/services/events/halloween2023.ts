@@ -10,14 +10,15 @@ import { getUserLogString } from "../../utils/getUserLogString"
 import { halloweenRepo } from "../../common/repos"
 import { HalloweenInventory, getDefaultHalloweenInventoryForId } from "../../common/schemas/HalloweenInventory"
 import { sendToLogChannel } from "../../utils/sendToLogChannel"
+import { EventDetail } from "../../common/types/EventDetail"
 
 const START_DATE = new Date("2023-10-01T00:00:00.000+09:00");
 const END_DATE = new Date("2023-10-31T23:59:59.000+09:00");
 
-const DROP_INTERVAL_MS_MIN = 6 * 60 * 1000;
-const DROP_INTERVAL_MS_MAX = 11 * 60 * 1000;
-const SUMMON_INTERVAL_MS_MIN = 35 * 60 * 1000;
-const SUMMON_INTERVAL_MS_MAX = 75 * 60 * 1000;
+const DROP_INTERVAL_MS_MIN = isDevEnv ? 60 * 1000 : 6 * 60 * 1000;
+const DROP_INTERVAL_MS_MAX = isDevEnv ? 1.5 * 60 * 1000 : 11 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MIN = isDevEnv ? 2 * 60 * 1000 : 35 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MAX = isDevEnv ? 2.5 * 60 * 1000 : 75 * 60 * 1000;
 
 const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
 const DROP_DURATION_MS_MIN = 15 * 1000;
@@ -31,9 +32,39 @@ const SUMMON_DURATION_MS_MAX = 20 * 1000;
 const CANDY_REQUEST_MIN = 2;
 const CANDY_REQUEST_MAX = 6;
 
-export const halloween = async () => {
+let TRIGGER_INTERVAL: NodeJS.Timeout = null;
+let DROP_INTERVAL: NodeJS.Timeout = null;
+let SUMMON_INTERVAL: NodeJS.Timeout = null;
+let IS_LIVE = false;
+
+export const halloween2023: EventDetail = {
+    id: "halloween_2023",
+    name: "Halloween 2023",
+    trigger: async () => await triggerHalloween(),
+    start: async () => await startHalloween(),
+    end: () => endHalloween(),
+    status: IS_LIVE,
+}
+
+const triggerHalloween = async () => {
+    if (TRIGGER_INTERVAL != null || IS_LIVE) {
+        log.info("[Halloween 2023] Trigger Interval already present or event is already live.");
+        return;
+    }
+
+    TRIGGER_INTERVAL = setInterval(async () => {
+        const currDate = Date.now();
+        if (currDate >= START_DATE.getTime() && currDate <= END_DATE.getTime()) {
+            log.info(sendToLogChannel("[Halloween 2023] Triggering event..."));
+            clearInterval(TRIGGER_INTERVAL);
+            await startHalloween();
+        }
+    })
+}
+
+const startHalloween = async () => {
     const currDate = Date.now();
-    if (currDate < START_DATE.getTime() || currDate > END_DATE.getTime()) {
+    if (!isDevEnv && currDate < START_DATE.getTime() || currDate > END_DATE.getTime()) {
         log.info("[Halloween 2023] Event has not started or has already ended.");
         return;
     }
@@ -49,30 +80,48 @@ export const halloween = async () => {
     }
     const channel = guildChannel as TextChannel;
 
-    log.info("[Halloween 2023] Starting event");
+    log.info(sendToLogChannel("[Halloween 2023] Starting event..."));
 
     const dropTs = getRandomNumberBetween(DROP_INTERVAL_MS_MIN, DROP_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next candy drop in ${Math.round(dropTs / 1000)} seconds.`);
-    setTimeout(async () => await dropCandiesWrapper(channel), dropTs);
+    DROP_INTERVAL = setTimeout(async () => await dropCandiesWrapper(channel), dropTs);
 
     const summonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next spirit summon in ${Math.round(summonTs / 1000)} seconds.`);
-    setTimeout(async () => await summonSpiritWrapper(channel), summonTs);
+    SUMMON_INTERVAL = setTimeout(async () => await summonSpiritWrapper(channel), summonTs);
+}
 
+const endHalloween = () => {
+    if (TRIGGER_INTERVAL != null) {
+        clearTimeout(TRIGGER_INTERVAL);
+        TRIGGER_INTERVAL = null;
+    }
+
+    if (DROP_INTERVAL != null) {
+        clearTimeout(DROP_INTERVAL);
+        DROP_INTERVAL = null;
+    }
+
+    if (SUMMON_INTERVAL != null) {
+        clearTimeout(SUMMON_INTERVAL);
+        SUMMON_INTERVAL = null;
+    }
+
+    log.info(sendToLogChannel("[Halloween 2023] Event has ended"));
 }
 
 const dropCandiesWrapper = async (channel: TextChannel) => {
     await dropCandies(channel);
     const nextDropTs = getRandomNumberBetween(DROP_INTERVAL_MS_MIN, DROP_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next candy drop in ${Math.round(nextDropTs / 1000)} seconds.`);
-    setTimeout(async () => await dropCandiesWrapper(channel), nextDropTs);
+    DROP_INTERVAL = setTimeout(async () => await dropCandiesWrapper(channel), nextDropTs);
 }
 
 const summonSpiritWrapper = async (channel: TextChannel) => {
     await summonSpirit(channel);
     const nextSummonTs = getRandomNumberBetween(SUMMON_INTERVAL_MS_MIN, SUMMON_INTERVAL_MS_MAX);
     log.info(`[Halloween 2023] Next spirit summon in ${Math.round(nextSummonTs / 1000)} seconds.`);
-    setTimeout(dropCandiesWrapper, nextSummonTs);
+    SUMMON_INTERVAL = setTimeout(async () => await dropCandiesWrapper(channel), nextSummonTs);
 }
 
 const dropCandies = async (channel: TextChannel) => {
@@ -119,7 +168,7 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
         const totalCandies = prevCandies + candyCount;
 
         userHalloweenInventory.candies = totalCandies;
-        await halloweenRepo.set(userId, userHalloweenInventory);
+        !isDevEnv && await halloweenRepo.set(userId, userHalloweenInventory);
 
         await message.reply(`You collected ${candyCount} candies.\n**Total Candies: ${totalCandies}**`);
         log.info(`[Halloween 2023] ${getUserLogString(user)} collected ${candyCount}. Total Candies: ${totalCandies}`);
@@ -175,7 +224,7 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
             log.info(`[Halloween 2023] ${getUserLogString(user)} treated spirit. Latest inventory: ${userHalloweenInventory}`);
         }
 
-        await halloweenRepo.set(userId, userHalloweenInventory);
+        !isDevEnv && await halloweenRepo.set(userId, userHalloweenInventory);
     } catch (err) {
         log.error(sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not ${action} spirits.`));
         await message.reply("An error occurred!");
