@@ -1,5 +1,6 @@
 export * from "./bake";
 export * from "./batchbake";
+export * from "./candies";
 export * from "./coins";
 export * from "./cookies";
 export * from "./event";
