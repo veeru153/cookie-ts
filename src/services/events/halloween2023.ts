@@ -33,6 +33,7 @@ const CANDY_REQUEST_MIN = 1;
 const CANDY_REQUEST_MAX = 25;
 
 let TRIGGER_INTERVAL: NodeJS.Timeout = null;
+let END_TRIGGER_INTERVAL: NodeJS.Timeout = null;
 let DROP_INTERVAL_LIST: NodeJS.Timeout[] = [];
 let SUMMON_INTERVAL_LIST: NodeJS.Timeout[] = [];
 let IS_LIVE = false;
@@ -46,19 +47,37 @@ export const halloween2023: EventDetail = {
 }
 
 const triggerHalloween = async () => {
-    if (TRIGGER_INTERVAL != null || IS_LIVE) {
-        log.info("[Halloween 2023] Trigger Interval already present or event is already live.");
+    if (Date.now() > END_DATE.getTime()) {
+        log.info("[Halloween 2023] Not setting Trigger - Event has already ended");
         return;
     }
 
+    if (TRIGGER_INTERVAL != null || IS_LIVE) {
+        log.info("[Halloween 2023] Not setting Trigger - Trigger Interval already present or event is already live");
+        return;
+    }
+
+    log.info("[Halloween 2023] Trigger set for %s", START_DATE.toTimeString())
     TRIGGER_INTERVAL = setInterval(async () => {
         const currDate = Date.now();
         if (currDate >= START_DATE.getTime() && currDate <= END_DATE.getTime()) {
             log.info(sendToLogChannel("[Halloween 2023] Triggering event..."));
             clearInterval(TRIGGER_INTERVAL);
+            END_TRIGGER_INTERVAL = setInterval(endTriggerWrapper, 1000);
             await startHalloween();
         }
-    })
+    }, 1000)
+}
+
+const endTriggerWrapper = () => {
+    if (Date.now() <= END_DATE.getTime()) {
+        return;
+    }
+
+    log.info("[Halloween 2023] Ending event...");
+    endHalloween();
+    clearInterval(END_TRIGGER_INTERVAL);
+    END_TRIGGER_INTERVAL = null;
 }
 
 const startHalloween = async () => {
