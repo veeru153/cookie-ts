@@ -11,6 +11,7 @@ import { halloweenRepo } from "../../common/repos"
 import { HalloweenInventory, getDefaultHalloweenInventoryForId } from "../../common/schemas/HalloweenInventory"
 import { sendToLogChannel } from "../../utils/sendToLogChannel"
 import { EventDetail } from "../../common/types/EventDetail"
+import { getUserHalloweenInventory } from "../../utils/getUserHalloweenInventory"
 
 const START_DATE = new Date("2023-10-01T00:00:00.000+09:00");
 const END_DATE = new Date("2023-10-31T23:59:59.000+09:00");
@@ -31,6 +32,8 @@ const SUMMON_DURATION_MS_MIN = isDevEnv ? 24 * 1000 : 15 * 1000;
 const SUMMON_DURATION_MS_MAX = isDevEnv ? 25 * 1000 : 20 * 1000;
 const CANDY_REQUEST_MIN = 1;
 const CANDY_REQUEST_MAX = 25;
+
+const MAX_MESSAGES_COLLECTED = 1;
 
 let TRIGGER_INTERVAL: NodeJS.Timeout = null;
 let END_TRIGGER_INTERVAL: NodeJS.Timeout = null;
@@ -169,7 +172,7 @@ const dropCandies = async (channel: TextChannel) => {
     const collectCommands = ["pick", "collect"];
     const filter = (message: Message) => collectCommands.includes(message.content.substring(PREFIX.length));
 
-    const collector = channel.createMessageCollector({ filter, time: dropDurationMs });
+    const collector = channel.createMessageCollector({ filter, time: dropDurationMs, max: MAX_MESSAGES_COLLECTED });
     collector.on('collect', async (message: Message) => {
         await handleCandyCollection(message, alreadyCollectedUserIdList);
     })
@@ -204,7 +207,7 @@ const handleCandyCollection = async (message: Message, alreadyCollectedUserIdLis
         userHalloweenInventory.candies = totalCandies;
         halloweenRepo.set(userId, userHalloweenInventory);
 
-        await message.reply(`You collected ${candyCount} candies.\nTotal Candies: ${totalCandies}`);
+        await message.reply(`**You collected ${candyCount} candies.**\nTotal Candies: ${totalCandies}`);
         log.info(`[Halloween 2023] ${getUserLogString(user)} collected ${candyCount}. Total Candies: ${totalCandies}`);
     } catch (err) {
         log.error(err, sendToLogChannel(`[Halloween 2023] ${getUserLogString(user)} could not collect candies.`));
@@ -222,14 +225,14 @@ const summonSpirit = async (channel: TextChannel) => {
     const spiritCommands = ["trick", "treat"];
     const filter = (message: Message) => spiritCommands.includes(message.content.substring(PREFIX.length));
 
-    const collector = channel.createMessageCollector({ filter, time: summonDurationMs });
+    const collector = channel.createMessageCollector({ filter, time: summonDurationMs, max: MAX_MESSAGES_COLLECTED });
     collector.on('collect', async (message: Message) => {
         await handleSpiritInteraction(message, candiesRequested, alreadyInteractedUserIdList);
     })
 
     collector.on('end', async () => {
         if (alreadyInteractedUserIdList.length > 0) {
-            summonMessage.editable && await summonMessage.edit("The spirit has left.");
+            summonMessage.editable && await summonMessage.edit("**The spirit has left.**");
             alreadyInteractedUserIdList = [];
         } else {
             summonMessage.deletable && await summonMessage.delete();
@@ -248,15 +251,14 @@ const handleSpiritInteraction = async (message: Message, candiesRequested: numbe
             return;
         }
 
+        alreadyInteractedUserIdList.push(userId);
         const userHalloweenInventory = await getUserHalloweenInventory(user);
 
         if (action === "trick") {
             await handleTrick(message, candiesRequested, userHalloweenInventory);
-            alreadyInteractedUserIdList.push(userId);
             log.info(`[Halloween 2023] ${getUserLogString(user)} tricked spirit. Latest inventory: ${JSON.stringify(userHalloweenInventory)}`);
         } else if (action === "treat") {
-            const userTreated = await handleTreat(message, candiesRequested, userHalloweenInventory);
-            userTreated && alreadyInteractedUserIdList.push(userId);
+            await handleTreat(message, candiesRequested, userHalloweenInventory);
             log.info(`[Halloween 2023] ${getUserLogString(user)} treated spirit. Latest inventory: ${JSON.stringify(userHalloweenInventory)}`);
         }
 
@@ -271,17 +273,22 @@ const handleTrick = async (message: Message, candiesRequested: number, userHallo
     const appreciation = getRandomNumberBetween(-2, 3);
     let trickResponse: string = null;
 
-    if (appreciation > 0) {
-        trickResponse = `👏 The spirit was amused and has given you **${appreciation}** 🪙!`;
+    const candyThresholdForTrick = Math.ceil(candiesRequested / 5) * 10;
+    if (userHalloweenInventory.candies < candyThresholdForTrick) {
+        trickResponse = "**😜 The spirit does not interact with the less sweet...**";
+    } else if (appreciation > 0) {
         const coinsReceived = 2 * Math.ceil(candiesRequested / 5);
+        trickResponse = `**👏 The spirit was amused and has given you ${coinsReceived} 🪙!**`;
         userHalloweenInventory.coins += coinsReceived;
         userHalloweenInventory.points += coinsReceived;
     } else {
-        trickResponse = "😒 The spirit was not amused...";
+        trickResponse = "**😒 The spirit was not amused...**";
         const currCandies = userHalloweenInventory.candies;
         userHalloweenInventory.candies = Math.max(0, currCandies - (2 * candiesRequested));
     }
 
+    trickResponse += `\nTotal Candies: ${userHalloweenInventory.candies}`;
+    trickResponse += `\nTotal Coins: ${userHalloweenInventory.coins} 🪙`;
     await message.reply(trickResponse);
 }
 
@@ -302,19 +309,13 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
     userHalloweenInventory.coins += coinsReceived;
     userHalloweenInventory.points += 1;
 
-    const treatResponse = `You exchanged ${candiesRequested} candies with the spirit for ${coinsReceived} 🪙.\n`
+    const treatResponse = `**You exchanged ${candiesRequested} candies with the spirit for ${coinsReceived} 🪙.**\n`
         + `Total Candies: ${userCandies - candiesRequested}\n`
-        + `Total Coins: ${userCoins + 1} 🪙`;
+        + `Total Coins: ${userCoins + coinsReceived} 🪙`;
     await message.reply(treatResponse);
     return true;
 }
 
-const getUserHalloweenInventory = async (user: User) => {
-    const inventory = await halloweenRepo.get(user.id);
-    if (inventory != null) {
-        return inventory;
-    }
+const memberHasEnoughCandiesToTrick = (candiesRequested: number, userCandies: number) => {
 
-    log.info(`[Halloween 2023] ${getUserLogString(user)} does not have Halloween inventory. Providing and setting default.`);
-    return getDefaultHalloweenInventoryForId(user.id);
 }

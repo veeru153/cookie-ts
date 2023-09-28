@@ -11,5 +11,6 @@ export const shopRepo = new Repository<ShopItem>("shop").prepopulate();
 export const inventoryRepo = new Repository<UserInventory>("inventory");
 export const profileRepo = new Repository<UserProfile>("profile");
 
-const halloweenRepoName = isDevEnv ? "event_HALLOWEEN_2023_test" : "event_HALLOWEEN_2023";
-export const halloweenRepo = new Repository<HalloweenInventory>(halloweenRepoName);
+const halloweenTestRepo = new Repository<HalloweenInventory>("event_HALLOWEEN_2023_test");
+const halloweenProdRepo = new Repository<HalloweenInventory>("event_HALLOWEEN_2023");
+export const halloweenRepo = isDevEnv ? halloweenTestRepo : halloweenProdRepo;
