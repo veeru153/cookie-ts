@@ -99,7 +99,7 @@ const startHalloween = async () => {
 
     const guildId = Guilds.YUQICORD;
     const guild: Guild = await client.guilds.fetch(guildId);
-    const channelId = isDevEnv ? Channels.Kitchen.HALLOWEEN_TEST : Channels.Events.HALLOWEEN;
+    const channelId = isDevEnv ? Channels.Kitchen.HALLOWEEN_TEST : Channels.Cookieland.GENERAL;
     const guildChannel = await guild.channels.fetch(channelId);
 
     if (!guildChannel.isTextBased()) {
@@ -166,7 +166,9 @@ const summonSpiritWrapper = async (channel: TextChannel) => {
 const dropCandies = async (channel: TextChannel) => {
     const emote = getOneRandomlyFromArray(CANDY_EMOTES);
     const dropDurationMs = getRandomNumberBetween(DROP_DURATION_MS_MIN, DROP_DURATION_MS_MAX);
-    const dropMessage = await channel.send(`${emote} **A mysterious bag of candies has appeared!**`);
+    const dropMessageString = `${emote} **A mysterious bag of candies has appeared!**\n`
+        + "Use `-pick` or `-collect` to collect candies from this bag.";
+    const dropMessage = await channel.send(dropMessageString);
 
     let alreadyCollectedUserIdList = [];
     const collectCommands = ["pick", "collect"];
@@ -219,7 +221,11 @@ const summonSpirit = async (channel: TextChannel) => {
     const emote = getOneRandomlyFromArray(SPIRIT_EMOTES);
     const summonDurationMs = getRandomNumberBetween(SUMMON_DURATION_MS_MIN, SUMMON_DURATION_MS_MAX);
     const candiesRequested = getRandomNumberBetween(CANDY_REQUEST_MIN, CANDY_REQUEST_MAX);
-    const summonMessage = await channel.send(`${emote} **A mysterious spirit has appeared!**\nThey want **${candiesRequested}** candies.`);
+    const summonMessageString = `${emote} **A mysterious spirit has appeared!**\n`
+        + `They want **${candiesRequested}** candies.\n`
+        + "Use `-trick` to trick the spirit. You much have sufficient candies to trick.\n"
+        + "User `-treat` to treat the spirit.";
+    const summonMessage = await channel.send(summonMessageString);
 
     let alreadyInteractedUserIdList = [];
     const spiritCommands = ["trick", "treat"];
@@ -314,8 +320,4 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
         + `Total Coins: ${userCoins + coinsReceived} 🪙`;
     await message.reply(treatResponse);
     return true;
-}
-
-const memberHasEnoughCandiesToTrick = (candiesRequested: number, userCandies: number) => {
-
 }
