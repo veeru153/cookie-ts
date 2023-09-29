@@ -2,7 +2,7 @@ import { Emoji, GuildEmoji, TextChannel } from "discord.js";
 import client from "../common/client";
 import { isDevEnv } from "../common/constants/common";
 import { Channels } from "../common/enums/Channels";
-import { Guild } from "../common/enums/Guilds";
+import { Guilds } from "../common/enums/Guilds";
 import { Errors } from "../common/enums/Errors";
 import { CookieException } from "../common/CookieException";
 import { log } from "../common/logger";
@@ -11,7 +11,7 @@ import { sendToLogChannel } from "../utils/sendToLogChannel";
 let lastUpdatedGuildAge = -1;
 
 export const updateGuildAge = async () => {
-    const guild = await client.guilds.fetch(Guild.YUQICORD);
+    const guild = await client.guilds.fetch(Guilds.YUQICORD);
     const ageMs = Date.now() - guild.createdTimestamp;
     const MS_IN_DAY = 86400000
     const age = Math.floor(ageMs / MS_IN_DAY);
@@ -58,7 +58,7 @@ const clearChannel = async (channel: TextChannel) => {
 
 const getEmotes = async (animated = false) => {
     const emotes = [];
-    const guild = client.guilds.cache.get(Guild.YUQICORD);
+    const guild = client.guilds.cache.get(Guilds.YUQICORD);
     guild.emojis.cache.forEach((e: GuildEmoji) => {
         if (animated)
             return e.animated && emotes.push(e.toString());

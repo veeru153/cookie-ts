@@ -4,7 +4,7 @@ import { CLIENT_ID, TOKEN, isDevEnv } from "../common/constants/common";
 import { log } from "../common/logger";
 import { HybridCommand } from "../common/types/HybridCommand";
 import * as cmds from "../cmds";
-import { Guild } from "../common/enums/Guilds";
+import { Guilds } from "../common/enums/Guilds";
 
 const rest = new REST().setToken(TOKEN);
 
@@ -12,7 +12,7 @@ export const syncCommands = async () => {
     try {
         log.info("Syncing Slash Commands...");
         await rest.put(
-            Routes.applicationGuildCommands(CLIENT_ID, Guild.YUQICORD),
+            Routes.applicationGuildCommands(CLIENT_ID, Guilds.YUQICORD),
             { body: Object.values(cmds).map((cmd: HybridCommand) => cmd.info) }
         )
         log.info("Slash Commands Synced!");
