@@ -313,7 +313,7 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
 
     userHalloweenInventory.candies -= candiesRequested;
     userHalloweenInventory.coins += coinsReceived;
-    userHalloweenInventory.points += 1;
+    userHalloweenInventory.points += coinsReceived;
 
     const treatResponse = `**You exchanged ${candiesRequested} candies with the spirit for ${coinsReceived} 🪙.**\n`
         + `Total Candies: ${userCandies - candiesRequested}\n`
