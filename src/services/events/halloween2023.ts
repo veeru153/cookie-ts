@@ -282,6 +282,7 @@ const handleTrick = async (message: Message, candiesRequested: number, userHallo
     const candyThresholdForTrick = Math.ceil(candiesRequested / 5) * 10;
     if (userHalloweenInventory.candies < candyThresholdForTrick) {
         trickResponse = "**😜 The spirit does not interact with the less sweet...**";
+        userHalloweenInventory.points -= 1;
     } else if (appreciation > 0) {
         const coinsReceived = 2 * Math.ceil(candiesRequested / 5);
         trickResponse = `**👏 The spirit was amused and has given you ${coinsReceived} 🪙!**`;
@@ -305,6 +306,7 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
     if (userCandies < candiesRequested) {
         const sadEmotes = ["😭", "😖", "😦", "😢"];
         const emote = sadEmotes[Math.floor(Math.random() * sadEmotes.length)];
+        userHalloweenInventory.points -= 1;
         await message.reply(`${emote} You don't have enough candies...`);
         return false;
     }
@@ -313,7 +315,7 @@ const handleTreat = async (message: Message, candiesRequested: number, userHallo
 
     userHalloweenInventory.candies -= candiesRequested;
     userHalloweenInventory.coins += coinsReceived;
-    userHalloweenInventory.points += 1;
+    userHalloweenInventory.points += coinsReceived;
 
     const treatResponse = `**You exchanged ${candiesRequested} candies with the spirit for ${coinsReceived} 🪙.**\n`
         + `Total Candies: ${userCandies - candiesRequested}\n`
