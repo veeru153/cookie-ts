@@ -16,10 +16,10 @@ import { getUserHalloweenInventory } from "../../utils/getUserHalloweenInventory
 const START_DATE = new Date("2023-10-01T00:00:00.000+09:00");
 const END_DATE = new Date("2023-10-31T23:59:59.000+09:00");
 
-const DROP_INTERVAL_MS_MIN = isDevEnv ? 20 * 1000 : 2 * 60 * 1000;
-const DROP_INTERVAL_MS_MAX = isDevEnv ? 25 * 1000 : 4 * 60 * 1000;
-const SUMMON_INTERVAL_MS_MIN = isDevEnv ? 55 * 1000 : 5 * 60 * 1000;
-const SUMMON_INTERVAL_MS_MAX = isDevEnv ? 60 * 1000 : 10 * 60 * 1000;
+const DROP_INTERVAL_MS_MIN = isDevEnv ? 20 * 1000 : 1.5 * 60 * 1000;
+const DROP_INTERVAL_MS_MAX = isDevEnv ? 25 * 1000 : 2 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MIN = isDevEnv ? 55 * 1000 : 3 * 60 * 1000;
+const SUMMON_INTERVAL_MS_MAX = isDevEnv ? 60 * 1000 : 4 * 60 * 1000;
 
 const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
 const DROP_DURATION_MS_MIN = isDevEnv ? 24 * 1000 : 15 * 1000;
