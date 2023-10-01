@@ -13,6 +13,7 @@ export enum Kitchen {
     LOGS = "443303710697717760",
     COOKIE_LOGS = "1012732893879083138",
     COMMUNITY_UPDATES = "842016594992955422",
+    HALLOWEEN_TEST = "1155486412850860062",
 }
 
 export enum Cookieland {
@@ -34,6 +35,7 @@ export enum Yuqi {
 export enum Events {
     FANFIC = "566680739744317450",
     FANFIC_2 = "1151212687309676666",
+    HALLOWEEN = "1155563451108835369",
 }
 
 export enum Stats {
