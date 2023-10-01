@@ -172,7 +172,9 @@ const dropCandies = async (channel: TextChannel) => {
 
     let alreadyCollectedUserIdList = [];
     const collectCommands = ["pick", "collect"];
-    const filter = (message: Message) => collectCommands.includes(message.content.substring(PREFIX.length));
+    const filter = (message: Message) => {
+        return message.content.startsWith(PREFIX) && collectCommands.includes(message.content.substring(PREFIX.length));
+    }
 
     const collector = channel.createMessageCollector({ filter, time: dropDurationMs, max: MAX_MESSAGES_COLLECTED });
     collector.on('collect', async (message: Message) => {
@@ -229,7 +231,9 @@ const summonSpirit = async (channel: TextChannel) => {
 
     let alreadyInteractedUserIdList = [];
     const spiritCommands = ["trick", "treat"];
-    const filter = (message: Message) => spiritCommands.includes(message.content.substring(PREFIX.length));
+    const filter = (message: Message) => {
+        return message.content.startsWith(PREFIX) && spiritCommands.includes(message.content.substring(PREFIX.length));
+    }
 
     const collector = channel.createMessageCollector({ filter, time: summonDurationMs, max: MAX_MESSAGES_COLLECTED });
     collector.on('collect', async (message: Message) => {
