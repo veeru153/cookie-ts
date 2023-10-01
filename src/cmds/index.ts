@@ -7,6 +7,7 @@ export * from "./event";
 export * from "./inventory";
 export * from "./mybag";
 export * from "./ping";
+export * from "./points";
 export * from "./profile";
 export * from "./shop";
 export * from "./sync";
