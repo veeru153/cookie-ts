@@ -225,7 +225,7 @@ const summonSpirit = async (channel: TextChannel) => {
     const candiesRequested = getRandomNumberBetween(CANDY_REQUEST_MIN, CANDY_REQUEST_MAX);
     const summonMessageString = `${emote} **A mysterious spirit has appeared!**\n`
         + `They want **${candiesRequested}** candies.\n`
-        + "Use `-trick` to trick the spirit. You much have sufficient candies to trick.\n"
+        + "Use `-trick` to trick the spirit. You must have sufficient candies to trick.\n"
         + "User `-treat` to treat the spirit.";
     const summonMessage = await channel.send(summonMessageString);
 
