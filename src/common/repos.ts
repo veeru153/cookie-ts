@@ -1,6 +1,7 @@
 import { Repository } from "../entities/Repository";
 import { isDevEnv } from "./constants/common";
 import { Asset } from "./schemas/Asset";
+import { ChristmasInventory } from "./schemas/ChristmasInventory";
 import { HalloweenInventory } from "./schemas/HalloweenInventory";
 import { ShopItem } from "./schemas/ShopItem";
 import { UserInventory } from "./schemas/UserInventory";
@@ -14,3 +15,7 @@ export const profileRepo = new Repository<UserProfile>("profile");
 const halloweenTestRepo = new Repository<HalloweenInventory>("event_HALLOWEEN_2023_test");
 const halloweenProdRepo = new Repository<HalloweenInventory>("event_HALLOWEEN_2023");
 export const halloweenRepo = isDevEnv ? halloweenTestRepo : halloweenProdRepo;
+
+const christmasTestRepo = new Repository<ChristmasInventory>("event_CHRISTMAS_2023_test");
+const christmasProdRepo = new Repository<ChristmasInventory>("event_CHRISTMAS_2023");
+export const christmasRepo = isDevEnv ? christmasTestRepo : christmasProdRepo;
