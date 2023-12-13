@@ -49,14 +49,14 @@ export const giftMember = async (sender: GuildMember, receiver: GuildMember) => 
     }
 
     const gift = getRandomHousePart();
-    updateReceiverInventory(gift, receiverInventory);
+    const housePart = updateReceiverInventoryAndGetHousePartString(gift, receiverInventory);
 
     senderInventory.lastGiftTs = DateTime.now().toMillis();
     senderInventory.usersGiftedToday.push(receiver.id);
 
     await christmasRepo.set(receiver.id, receiverInventory);
     await christmasRepo.set(sender.id, senderInventory);
-
+    return `You gifted ${receiver.toString()} a ${housePart}.`;
 }
 
 const getRandomHousePart = () => {
@@ -69,17 +69,22 @@ const getRandomHousePart = () => {
     return i;
 }
 
-const updateReceiverInventory = (gift: number, receiverInventory: ChristmasInventory) => {
+const updateReceiverInventoryAndGetHousePartString = (gift: number, receiverInventory: ChristmasInventory) => {
     if (gift === WALL) {
         receiverInventory.walls = receiverInventory.walls + 1;
+        return "wall";
     } else if (gift === FLOOR) {
         receiverInventory.floors = receiverInventory.floors + 1;
+        return "floor";
     } else if (gift === ROOF) {
         receiverInventory.roofs = receiverInventory.roofs + 1;
+        return "roof";
     } else if (gift === WINDOW) {
         receiverInventory.windows = receiverInventory.windows + 1;
+        return "window";
     } else if (gift === DOOR) {
         receiverInventory.doors = receiverInventory.doors + 1;
+        return "door";
     } else {
         throw new CookieException("Unknown gift detected. This is an issue in Santa's factory.");
     }
