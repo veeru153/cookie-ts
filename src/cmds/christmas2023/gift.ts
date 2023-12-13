@@ -1,6 +1,4 @@
 import { ApplicationCommandOptionType, Message, ChatInputCommandInteraction, GuildMember } from "discord.js";
-import { BATCH_BAKE_COUNT_MIN, BATCH_BAKE_COUNT_MAX } from "../../common/constants/bake";
-import Scope from "../../common/enums/Scope";
 import { HybridCommand } from "../../common/types/HybridCommand";
 import { giftMember } from "../../services/events/christmasService2023";
 import { CookieException } from "../../common/CookieException";
@@ -66,6 +64,5 @@ export const gift: HybridCommand = {
         ]
     },
     legacy: async (message: Message, args: string[]) => await legacy(message, args),
-    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
-    scope: [Scope.ADMIN]
+    slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction)
 }

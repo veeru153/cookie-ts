@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { DateTime } from "luxon";
 import { CookieException } from "../../common/CookieException";
-import { christmasRepo } from "../../common/repos";
+import { christmasRepo, inventoryRepo } from "../../common/repos";
 import { ChristmasInventory, getDefaultChristmasInventoryForId } from "../../common/schemas/ChristmasInventory";
 import { DAILY_GIFT_LIMIT, RATES, WALL, FLOOR, ROOF, WINDOW, DOOR, REQUIRED_WALLS, REQUIRED_FLOORS, REQUIRED_ROOFS, REQUIRED_WINDOWS, REQUIRED_DOORS } from "../../common/constants/christmas2023";
 
@@ -11,6 +11,10 @@ export const giftMember = async (sender: GuildMember, receiver: GuildMember) => 
     }
     if (receiver == null) {
         throw new CookieException("Could not find receiver. Please try again.");
+    }
+
+    if (sender.id === receiver.id) {
+        throw new CookieException("You can't gift yourself.");
     }
 
     let senderInventory = await christmasRepo.get(sender.id);
@@ -118,7 +122,6 @@ export const getHouseProgress = async (member: GuildMember) => {
     }
 
     const { walls, floors, roofs, windows, doors } = christmasInventory;
-
     let res = `Gingerbread House progress:`
         + `Walls: ${walls}/${REQUIRED_WALLS}`
         + `Floors: ${floors}/${REQUIRED_FLOORS}`
@@ -126,9 +129,47 @@ export const getHouseProgress = async (member: GuildMember) => {
         + `Windows: ${windows}/${REQUIRED_WINDOWS}`
         + `Doors: ${doors}/${REQUIRED_DOORS}`;
 
+    if (canClaimReward(christmasInventory)) {
+        res += "**Your house is complete! Claim the reward with: `{COMMAND}`**"
+    }
+
     return res;
 }
 
-// export const canClaimRewards = () => {
-//     // verify if member has all parts and return true or false
-// }
+export const claimReward = async (member: GuildMember) => {
+    if (member == null) {
+        throw new CookieException("Invalid Member");
+    }
+
+    let christmasInventory = await christmasRepo.get(member.id);
+    if (christmasInventory == null) {
+        christmasInventory = getDefaultChristmasInventoryForId(member.id);
+    }
+
+    if (christmasInventory.hasClaimedReward) {
+        return "You have already claimed the reward!";
+    }
+
+    if (!canClaimReward(christmasInventory)) {
+        return "Can't claim rewards. Your Gingerbread House isn't complete.";
+    }
+
+    // TODO: Add reward to inventory - after adding ASSET
+    const userInventory = await inventoryRepo.get(member.id);
+    // userInventory.backgrounds.push()
+    christmasInventory.hasClaimedReward = true;
+
+    await inventoryRepo.set(member.id, userInventory);
+    await christmasRepo.set(member.id, christmasInventory);
+
+    return "{REWARD} has been added to your inventory!";
+}
+
+const canClaimReward = (christmasInventory: ChristmasInventory) => {
+    const { walls, floors, roofs, windows, doors } = christmasInventory;
+    return walls >= REQUIRED_WALLS
+        && floors >= REQUIRED_FLOORS
+        && roofs >= REQUIRED_ROOFS
+        && windows >= REQUIRED_WINDOWS
+        && doors >= REQUIRED_DOORS;
+}

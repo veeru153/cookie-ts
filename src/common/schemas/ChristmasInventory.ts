@@ -8,6 +8,7 @@ export interface ChristmasInventory extends DocumentData {
     doors: number;
     lastGiftTs: number;
     usersGiftedToday: string[];
+    hasClaimedReward: boolean;
 }
 
 const DEFAULT_INVENTORY = {
@@ -17,7 +18,8 @@ const DEFAULT_INVENTORY = {
     windows: 0,
     doors: 0,
     lastGiftTs: 1,
-    usersGiftedToday: []
+    usersGiftedToday: [],
+    hasClaimedReward: false,
 }
 
 export const getDefaultChristmasInventoryForId = (id: string): ChristmasInventory => {
