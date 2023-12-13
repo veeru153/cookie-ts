@@ -1,13 +1,13 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { isArrayUnavailable, isStringBlank } from "../utils/validators";
-import { HybridCommand } from "../common/types/HybridCommand";
-import { log } from "../common/logger";
-import { sendToLogChannel } from "../utils/sendToLogChannel";
-import { CookieException } from "../common/CookieException";
-import { halloweenRepo, inventoryRepo } from "../common/repos";
-import { validateAndPatchInventory } from "../utils/validateAndPatchInventory";
-import { getUserHalloweenInventory } from "../utils/getUserHalloweenInventory";
-import { isDevEnv } from "../common/constants/common";
+import { isArrayUnavailable, isStringBlank } from "../../utils/validators";
+import { HybridCommand } from "../../common/types/HybridCommand";
+import { log } from "../../common/logger";
+import { sendToLogChannel } from "../../utils/sendToLogChannel";
+import { CookieException } from "../../common/CookieException";
+import { halloweenRepo, inventoryRepo } from "../../common/repos";
+import { validateAndPatchInventory } from "../../utils/validateAndPatchInventory";
+import { getUserHalloweenInventory } from "../../utils/getUserHalloweenInventory";
+import { isDevEnv } from "../../common/constants/common";
 
 enum CoinsAction {
     GET = "get",
@@ -122,7 +122,7 @@ const slash = async (interaction: ChatInputCommandInteraction) => {
 export const coins: HybridCommand = {
     info: {
         name: "coins",
-        description: "(Events Only) Get current number of coins or convert coins to cookies",
+        description: "(Halloween 2023) Get current number of coins or convert coins to cookies",
         options: [
             {
                 name: "get",

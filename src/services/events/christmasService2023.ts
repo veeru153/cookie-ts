@@ -3,14 +3,7 @@ import { DateTime } from "luxon";
 import { CookieException } from "../../common/CookieException";
 import { christmasRepo } from "../../common/repos";
 import { ChristmasInventory, getDefaultChristmasInventoryForId } from "../../common/schemas/ChristmasInventory";
-
-const DAILY_GIFT_LIMIT = 5;
-const WALL = 0;
-const FLOOR = 1;
-const ROOF = 2;
-const WINDOW = 3;
-const DOOR = 4;
-const RATES = [0.2667, 0.5334, 0.7556, 0.8889, 1];
+import { DAILY_GIFT_LIMIT, RATES, WALL, FLOOR, ROOF, WINDOW, DOOR, REQUIRED_WALLS, REQUIRED_FLOORS, REQUIRED_ROOFS, REQUIRED_WINDOWS, REQUIRED_DOORS } from "../../common/constants/christmas2023";
 
 export const giftMember = async (sender: GuildMember, receiver: GuildMember) => {
     if (sender == null) {
@@ -110,6 +103,28 @@ const getNextResetTimeString = () => {
             res += `${diff.minutes.toFixed(2)} minutes`;
         }
     }
+
+    return res;
+}
+
+export const getHouseProgress = async (member: GuildMember) => {
+    if (member == null) {
+        throw new CookieException("Invalid member");
+    }
+
+    let christmasInventory = await christmasRepo.get(member.id);
+    if (christmasInventory == null) {
+        christmasInventory = getDefaultChristmasInventoryForId(member.id);
+    }
+
+    const { walls, floors, roofs, windows, doors } = christmasInventory;
+
+    let res = `Gingerbread House progress:`
+        + `Walls: ${walls}/${REQUIRED_WALLS}`
+        + `Floors: ${floors}/${REQUIRED_FLOORS}`
+        + `Roofs: ${roofs}/${REQUIRED_ROOFS}`
+        + `Windows: ${windows}/${REQUIRED_WINDOWS}`
+        + `Doors: ${doors}/${REQUIRED_DOORS}`;
 
     return res;
 }

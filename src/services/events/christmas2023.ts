@@ -1,12 +1,9 @@
-import { isDevEnv } from "../../common/constants/common";
+import { END_DATE, START_DATE } from "../../common/constants/christmas2023";
+import { KST, isDevEnv } from "../../common/constants/common";
 import { log } from "../../common/logger";
 import { EventDetail } from "../../common/types/EventDetail";
 import { sendToLogChannel } from "../../utils/sendToLogChannel";
 import { DateTime, Settings } from "luxon";
-
-Settings.defaultZone = "UTC+9";
-const START_DATE = DateTime.fromISO("2023-12-20T00:00:00.000+09:00");
-const END_DATE = DateTime.fromISO("2024-01-04T23:59:59.000+09:00");
 
 let TRIGGER_INTERVAL: NodeJS.Timeout = null;
 let END_TRIGGER_INTERVAL: NodeJS.Timeout = null;
@@ -21,7 +18,7 @@ export const christmas2023: EventDetail = {
 }
 
 const triggerChristmas = async () => {
-    if (DateTime.now() > END_DATE) {
+    if (nowKst() > END_DATE) {
         log.info("[Christmas 2023] Not setting Trigger - Event has already ended");
         return;
     }
@@ -33,7 +30,7 @@ const triggerChristmas = async () => {
 
     log.info("[Christmas 2023] Trigger set for %s", START_DATE.toString())
     TRIGGER_INTERVAL = setInterval(async () => {
-        const currDate = DateTime.now();
+        const currDate = nowKst();
         if (currDate >= START_DATE && currDate <= END_DATE) {
             log.info(sendToLogChannel("[Christmas 2023] Triggering event..."));
             clearInterval(TRIGGER_INTERVAL);
@@ -44,7 +41,7 @@ const triggerChristmas = async () => {
 }
 
 const startChristmas = async () => {
-    const currDate = DateTime.now();
+    const currDate = nowKst();
     if (!isDevEnv && (currDate < START_DATE || currDate > END_DATE)) {
         log.info("[Christmas 2023] Event has not started or has already ended.");
         return "[Christmas 2023] Event has not started or has already ended.";
@@ -59,7 +56,7 @@ const startChristmas = async () => {
 }
 
 const endTriggerWrapper = () => {
-    if (DateTime.now() <= END_DATE) {
+    if (nowKst() <= END_DATE) {
         return;
     }
 
@@ -82,3 +79,5 @@ const endChristmas = () => {
     log.info(sendToLogChannel("[Christmas 2023] Event has ended"));
     return "[Christmas 2023] Event ended!";
 }
+
+const nowKst = () => DateTime.now().setZone(KST);

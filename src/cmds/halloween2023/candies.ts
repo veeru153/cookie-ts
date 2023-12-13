@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
-import { HybridCommand } from "../common/types/HybridCommand";
-import { log } from "../common/logger";
-import { sendToLogChannel } from "../utils/sendToLogChannel";
-import { getUserHalloweenInventory } from "../utils/getUserHalloweenInventory";
-import { isDevEnv } from "../common/constants/common";
-import { getOneRandomlyFromArray } from "../utils/randomUtils";
+import { HybridCommand } from "../../common/types/HybridCommand";
+import { log } from "../../common/logger";
+import { sendToLogChannel } from "../../utils/sendToLogChannel";
+import { getUserHalloweenInventory } from "../../utils/getUserHalloweenInventory";
+import { isDevEnv } from "../../common/constants/common";
+import { getOneRandomlyFromArray } from "../../utils/randomUtils";
 
 const CANDY_EMOTES = ["🍬", "🍭", "🍫"];
 // TODO: Maintain start and end dates at a central place. Only halloween now so we keep them here
@@ -43,7 +43,7 @@ const slash = async (interaction: ChatInputCommandInteraction) => {
 export const candies: HybridCommand = {
     info: {
         name: "candies",
-        description: "(Events Only) Get current number of candies"
+        description: "(Halloween 2023) Get current number of candies"
     },
     legacy: async (message: Message, args: any[]) => await legacy(message, args),
     slash: async (interaction: ChatInputCommandInteraction) => await slash(interaction),
