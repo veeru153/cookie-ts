@@ -13,7 +13,7 @@ export const DEV_ENV_WHITELIST_IDS = [
 
 export const PREFIX = isDevEnv ? "+" : "-";
 
-export const BASE_URL = "https://cookie-pw1t.onrender.com";
+export const BASE_URL = "https://veeru153.github.io/cookie-web/#";
 export const SHOP_URL = BASE_URL + "/shop";
 export const USER_URL = BASE_URL + "/user";
 
