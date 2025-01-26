@@ -1,9 +1,25 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import routes from "./api/routes";
 import { log } from "./common/logger";
 import path from "path";
+import cors from "cors";
 
 const app = express();
+
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
+app.use(cors({
+    origin: allowedOrigins
+}))
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+    }
+    next();
+})
+
 app.use(express.static(path.join(__dirname, 'api', 'public')));
 for (const route of routes) {
     app.use(route.url, route.router);
