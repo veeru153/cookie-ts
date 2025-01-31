@@ -7,7 +7,7 @@ import { initializeMemberCollections } from "../services/inventoryService";
 export const guildMemberAddHandler = async (member: GuildMember) => {
     let greeting =
         `**Welcome to Yuqi's Cookie House :cookie: ${member.toString()}!**\n`
-        + `Rules and other information is available in the Server Guide and [our website](https://cookie-pw1t.onrender.com/).\n`
+        + `Rules and other information is available in the Server Guide and [our website](https://veeru153.github.io/cookie-web/).\n`
         + `Ask staff if you need anything!`;
 
     const channelId = isDevEnv ? Channels.Cookie.TESTING : Channels.Cookieland.GENERAL;
