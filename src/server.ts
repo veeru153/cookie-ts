@@ -23,9 +23,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 })
 
 // app.use(express.static(path.join(__dirname, 'api', 'public')));
-// for (const route of routes) {
-//     app.use(route.url, route.router);
-// }
+
+for (const route of routes) {
+    app.use(route.url, route.router);
+}
 
 // app.get('/', (req: Request, res: Response) => {
 //     res.render(path.join(__dirname, 'api', 'views', 'home.ejs'));
