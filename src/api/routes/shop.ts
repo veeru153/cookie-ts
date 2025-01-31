@@ -6,13 +6,13 @@ import { shopRepo } from "../../common/repos";
 
 export const shop = Router();
 
-shop.get('/', async (req: Request, res: Response) => {
-    const catalogue = await getCatalogue(false);
-    const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BACKGROUND).sort((a, b) => b.ts - a.ts);
-    res.render(path.join(__dirname, '..', 'views', 'shop.ejs'), { backgrounds: filteredCatalogue });
-})
+// shop.get('/', async (req: Request, res: Response) => {
+//     const catalogue = await getCatalogue(false);
+//     const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BACKGROUND).sort((a, b) => b.ts - a.ts);
+//     res.render(path.join(__dirname, '..', 'views', 'shop.ejs'), { backgrounds: filteredCatalogue });
+// })
 
-shop.get('/json', async (req: Request, res: Response) => {
+shop.get('/', async (req: Request, res: Response) => {
     const catalogue = await getCatalogue(false);
     const filteredCatalogue = catalogue.filter(item => item.type === ShopItemType.BACKGROUND).sort((a, b) => b.ts - a.ts);
     res.json({
