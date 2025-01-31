@@ -42,7 +42,7 @@ app.all('*', (req: Request, res: Response) => {
     })
 })
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 export const server = () => {
     app.listen(PORT, () => {
         log.info(`Server is ready! Listening on PORT: ${PORT}`);
