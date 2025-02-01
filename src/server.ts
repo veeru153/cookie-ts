@@ -54,5 +54,9 @@ const PORT = process.env.PORT || 3001;
 export const server = () => {
     app.listen(PORT, () => {
         log.info(`Server is ready! Listening on PORT: ${PORT}`);
+        console.log(`[Cookie:Startup] Service started at ${new Date().toISOString()}`);
     })
+    setInterval(() => {
+        console.log(`[Cookie:Heartbeat] Service is running at ${new Date().toISOString()}`);
+    }, 30000);
 }
